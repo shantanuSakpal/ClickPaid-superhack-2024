@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, {useEffect} from "react";
 import Link from "next/link";
 import {FaBars, FaTimes} from "react-icons/fa";
 import BrandLogo from "@/components/BrandLogo";
@@ -15,12 +15,10 @@ export default function Navbar() {
     const onSuccess = (result) => {
         // This is where you should perform frontend actions once a user has been verified
         setIsVerified(true);
+        sessionStorage.setItem('isVerified', true);
         toast.success(
-            `Successfully verified with World ID!
-    Your nullifier hash is: ` + result.nullifier_hash
+            `Successfully verified with World ID!`
         )
-        console.log("on Success", result);
-
     }
 
     const handleVerify = async (result) => {
@@ -42,13 +40,18 @@ export default function Navbar() {
         }
         try {
             const response = await axios.post(`/api/auth/login`, body);
-            console.log("verified---------", response.data);
+            console.log("verified---------");
         } catch (error) {
             console.error('Error:', error.response.data);
         }
     }
 
-
+    useEffect(() => {
+        const isVerified = sessionStorage.getItem('isVerified');
+        if (isVerified) {
+            setIsVerified(true);
+        }
+    }, []);
 
     return (
         <nav className="bg-theme-gray-dark  text-white fixed top-0 left-0 w-full">
