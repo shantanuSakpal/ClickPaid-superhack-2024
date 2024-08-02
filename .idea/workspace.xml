@@ -5,16 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/app/api/auth/demo/route.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/layout.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/layout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/page.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/page.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/providers.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/NavbarCustom.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Navbar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tailwind.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/api/auth/login/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/auth/login/route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/favicon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/favicon.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Navbar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/next.config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/next.config.mjs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +37,7 @@
     &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/shantanu/web_projects/web3/superhack/clickpaid-superhack-24/frontend/app&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/shantanu/web_projects/web3/superhack/clickpaid-superhack-24/frontend&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -77,7 +73,8 @@
       <updated>1722571668763</updated>
       <workItem from="1722571670337" duration="1195000" />
       <workItem from="1722572945349" duration="4361000" />
-      <workItem from="1722593495792" duration="1257000" />
+      <workItem from="1722593495792" duration="11120000" />
+      <workItem from="1722609376687" duration="3458000" />
     </task>
     <servers />
   </component>
@@ -86,6 +83,17 @@
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName=".env" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />

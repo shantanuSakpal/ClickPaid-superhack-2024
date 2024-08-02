@@ -1,9 +1,7 @@
 "use client";
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
-import {FaBars} from "react-icons/fa";
-import {FaTimes} from "react-icons/fa";
+import {FaBars, FaTimes} from "react-icons/fa";
 import BrandLogo from "@/components/BrandLogo";
 import {IDKitWidget} from '@worldcoin/idkit'
 import {toast} from 'react-hot-toast';
@@ -21,7 +19,7 @@ export default function Navbar() {
             `Successfully verified with World ID!
     Your nullifier hash is: ` + result.nullifier_hash
         )
-        console.log(result);
+        console.log("on Success", result);
 
     }
 
@@ -34,22 +32,23 @@ export default function Navbar() {
             "verification_level": "orb"
         }
          */
+        const {proof, merkle_root, nullifier_hash, verification_level} = result;
+        const body = {
+            action: "login",
+            proof: proof,
+            merkle_root: merkle_root,
+            nullifier_hash: nullifier_hash,
+            verification_level: verification_level,
+        }
         try {
-            const response = await axios.post(`api/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(result),
-            });
-
-            console.log("verified---------", response);
-            onSuccess(response);
-
+            const response = await axios.post(`/api/auth/login`, body);
+            console.log("verified---------", response.data);
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error:', error.response.data);
         }
     }
+
+
 
     return (
         <nav className="bg-theme-gray-dark  text-white fixed top-0 left-0 w-full">
@@ -78,7 +77,7 @@ export default function Navbar() {
                                 <IDKitWidget
                                     app_id="app_staging_752fdbd001c5de1565710da8ddb8d3a3" // obtained from the Developer Portal
                                     action="login" // this is your action name from the Developer Portal
-                                    signal="user_value" // any arbitrary value the user is committing to, e.g. a vote
+                                    signal="login to app" // any arbitrary value the user is committing to, e.g. a vote
                                     onSuccess={onSuccess}
                                     handleVerify={handleVerify}
                                     verification_level="device" // minimum verification level accepted, defaults to "orb"
@@ -88,6 +87,8 @@ export default function Navbar() {
                                         onClick={open}>Login with World Id</button>}
                                 </IDKitWidget>)
                         }
+
+
 
                     </div>
 
