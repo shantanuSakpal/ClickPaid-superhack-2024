@@ -15,5 +15,9 @@ app.use(cors({
 }));
 app.use("/v1/user", user_1.default);
 app.listen(3000, () => {
+    //log a message when the server has started
     console.log("Server is running on port 3000");
+});
+app.get("/", (req, res) => {
+    res.send("Server is running");
 });

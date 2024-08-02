@@ -1,9 +1,10 @@
-import { Router } from "express";
+import {Router} from "express";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = "notapro";
 
-const LIMEWIRE_API_KEY: string = process.env.LIMEWIRE_API_KEY!.toString();
+//@ts-ignore
+const LIMEWIRE_API_KEY: string = process.env.LIMEWIRE_API_KEY;
 
 const router = Router();
 
@@ -16,34 +17,34 @@ router.post("/auth/signin", async (req: any, res: any) => {
 
 //ai image generation
 router.post("/generateImage", async (req: any, res: any) => {
-  const { prompt } = req.body;
-  console.log(prompt);
+    const {prompt} = req.body;
+    console.log(prompt);
 
-  try {
-    const resp = await fetch(`https://api.limewire.com/api/image/generation`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Version": "v1",
-        Accept: "application/json",
-        Authorization: "Bearer " + LIMEWIRE_API_KEY,
-      },
-      body: JSON.stringify({
-        prompt: prompt,
-        aspect_ratio: "1:1",
-      }),
-    });
+    try {
+        const resp = await fetch(`https://api.limewire.com/api/image/generation`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Api-Version": "v1",
+                Accept: "application/json",
+                Authorization: "Bearer " + LIMEWIRE_API_KEY,
+            },
+            body: JSON.stringify({
+                prompt: prompt,
+                aspect_ratio: "1:1",
+            }),
+        });
 
-    const data = await resp.json();
+        const data = await resp.json();
 
-    console.log(data);
-    res.status(200).json(data);
-  } catch (error) {
-    console.error("Error :", error);
-    res.status(500).json({
-      error: "Failed to generate image",
-    });
-  }
+        console.log(data);
+        res.status(200).json(data);
+    } catch (error) {
+        console.error("Error :", error);
+        res.status(500).json({
+            error: "Failed to generate image",
+        });
+    }
 });
 
 // router.post(

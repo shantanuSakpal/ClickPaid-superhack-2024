@@ -11,7 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const JWT_SECRET = "notapro";
-const LIMEWIRE_API_KEY = process.env.LIMEWIRE_API_KEY.toString();
+//@ts-ignore
+const LIMEWIRE_API_KEY = process.env.LIMEWIRE_API_KEY;
 const router = (0, express_1.Router)();
 //routes
 //sign in with wallet

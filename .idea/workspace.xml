@@ -5,22 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/frontend/public/img/clickpaid_brand.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/dist/db.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/dist/db.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/dist/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/dist/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/dist/routers/user.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/dist/routers/user.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/prisma/migrations/20240522070748_init/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/prisma/migrations/20240522075953_/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/prisma/migrations/20240524160006_amout_to_string/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/prisma/migrations/20240527161809_payout_issue/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/prisma/migrations/20240601071421_email_from_user_removed/migration.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/prisma/migrations/migration_lock.toml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/prisma/schema.prisma" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/db.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/db.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/routers/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routers/user.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/routers/worker.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/routers/worker.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/favicon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/favicon.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/NavbarCustom.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/NavbarCustom.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/img/clickpaid_logo.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/public/img/clickpaid_logo.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/next.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/vercel.svg" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,8 +44,8 @@
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "shantanu",
-    "last_opened_file_path": "/home/shantanu/web_projects/web3/superhack/clickpaid-superhack-24/server",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/shantanu/web_projects/web3/superhack/clickpaid-superhack-24/frontend/app",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -59,6 +57,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/frontend/app" />
       <recent name="$PROJECT_DIR$/server" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -81,7 +80,7 @@
       <option name="presentableId" value="Default" />
       <updated>1722571668763</updated>
       <workItem from="1722571670337" duration="1195000" />
-      <workItem from="1722572945349" duration="980000" />
+      <workItem from="1722572945349" duration="1993000" />
     </task>
     <servers />
   </component>

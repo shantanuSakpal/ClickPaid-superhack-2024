@@ -14,7 +14,7 @@ export default function App() {
                     className="sm:hidden"
                 />
                 <NavbarBrand>
-                    <Image src="/img/clickpaid_logo.jpg" alt={"logo"} width={150} height={40} />
+                    <Image src="/img/clickpaid_brand.jpg" alt={"logo"} width={200} height={50} />
                 </NavbarBrand>
             </NavbarContent>
 
