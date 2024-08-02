@@ -1,15 +1,24 @@
 /** @type {import('tailwindcss').Config} */
-import {nextui} from "@nextui-org/react";
 
 module.exports = {
     content: [
         "./pages/**/*.{js,ts,jsx,tsx,mdx}",
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
         "./app/**/*.{js,ts,jsx,tsx,mdx}",
-        "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
     ],
     theme: {
         extend: {
+            colors: {
+                "theme-gray-dark": "#111827",
+                "theme-gray-light": "#232a3e",
+                "theme-purple-dark": "#5530b8",
+                "theme-purple": "#7a49ff",
+                "theme-purple-light": "#a87dff",
+                "theme-pink-dark": "#e2558c",
+                "theme-pink": "#ff69b4",
+                "theme-pink-light": "#ffa5c0",
+                "theme-orange": "#FB773C"
+            },
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
                 "gradient-conic":
@@ -17,24 +26,5 @@ module.exports = {
             },
         },
     },
-    darkMode: "class",
-    plugins: [
-        nextui({
-            prefix: "nextui", // prefix for themes variables
-            defaultTheme: "light", // default theme from the themes object
-            defaultExtendTheme: "light", // default theme to extend on custom themes
-            layout: {}, // common layout tokens (applied to all themes)
-            themes: {
-                light: {
-                    layout: {}, // light theme layout tokens
-                    colors: {}, // light theme colors
-                },
-                dark: {
-                    layout: {}, // dark theme layout tokens
-                    colors: {}, // dark theme colors
-                },
-                // ... custom themes
-            },
-        }),
-    ],
+    plugins: [],
 };
