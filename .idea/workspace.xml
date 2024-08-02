@@ -5,8 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/dist/db.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/dist/db.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/dist/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/dist/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/dist/routers/user.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/dist/routers/user.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/prisma/migrations/20240522070748_init/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/prisma/migrations/20240522075953_/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/prisma/migrations/20240524160006_amout_to_string/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/prisma/migrations/20240527161809_payout_issue/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/prisma/migrations/20240601071421_email_from_user_removed/migration.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/prisma/migrations/migration_lock.toml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/prisma/schema.prisma" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/db.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/db.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/routers/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routers/user.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/routers/worker.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/routers/worker.ts" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,26 +30,41 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
   <component name="ProjectId" id="2k5Rto49tOkkZLwml2707SLhINw" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "shantanu",
+    "last_opened_file_path": "/home/shantanu/web_projects/web3/superhack/clickpaid-superhack-24/server",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "/snap/webstorm/387/plugins/javascript-plugin/jsLanguageServicesImpl/external",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/server" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -52,10 +81,17 @@
       <option name="presentableId" value="Default" />
       <updated>1722571668763</updated>
       <workItem from="1722571670337" duration="1195000" />
+      <workItem from="1722572945349" duration="980000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName=".env" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
 </project>
