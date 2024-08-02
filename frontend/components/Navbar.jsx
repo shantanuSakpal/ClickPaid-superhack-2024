@@ -92,7 +92,6 @@ export default function Navbar() {
                         }
 
 
-
                     </div>
 
                     <button
@@ -106,10 +105,22 @@ export default function Navbar() {
                 </div>
                 <div className="md:hidden my-2">
                     {isMenuOpen && (
-                        <div className="  flex flex-col gap-2 text-xl border-t border-theme-gray-light">
-                            <Link className=" py-3 px-4 hover:bg-theme-gray-light" href="/create">Create</Link>
-                            <Link className=" py-3 px-4 hover:bg-theme-gray-light" href="/vote">Vote</Link>
-                            <Link className=" py-3 px-4 hover:bg-theme-gray-light" href="/earn">Earn</Link>
+                        <div className=" text-center flex flex-col gap-2  border-t border-theme-gray-light py-2  font-bold">
+                            <Link className=" py-1 hover:bg-theme-gray-light" href="/create">Create</Link>
+                            <Link className=" py-1 hover:bg-theme-gray-light" href="/vote">Vote</Link>
+                            <Link className=" py-1 hover:bg-theme-gray-light" href="/earn">Earn</Link>
+                            <IDKitWidget
+                                app_id="app_staging_752fdbd001c5de1565710da8ddb8d3a3" // obtained from the Developer Portal
+                                action="login" // this is your action name from the Developer Portal
+                                signal="login to app" // any arbitrary value the user is committing to, e.g. a vote
+                                onSuccess={onSuccess}
+                                handleVerify={handleVerify}
+                                verification_level="device" // minimum verification level accepted, defaults to "orb"
+                            >
+                                {({open}) => <button
+                                    className=" mx-4 px-3 py-2 bg-theme-purple hover:bg-theme-purple-dark rounded-lg  font-bold"
+                                    onClick={open}>Login with World Id</button>}
+                            </IDKitWidget>
                         </div>
                     )}
                 </div>
