@@ -10,13 +10,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
+const idkit_1 = require("@worldcoin/idkit");
 const JWT_SECRET = "notapro";
 //@ts-ignore
 const LIMEWIRE_API_KEY = process.env.LIMEWIRE_API_KEY;
 const router = (0, express_1.Router)();
 //routes
 //sign in with wallet
-router.post("/auth/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/auth/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { proof, signal } = req.body;
+    const app_id = process.env.APP_ID.toString();
+    const action = process.env.ACTION_ID.toString();
+    // @ts-ignore
+    const verifyRes = (yield (0, idkit_1.verifyCloudProof)(proof, app_id, action, signal));
+    if (verifyRes.success) {
+        // This is where you should perform backend actions if the verification succeeds
+        // Such as, setting a user as "verified" in a database
+        res.status(200).send(verifyRes);
+    }
+    else {
+        // This is where you should handle errors from the World ID /verify endpoint.
+        // Usually these errors are due to a user having already verified.
+        res.status(400).send(verifyRes);
+    }
 }));
 //ai image generation
 router.post("/generateImage", (req, res) => __awaiter(void 0, void 0, void 0, function* () {

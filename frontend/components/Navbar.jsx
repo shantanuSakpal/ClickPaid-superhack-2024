@@ -2,38 +2,98 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaBars } from "react-icons/fa";
-import { FaTimes } from "react-icons/fa";
+import {FaBars} from "react-icons/fa";
+import {FaTimes} from "react-icons/fa";
 import BrandLogo from "@/components/BrandLogo";
+import {IDKitWidget} from '@worldcoin/idkit'
+import {toast} from 'react-hot-toast';
+import axios from "axios";
+
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+    const [isVerified, setIsVerified] = React.useState(false);
+
+    const onSuccess = (result) => {
+        // This is where you should perform frontend actions once a user has been verified
+        setIsVerified(true);
+        toast.success(
+            `Successfully verified with World ID!
+    Your nullifier hash is: ` + result.nullifier_hash
+        )
+        console.log(result);
+
+    }
+
+    const handleVerify = async (result) => {
+        /*
+        response : {
+            "proof": "0x2bb9c61621d847b4b9a85530db7bc7e35fc788148cfa88291330f607d4f8bd9122edf03b54bf6fde749089f88583438eaaa9f4011604c74ac4de280530a0ca470dcae12ef101b16aa58b4e0e5338d49513d7b2184508d12018351b3d516654e109f2fb72cce0ddae9d30eb42081ad67f1648ac1c18cb9af7516f9e2fadf068fc14b2b626e285e28abc6434164c98ddaaa0c91380e32332dc36debab7e579160d0125672f3397e4d01dc214a374416d4c1980ece1bb87cada327f50c69875715f28cf32758dfa5b0b958b6927c1e380c5029c9f5c59b672b76d360aa88434aab9128a26340b0b07a24e42459509f3b64480e506ca76f10bd25b59bd68bb9003c4",
+            "merkle_root": "0x0e6aaf1836c1d8e844fe356014d09f5653e92e0362327e7a088b775cb4861fb4",
+            "nullifier_hash": "0x0403589f79d03ca18573fe426eb5a007515a47ec20aadbc911538b60f1c8e4ba",
+            "verification_level": "orb"
+        }
+         */
+        try {
+            const response = await axios.post(`api/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(result),
+            });
+
+            console.log("verified---------", response);
+            onSuccess(response);
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
 
     return (
-        <nav className="bg-theme-gray-dark  text-white ">
+        <nav className="bg-theme-gray-dark  text-white fixed top-0 left-0 w-full">
+
             <div className=" mx-auto p-2">
                 <div className="flex justify-between">
                     <div className="flex">
-                            <BrandLogo/>
+                        <BrandLogo/>
                     </div>
                     <div className="hidden md:flex gap-2 items-center justify-center font-bold  ">
-                        <Link href="/create" className="text-lg px-3 py-1 rounded-lg hover:bg-theme-gray-light">
+                        <Link href="/create" className=" px-3 py-1 rounded-lg hover:bg-theme-gray-light">
                             Create
                         </Link>
-                        <Link href="/vote" className="text-lg px-3 py-1 rounded-lg hover:bg-theme-gray-light">
+                        <Link href="/vote" className=" px-3 py-1 rounded-lg hover:bg-theme-gray-light">
                             Vote
                         </Link>
-                        <Link href="/earn" className="text-lg px-3 py-1 rounded-lg hover:bg-theme-gray-light">
+                        <Link href="/earn" className=" px-3 py-1 rounded-lg hover:bg-theme-gray-light">
                             Earn
                         </Link>
-                        <Link href="/auth/login" className="text-lg mx-4 px-3 py-1 bg-theme-purple hover:bg-theme-purple-dark rounded-lg ">
-                            Login
-                        </Link>
+                        {
+                            isVerified ? (
+                                <button
+                                    className=" mx-4 px-3 py-1 bg-theme-purple hover:bg-theme-purple-dark rounded-lg "
+                                >Logged In</button>
+                            ) : (
+                                <IDKitWidget
+                                    app_id="app_staging_752fdbd001c5de1565710da8ddb8d3a3" // obtained from the Developer Portal
+                                    action="login" // this is your action name from the Developer Portal
+                                    signal="user_value" // any arbitrary value the user is committing to, e.g. a vote
+                                    onSuccess={onSuccess}
+                                    handleVerify={handleVerify}
+                                    verification_level="device" // minimum verification level accepted, defaults to "orb"
+                                >
+                                    {({open}) => <button
+                                        className=" mx-4 px-3 py-1 bg-theme-purple hover:bg-theme-purple-dark rounded-lg "
+                                        onClick={open}>Login with World Id</button>}
+                                </IDKitWidget>)
+                        }
+
                     </div>
 
                     <button
                         aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-                        className="md:hidden px-4 text-lg"
+                        className="md:hidden px-4 "
 
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                     >
@@ -44,8 +104,8 @@ export default function Navbar() {
                     {isMenuOpen && (
                         <div className="  flex flex-col gap-2 text-xl border-t border-theme-gray-light">
                             <Link className=" py-3 px-4 hover:bg-theme-gray-light" href="/create">Create</Link>
-                            <Link className=" py-3 px-4 hover:bg-theme-gray-light"  href="/vote">Vote</Link>
-                            <Link  className=" py-3 px-4 hover:bg-theme-gray-light" href="/earn">Earn</Link>
+                            <Link className=" py-3 px-4 hover:bg-theme-gray-light" href="/vote">Vote</Link>
+                            <Link className=" py-3 px-4 hover:bg-theme-gray-light" href="/earn">Earn</Link>
                         </div>
                     )}
                 </div>

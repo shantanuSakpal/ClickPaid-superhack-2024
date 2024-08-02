@@ -1,5 +1,6 @@
 import {Router} from "express";
 import jwt from "jsonwebtoken";
+import { type IVerifyResponse, verifyCloudProof } from '@worldcoin/idkit'
 
 const JWT_SECRET = "notapro";
 
@@ -11,8 +12,22 @@ const router = Router();
 //routes
 
 //sign in with wallet
-router.post("/auth/signin", async (req: any, res: any) => {
+router.post("/auth/login", async (req: any, res: any) => {
+    const { proof, signal } = req.body
+    const app_id:string = process.env.APP_ID!.toString()
+    const action:string = process.env.ACTION_ID!.toString()
+    // @ts-ignore
+    const verifyRes: IVerifyResponse = (await verifyCloudProof(proof, app_id, action, signal)) as IVerifyResponse
 
+    if (verifyRes.success) {
+        // This is where you should perform backend actions if the verification succeeds
+        // Such as, setting a user as "verified" in a database
+        res.status(200).send(verifyRes);
+    } else {
+        // This is where you should handle errors from the World ID /verify endpoint.
+        // Usually these errors are due to a user having already verified.
+        res.status(400).send(verifyRes);
+    }
 });
 
 //ai image generation

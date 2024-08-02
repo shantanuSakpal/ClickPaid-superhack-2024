@@ -23,7 +23,7 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex bg-white min-h-[100vh] px-10 text-black">
+    <div className="flex min-h-[100vh] px-10 text-black">
       <Toaster position="top-center" reverseOrder={true} />
       {/* Left side */}
       <div className="w-[70%] p-4 border-r border-gray-300">
