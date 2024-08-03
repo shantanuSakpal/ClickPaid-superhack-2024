@@ -1,32 +1,49 @@
 import {Router} from "express";
 import jwt from "jsonwebtoken";
-import { type IVerifyResponse, verifyCloudProof } from '@worldcoin/idkit'
+import {verifyProofWithWorldcoin} from "../utils/verifyWorldIDProof";
 
-const JWT_SECRET = "notapro";
-
-//@ts-ignore
-const LIMEWIRE_API_KEY: string = process.env.LIMEWIRE_API_KEY;
-
+const JWT_SECRET: string = process.env.JWT_SECRET!.toString();
+const LIMEWIRE_API_KEY: string = process.env.LIMEWIRE_API_KEY!.toString();
+const WORLDCOIN_APP_ID: string = process.env.WORLDCOIN_APP_ID!.toString();
 const router = Router();
 
 //routes
 
-//sign in with wallet
+//sign in with worldID
 router.post("/auth/login", async (req: any, res: any) => {
-    const { proof, signal } = req.body
-    const app_id:string = process.env.APP_ID!.toString()
-    const action:string = process.env.ACTION_ID!.toString()
-    // @ts-ignore
-    const verifyRes: IVerifyResponse = (await verifyCloudProof(proof, app_id, action, signal)) as IVerifyResponse
+    try {
 
-    if (verifyRes.success) {
-        // This is where you should perform backend actions if the verification succeeds
-        // Such as, setting a user as "verified" in a database
-        res.status(200).send(verifyRes);
-    } else {
-        // This is where you should handle errors from the World ID /verify endpoint.
-        // Usually these errors are due to a user having already verified.
-        res.status(400).send(verifyRes);
+        const {nullifier_hash, proof, merkle_root, verification_level, action} = req.body;
+        const verificationResult = await verifyProofWithWorldcoin(
+            WORLDCOIN_APP_ID,
+            nullifier_hash,
+            proof,
+            merkle_root,
+            verification_level,
+            action
+        );
+
+        if (verificationResult.success) {
+
+            //update the db here, use nullifier_hash as unique identifier for the user
+            //eg. nullifier_hash = 0x0403589f79d03ca18573fe426eb5a007515a47ec20aadbc911538b60f1c8e4ba
+
+            //return response
+            const token = jwt.sign({nullifier_hash}, JWT_SECRET);
+            res.status(200).json({success: true, token});
+
+        } else {
+            res.status(403).json({success: false, error: 'Verification failed'});
+        }
+    } catch (error) {
+        console.error('API Error:', error);
+        //@ts-ignore
+        if (error.message.includes('This person has already verified for this action')) {
+            const token = jwt.sign({nullifier_hash: req.body.nullifier_hash}, JWT_SECRET);
+            res.status(200).json({ success: true, token, message: 'User has already been verified' });
+
+        } else
+            res.status(500).json({success: false, error: 'Internal server error'});
     }
 });
 

@@ -1,4 +1,3 @@
- if made any changesn in schema, run
-1. ```npx prisma migrate dev --name "some-name"```
-2. ```npx prisma generate```  
-// to generate the prisma client
+ if made any changes in files, run
+1. ```tsc -b``` to compile the typescript files
+2. ```node --env-file=.env.local dist/index.js``` to run the server  

@@ -1,9 +1,7 @@
 "use client";
-import React from "react";
-import Image from "next/image";
+import React, {useEffect} from "react";
 import Link from "next/link";
-import {FaBars} from "react-icons/fa";
-import {FaTimes} from "react-icons/fa";
+import {FaBars, FaTimes} from "react-icons/fa";
 import BrandLogo from "@/components/BrandLogo";
 import {IDKitWidget} from '@worldcoin/idkit'
 import {toast} from 'react-hot-toast';
@@ -13,16 +11,13 @@ import axios from "axios";
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const [isVerified, setIsVerified] = React.useState(false);
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
     const onSuccess = (result) => {
         // This is where you should perform frontend actions once a user has been verified
         setIsVerified(true);
-        toast.success(
-            `Successfully verified with World ID!
-    Your nullifier hash is: ` + result.nullifier_hash
-        )
-        console.log(result);
-
+        toast.success(`Successfully verified with World ID!`)
+        // console.log("result----------------", result);
     }
 
     const handleVerify = async (result) => {
@@ -34,25 +29,33 @@ export default function Navbar() {
             "verification_level": "orb"
         }
          */
+        const {proof, merkle_root, nullifier_hash, verification_level} = result;
+        const body = {
+            action: "login",
+            proof: proof,
+            merkle_root: merkle_root,
+            nullifier_hash: nullifier_hash,
+            verification_level: verification_level,
+        }
         try {
-            const response = await axios.post(`api/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(result),
-            });
-
-            console.log("verified---------", response);
-            onSuccess(response);
+            const response = await axios.post(`${BACKEND_URL}/v1/user/auth/login`, body);
+            console.log("verified---------");
+            // console.log(response.data);
+            sessionStorage.setItem('token', response.data.token);
 
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error:', error.response.data);
         }
     }
 
-    return (
-        <nav className="bg-theme-gray-dark  text-white fixed top-0 left-0 w-full">
+    useEffect(() => {
+        const isVerified = sessionStorage.getItem('token');
+        if (isVerified) {
+            setIsVerified(true);
+        }
+    }, []);
+
+    return (<nav className="bg-theme-gray-dark  text-white fixed top-0 left-0 w-full">
 
             <div className=" mx-auto p-2">
                 <div className="flex justify-between">
@@ -69,25 +72,25 @@ export default function Navbar() {
                         <Link href="/earn" className=" px-3 py-1 rounded-lg hover:bg-theme-gray-light">
                             Earn
                         </Link>
-                        {
-                            isVerified ? (
-                                <button
-                                    className=" mx-4 px-3 py-1 bg-theme-purple hover:bg-theme-purple-dark rounded-lg "
-                                >Logged In</button>
-                            ) : (
-                                <IDKitWidget
-                                    app_id="app_staging_752fdbd001c5de1565710da8ddb8d3a3" // obtained from the Developer Portal
-                                    action="login" // this is your action name from the Developer Portal
-                                    signal="user_value" // any arbitrary value the user is committing to, e.g. a vote
-                                    onSuccess={onSuccess}
-                                    handleVerify={handleVerify}
-                                    verification_level="device" // minimum verification level accepted, defaults to "orb"
-                                >
-                                    {({open}) => <button
-                                        className=" mx-4 px-3 py-1 bg-theme-purple hover:bg-theme-purple-dark rounded-lg "
-                                        onClick={open}>Login with World Id</button>}
-                                </IDKitWidget>)
-                        }
+                        {isVerified ? (<button
+                                onClick={() => {
+                                    sessionStorage.removeItem('token');
+                                    setIsVerified(false);
+                                }}
+                                className=" mx-4 px-3 py-1 bg-theme-purple hover:bg-theme-purple-dark rounded-lg "
+                            >Logout</button>) : (<IDKitWidget
+                            app_id="app_staging_752fdbd001c5de1565710da8ddb8d3a3" // obtained from the Developer Portal
+                            action="login" // this is your action name from the Developer Portal
+                            signal="login to app" // any arbitrary value the user is committing to, e.g. a vote
+                            onSuccess={onSuccess}
+                            handleVerify={handleVerify}
+                            verification_level="device" // minimum verification level accepted, defaults to "orb"
+                        >
+                            {({open}) => <button
+                                className=" mx-4 px-3 py-1 bg-theme-purple hover:bg-theme-purple-dark rounded-lg "
+                                onClick={open}>Login with World Id</button>}
+                        </IDKitWidget>)}
+
 
                     </div>
 
@@ -101,16 +104,26 @@ export default function Navbar() {
                     </button>
                 </div>
                 <div className="md:hidden my-2">
-                    {isMenuOpen && (
-                        <div className="  flex flex-col gap-2 text-xl border-t border-theme-gray-light">
-                            <Link className=" py-3 px-4 hover:bg-theme-gray-light" href="/create">Create</Link>
-                            <Link className=" py-3 px-4 hover:bg-theme-gray-light" href="/vote">Vote</Link>
-                            <Link className=" py-3 px-4 hover:bg-theme-gray-light" href="/earn">Earn</Link>
-                        </div>
-                    )}
+                    {isMenuOpen && (<div
+                            className=" text-center flex flex-col gap-2  border-t border-theme-gray-light py-2  font-bold">
+                            <Link className=" py-1 hover:bg-theme-gray-light" href="/create">Create</Link>
+                            <Link className=" py-1 hover:bg-theme-gray-light" href="/vote">Vote</Link>
+                            <Link className=" py-1 hover:bg-theme-gray-light" href="/earn">Earn</Link>
+                            <IDKitWidget
+                                app_id="app_staging_752fdbd001c5de1565710da8ddb8d3a3" // obtained from the Developer Portal
+                                action="login" // this is your action name from the Developer Portal
+                                signal="login to app" // any arbitrary value the user is committing to, e.g. a vote
+                                onSuccess={onSuccess}
+                                handleVerify={handleVerify}
+                                verification_level="device" // minimum verification level accepted, defaults to "orb"
+                            >
+                                {({open}) => <button
+                                    className=" mx-4 px-3 py-2 bg-theme-purple hover:bg-theme-purple-dark rounded-lg  font-bold"
+                                    onClick={open}>Login with World Id</button>}
+                            </IDKitWidget>
+                        </div>)}
                 </div>
 
             </div>
-        </nav>
-    );
+        </nav>);
 }
