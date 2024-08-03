@@ -3,9 +3,12 @@ import React, { useState } from 'react';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { Toaster, toast } from 'react-hot-toast';
+import { uploadImage } from '../utils/uploadImages'; // Import uploadImage function
+import { db } from '../lib/fireBaseConfig'; // Import db from firebaseConfig
+import { collection, addDoc } from 'firebase/firestore';
 
 const chains = [
-  { name: 'OP Mainet', image: '/chain/optimism.jpeg' },
+  { name: 'OP Sepolia', image: '/chain/optimism.jpeg' },
   { name: 'Base', image: '/chain/base.jpeg' },
   { name: 'Mode', image: '/chain/mode.png' },
   { name: 'WorldCoin', image: '/chain/worldcoin.png' },
@@ -22,6 +25,7 @@ const Layout = () => {
   });
 
   const [images, setImages] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]); // Store file references
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,14 +41,14 @@ const Layout = () => {
       toast.error("Maximum 4 images allowed");
       return;
     }
-    const newImages = files.map(file => URL.createObjectURL(file));
-    setImages(prevImages => [...prevImages, ...newImages].slice(0, 4)); // Append new images and ensure the total count doesn't exceed 4
+
+    setImageFiles(prevFiles => [...prevFiles, ...files].slice(0, 4)); // Append new files and ensure the total count doesn't exceed 4
   };
 
   const handleImageRemove = (index) => {
-    const updatedImages = [...images];
-    updatedImages.splice(index, 1);
-    setImages(updatedImages);
+    const updatedFiles = [...imageFiles];
+    updatedFiles.splice(index, 1);
+    setImageFiles(updatedFiles);
   };
 
   const validateForm = () => {
@@ -53,25 +57,37 @@ const Layout = () => {
       toast.error("All fields are required");
       return false;
     }
-    if (isNaN(bountyReward)) {
-      toast.error("Bounty Reward must be a numbers");
+    if (isNaN(bountyReward) || isNaN(numberOfVotes) || isNaN(nftPrice)) {
+      toast.error("Bounty Reward, Votes, and NFT Price must be numbers");
       return false;
     }
-    if (isNaN(numberOfVotes)) {
-      toast.error("Votes must be a number");
-      return false;
-    }
-    if (isNaN(nftPrice)) {
-      toast.error("NFT Price must be a numbers");
-      return false;
-    }
-
-    if(bountyReward <= 0 || numberOfVotes <= 0 || nftPrice <= 0){
+    if (Number(bountyReward) <= 0 || Number(numberOfVotes) <= 0 || Number(nftPrice) <= 0) {
       toast.error("Values must be greater than 0");
       return false;
     }
 
     return true;
+  };
+
+  const uploadImages = async () => {
+    const uploadedImages = await Promise.all(
+      imageFiles.map(file => uploadImage(file))
+    );
+    toaster.sucess("Images Uploaded Successfully");
+    return uploadedImages.filter(url => url);
+  };
+
+  const saveSettings = async (uploadedImages) => {
+    try {
+      const docRef = await addDoc(collection(db, 'posts'), {
+        ...formState,
+        images: uploadedImages,
+      });
+      toast.success("Post saved successfully!");
+    } catch (error) {
+      console.error("Error saving post:", error);
+      toast.error("Could not save post.");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -81,7 +97,10 @@ const Layout = () => {
     }
 
     toast.promise(
-      saveSettings(formState), // You need to define saveSettings function
+      (async () => {
+        const uploadedImages = await uploadImages(); // Upload images before saving the post
+        await saveSettings(uploadedImages);
+      })(),
       {
         loading: 'Saving...',
         success: <b>Settings saved!</b>,
@@ -94,10 +113,10 @@ const Layout = () => {
     const divs = [];
 
     // Add existing images
-    for (let i = 0; i < images.length; i++) {
+    for (let i = 0; i < imageFiles.length; i++) {
       divs.push(
         <div key={i} className="relative w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
-          <img src={images[i]} alt={`uploaded-${i}`} className="absolute inset-0 w-full h-full object-cover rounded" />
+          <img src={URL.createObjectURL(imageFiles[i])} alt={`uploaded-${i}`} className="absolute inset-0 w-full h-full object-cover rounded" />
           <button
             onClick={() => handleImageRemove(i)}
             className="absolute top-2 right-2 bg-white bg-opacity-50 rounded-full p-1"
@@ -111,9 +130,9 @@ const Layout = () => {
     }
 
     // Add blank upload div
-    if (images.length < 4) {
+    if (imageFiles.length < 4) {
       divs.push(
-        <div key={images.length} className="relative w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
+        <div key={imageFiles.length} className="relative w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
           <input
             type="file"
             accept="image/*"
@@ -133,7 +152,7 @@ const Layout = () => {
       <Toaster position="top-center" reverseOrder={true} />
       {/* Left side */}
       <div className="w-7/12 p-4 border-r border-gray-300">
-        <div className={`grid gap-4 ${images.length === 0 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+        <div className={`grid gap-4 ${imageFiles.length === 0 ? 'grid-cols-1' : 'grid-cols-2'}`}>
           {renderDivs()}
         </div>
       </div>
@@ -191,58 +210,23 @@ const Layout = () => {
               />
             </div>
           </div>
-          <div className='flex space-x-2'>
-            <div className='w-1/2'>
-              <label htmlFor="nftPrice" className="block text-sm font-medium text-gray-700">NFT Price</label>
-              <input
-                type="text"
-                id="nftPrice"
-                name="nftPrice"
-                value={formState.nftPrice}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
-                placeholder="Enter NFT price"
-              />
-            </div>
-            <div className="w-1/2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Select Chain</label>
-              <Menu as="div" className="relative inline-block text-left w-full">
-                <div>
-                  <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                    <img src={formState.selectedChain.image} alt={formState.selectedChain.name} className="w-5 h-5 rounded-full mr-2" />
-                    {formState.selectedChain.name}
-                    <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
-                  </MenuButton>
-                </div>
-                <MenuItems
-                  transition
-                  className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                >
-                  <div className="py-1">
-                    {chains.map((chain) => (
-                      <MenuItem key={chain.name}>
-                        {({ active }) => (
-                          <button
-                            type="button"
-                            onClick={() => setFormState({ ...formState, selectedChain: chain })}
-                            className={`block w-full px-4 py-2 text-left text-sm ${active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'}`}
-                          >
-                            <img src={chain.image} alt={chain.name} className="w-5 h-5 rounded-full mr-2 inline" />
-                            {chain.name}
-                          </button>
-                        )}
-                      </MenuItem>
-                    ))}
-                  </div>
-                </MenuItems>
-              </Menu>
-            </div>
+          <div>
+            <label htmlFor="nftPrice" className="block text-sm font-medium text-gray-700">NFT Price</label>
+            <input
+              type="text"
+              id="nftPrice"
+              name="nftPrice"
+              value={formState.nftPrice}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+              placeholder="Enter NFT price"
+            />
           </div>
           <button
             type="submit"
-            className="w-full px-4 py-2 bg-black text-white font-medium rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+            className="w-full px-4 py-2 bg-black text-white font-medium rounded-md shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black"
           >
-            Post
+            Save Post
           </button>
         </form>
       </div>
