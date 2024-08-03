@@ -1,4 +1,4 @@
-// lib/firebaseConfig.js
+// _lib/firebaseConfig.js
 import dotenv from 'dotenv'
 dotenv.config()
 

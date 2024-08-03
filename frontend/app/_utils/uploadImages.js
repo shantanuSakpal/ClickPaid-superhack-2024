@@ -1,7 +1,7 @@
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "../lib/fireBaseConfig";
+import { storage } from "@/app/_lib/fireBaseConfig";
 import { collection, addDoc } from 'firebase/firestore';
-import { db } from "../lib/fireBaseConfig"; 
+import { db } from "@/app/_lib/fireBaseConfig";
 export const uploadImage = async (file) => {
   if (!file) return null;
 

@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from 'react';
 import {  toast } from 'react-hot-toast';
-import { uploadImage } from '../utils/uploadImages'; // Import uploadImage function
-import { db } from '../lib/fireBaseConfig'; // Import db from firebaseConfig
+import { uploadImage } from '@/app/_utils/uploadImages'; // Import uploadImage function
+import { db } from '@/app/_lib/fireBaseConfig'; // Import db from firebaseConfig
 import { collection, addDoc } from 'firebase/firestore';
 import Image from "next/image";
 import { FaCloudUploadAlt } from "react-icons/fa";

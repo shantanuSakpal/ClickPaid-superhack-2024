@@ -1,4 +1,4 @@
-import { uploadImage } from '../../utils/uploadImages';
+import { uploadImage } from '@/app/_utils/uploadImages';
 
 export async function POST(request) {
   try {
