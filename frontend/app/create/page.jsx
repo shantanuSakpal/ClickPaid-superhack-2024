@@ -1,11 +1,11 @@
 "use client";
 import React, { useState } from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import { Toaster, toast } from 'react-hot-toast';
+import {  toast } from 'react-hot-toast';
 import { uploadImage } from '../utils/uploadImages'; // Import uploadImage function
 import { db } from '../lib/fireBaseConfig'; // Import db from firebaseConfig
 import { collection, addDoc } from 'firebase/firestore';
+import Image from "next/image";
+import { FaCloudUploadAlt } from "react-icons/fa";
 
 const chains = [
   { name: 'OP Sepolia', image: '/chain/optimism.jpeg' },
@@ -14,7 +14,7 @@ const chains = [
   { name: 'WorldCoin', image: '/chain/worldcoin.png' },
 ];
 
-const Layout = () => {
+const Page = () => {
   const [formState, setFormState] = useState({
     title: '',
     description: '',
@@ -26,6 +26,7 @@ const Layout = () => {
 
   const [images, setImages] = useState([]);
   const [imageFiles, setImageFiles] = useState([]); // Store file references
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,6 +67,11 @@ const Layout = () => {
       return false;
     }
 
+    if(imageFiles.length === 0) {
+        toast.error("At least one image is required");
+        return false;
+    }
+
     return true;
   };
 
@@ -73,8 +79,13 @@ const Layout = () => {
     const uploadedImages = await Promise.all(
       imageFiles.map(file => uploadImage(file))
     );
-    toaster.sucess("Images Uploaded Successfully");
+    //if failed to upload images, return
+    if (uploadedImages.some(url => !url)) {
+        return [];
+    }
+    toast.success("Images Uploaded Successfully");
     return uploadedImages.filter(url => url);
+
   };
 
   const saveSettings = async (uploadedImages) => {
@@ -83,7 +94,16 @@ const Layout = () => {
         ...formState,
         images: uploadedImages,
       });
-      toast.success("Post saved successfully!");
+      toast.success("Post submitted successfully!");
+      setFormState({
+        title: '',
+        description: '',
+        selectedChain: chains[0],
+        bountyReward: '',
+        numberOfVotes: '',
+        nftPrice: '',
+      });
+      setImageFiles([]);
     } catch (error) {
       console.error("Error saving post:", error);
       toast.error("Could not save post.");
@@ -91,22 +111,23 @@ const Layout = () => {
   };
 
   const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
     if (!validateForm()) {
+        setLoading(false);
       return;
     }
 
-    toast.promise(
-      (async () => {
-        const uploadedImages = await uploadImages(); // Upload images before saving the post
-        await saveSettings(uploadedImages);
-      })(),
-      {
-        loading: 'Saving...',
-        success: <b>Settings saved!</b>,
-        error: <b>Could not save.</b>,
-      }
-    );
+    const uploadedImages = await uploadImages();
+    if (uploadedImages.length === 0) {
+      toast.error("Could not upload images");
+        setLoading(false);
+      return;
+    }
+    const saved = await saveSettings(uploadedImages);
+
+    setLoading(false);
+
   };
 
   const renderDivs = () => {
@@ -116,7 +137,9 @@ const Layout = () => {
     for (let i = 0; i < imageFiles.length; i++) {
       divs.push(
         <div key={i} className="relative w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
-          <img src={URL.createObjectURL(imageFiles[i])} alt={`uploaded-${i}`} className="absolute inset-0 w-full h-full object-cover rounded" />
+          <Image src={URL.createObjectURL(imageFiles[i])} alt={`uploaded-${i}`} className="absolute inset-0 w-full h-full object-cover rounded"
+          width={300} height={300}
+          />
           <button
             onClick={() => handleImageRemove(i)}
             className="absolute top-2 right-2 bg-white bg-opacity-50 rounded-full p-1"
@@ -132,15 +155,19 @@ const Layout = () => {
     // Add blank upload div
     if (imageFiles.length < 4) {
       divs.push(
-        <div key={imageFiles.length} className="relative w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageUpload}
-            className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-          />
-        </div>
+          <div key={imageFiles.length}
+               className="relative flex items-center justify-center w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
+            <label className="absolute top-1/2 flex flex-row text-xl items-center gap-2 ">Upload <FaCloudUploadAlt/>
+            </label>
+            <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+            />
+
+          </div>
       );
     }
 
@@ -148,9 +175,8 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex bg-white min-h-[100vh] px-10 text-black">
-      <Toaster position="top-center" reverseOrder={true} />
-      {/* Left side */}
+      <div className="flex bg-white min-h-[100vh] px-10 text-black">
+        {/* Left side */}
       <div className="w-7/12 p-4 border-r border-gray-300">
         <div className={`grid gap-4 ${imageFiles.length === 0 ? 'grid-cols-1' : 'grid-cols-2'}`}>
           {renderDivs()}
@@ -188,7 +214,7 @@ const Layout = () => {
             <div className='w-1/2'>
               <label htmlFor="bountyReward" className="block text-sm font-medium text-gray-700">Bounty Reward</label>
               <input
-                type="text"
+                type="number"
                 id="bountyReward"
                 name="bountyReward"
                 value={formState.bountyReward}
@@ -200,7 +226,7 @@ const Layout = () => {
             <div className='w-1/2'>
               <label htmlFor="numberOfVotes" className="block text-sm font-medium text-gray-700">Number of Votes</label>
               <input
-                type="text"
+                type="number"
                 id="numberOfVotes"
                 name="numberOfVotes"
                 value={formState.numberOfVotes}
@@ -225,8 +251,9 @@ const Layout = () => {
           <button
             type="submit"
             className="w-full px-4 py-2 bg-black text-white font-medium rounded-md shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black"
+            disabled={loading}
           >
-            Save Post
+            {loading ? "Uploading..." : "Submit"}
           </button>
         </form>
       </div>
@@ -234,4 +261,4 @@ const Layout = () => {
   );
 };
 
-export default Layout;
+export default Page;

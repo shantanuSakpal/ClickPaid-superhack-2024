@@ -28,6 +28,6 @@ export const saveSettings = async (formState, images) => {
     return docRef.id; // Return the document ID if needed
   } catch (error) {
     console.error("Error saving post:", error);
-    throw new Error("Could not save post."); // Throw an error to handle in the calling function
+    throw new Error("Could not save post.", error); // Throw an error to handle in the calling function
   }
 };

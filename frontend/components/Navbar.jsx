@@ -12,8 +12,8 @@ export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const [isVerified, setIsVerified] = React.useState(false);
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-    const APP_ID = process.env.NEXT_PUBLIC_APP_ID;
-    const ACTION_ID = process.env.NEXT_PUBLIC_ACTION_ID;
+    const APP_ID = "app_staging_752fdbd001c5de1565710da8ddb8d3a3";
+    const ACTION_ID =  "login";
 
     const onSuccess = (result) => {
         // This is where you should perform frontend actions once a user has been verified
