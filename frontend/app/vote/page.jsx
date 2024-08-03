@@ -17,23 +17,7 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen text-black">
-      <Head>
-        <title>Instagram Clone</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="container mx-auto flex justify-between items-center p-4">
-          <div className="text-2xl font-bold">Instagram</div>
-          <div className="flex space-x-4">
-            <input type="text" placeholder="Search" className="border p-1 rounded"/>
-            <div>Home</div>
-            <div>Messages</div>
-            <div>Profile</div>
-          </div>
-        </div>
-      </header>
+    <div className="bg-gray-50  text-black">
 
       <main className="container mx-auto flex justify-between mt-0 space-x-4">
         {/* Left Sidebar for Trending Section */}

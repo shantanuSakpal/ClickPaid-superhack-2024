@@ -57,7 +57,7 @@ export default function Navbar() {
         }
     }, []);
 
-    return (<nav className="bg-theme-gray-dark  text-white fixed top-0 left-0 w-full">
+    return (<nav className="bg-theme-gray-dark  text-white fixed top-0 left-0 w-full z-10">
 
             <div className=" mx-auto p-2">
                 <div className="flex justify-between">
