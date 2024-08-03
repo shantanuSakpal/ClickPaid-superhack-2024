@@ -7,7 +7,7 @@ export async function POST(req) {
         const body = await req.json();
         const {nullifier_hash, proof, merkle_root, verification_level, action} = body;
 
-        const app_id = process.env.NEXT_PUBLIC_APP_ID; // Make sure this is set in your .env.local file
+        const app_id = process.env.NEXT_PUBLIC_APP_ID; // Make sure this is set in your .env.local.local file
 
         const verificationResult = await verifyProofWithWorldcoin(
             app_id,
@@ -20,7 +20,8 @@ export async function POST(req) {
 
         if (verificationResult.success) {
 
-            //update the db here
+            //update the db here, use nullifier_hash as unique identifier for the user
+            //eg. nullifier_hash = 0x0403589f79d03ca18573fe426eb5a007515a47ec20aadbc911538b60f1c8e4ba
 
 
             return NextResponse.json(verificationResult, {status: 200});

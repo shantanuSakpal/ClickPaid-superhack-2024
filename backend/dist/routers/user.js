@@ -8,30 +8,43 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const idkit_1 = require("@worldcoin/idkit");
-const JWT_SECRET = "notapro";
-//@ts-ignore
-const LIMEWIRE_API_KEY = process.env.LIMEWIRE_API_KEY;
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const verifyWorldIDProof_1 = require("../utils/verifyWorldIDProof");
+const JWT_SECRET = process.env.JWT_SECRET.toString();
+const LIMEWIRE_API_KEY = process.env.LIMEWIRE_API_KEY.toString();
+const WORLDCOIN_APP_ID = process.env.WORLDCOIN_APP_ID.toString();
 const router = (0, express_1.Router)();
 //routes
-//sign in with wallet
+//sign in with worldID
 router.post("/auth/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { proof, signal } = req.body;
-    const app_id = process.env.APP_ID.toString();
-    const action = process.env.ACTION_ID.toString();
-    // @ts-ignore
-    const verifyRes = (yield (0, idkit_1.verifyCloudProof)(proof, app_id, action, signal));
-    if (verifyRes.success) {
-        // This is where you should perform backend actions if the verification succeeds
-        // Such as, setting a user as "verified" in a database
-        res.status(200).send(verifyRes);
+    try {
+        const { nullifier_hash, proof, merkle_root, verification_level, action } = req.body;
+        const verificationResult = yield (0, verifyWorldIDProof_1.verifyProofWithWorldcoin)(WORLDCOIN_APP_ID, nullifier_hash, proof, merkle_root, verification_level, action);
+        if (verificationResult.success) {
+            //update the db here, use nullifier_hash as unique identifier for the user
+            //eg. nullifier_hash = 0x0403589f79d03ca18573fe426eb5a007515a47ec20aadbc911538b60f1c8e4ba
+            //return response
+            const token = jsonwebtoken_1.default.sign({ nullifier_hash }, JWT_SECRET);
+            res.status(200).json({ success: true, token });
+        }
+        else {
+            res.status(403).json({ success: false, error: 'Verification failed' });
+        }
     }
-    else {
-        // This is where you should handle errors from the World ID /verify endpoint.
-        // Usually these errors are due to a user having already verified.
-        res.status(400).send(verifyRes);
+    catch (error) {
+        console.error('API Error:', error);
+        //@ts-ignore
+        if (error.message.includes('This person has already verified for this action')) {
+            const token = jsonwebtoken_1.default.sign({ nullifier_hash: req.body.nullifier_hash }, JWT_SECRET);
+            res.status(200).json({ success: true, token, message: 'User has already been verified' });
+        }
+        else
+            res.status(500).json({ success: false, error: 'Internal server error' });
     }
 }));
 //ai image generation
