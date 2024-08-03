@@ -5,14 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/dist/utils/verifyWorldIDProof.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/utils/verifyWorldIDProof.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/backend/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/dist/routers/user.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/dist/routers/user.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/routers/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routers/user.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/api/auth/login/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/auth/login/route.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Navbar.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -78,7 +71,7 @@
       <workItem from="1722572945349" duration="4361000" />
       <workItem from="1722593495792" duration="11120000" />
       <workItem from="1722609376687" duration="4849000" />
-      <workItem from="1722659502580" duration="2868000" />
+      <workItem from="1722659502580" duration="4119000" />
     </task>
     <servers />
   </component>

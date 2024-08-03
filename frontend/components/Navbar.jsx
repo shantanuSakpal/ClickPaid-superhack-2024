@@ -12,6 +12,8 @@ export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const [isVerified, setIsVerified] = React.useState(false);
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+    const APP_ID = process.env.NEXT_PUBLIC_APP_ID;
+    const ACTION_ID = process.env.NEXT_PUBLIC_ACTION_ID;
 
     const onSuccess = (result) => {
         // This is where you should perform frontend actions once a user has been verified
@@ -79,8 +81,8 @@ export default function Navbar() {
                                 }}
                                 className=" mx-4 px-3 py-1 bg-theme-purple hover:bg-theme-purple-dark rounded-lg "
                             >Logout</button>) : (<IDKitWidget
-                            app_id="app_staging_752fdbd001c5de1565710da8ddb8d3a3" // obtained from the Developer Portal
-                            action="login" // this is your action name from the Developer Portal
+                            app_id={APP_ID} // obtained from the Developer Portal
+                            action={ACTION_ID} // this is your action name from the Developer Portal
                             signal="login to app" // any arbitrary value the user is committing to, e.g. a vote
                             onSuccess={onSuccess}
                             handleVerify={handleVerify}
@@ -110,8 +112,8 @@ export default function Navbar() {
                             <Link className=" py-1 hover:bg-theme-gray-light" href="/vote">Vote</Link>
                             <Link className=" py-1 hover:bg-theme-gray-light" href="/earn">Earn</Link>
                             <IDKitWidget
-                                app_id="app_staging_752fdbd001c5de1565710da8ddb8d3a3" // obtained from the Developer Portal
-                                action="login" // this is your action name from the Developer Portal
+                                app_id={APP_ID} // obtained from the Developer Portal
+                                action={ACTION_ID} // this is your action name from the Developer Portal
                                 signal="login to app" // any arbitrary value the user is committing to, e.g. a vote
                                 onSuccess={onSuccess}
                                 handleVerify={handleVerify}
