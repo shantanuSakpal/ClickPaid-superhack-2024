@@ -3,7 +3,8 @@ import React from "react";
 import Link from "next/link";
 import {FaBars, FaTimes} from "react-icons/fa";
 import BrandLogo from "@/components/BrandLogo";
-import {useSession, signIn, signOut} from "next-auth/react"
+import {useSession, signIn} from "next-auth/react"
+import { CgProfile } from "react-icons/cg";
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -31,10 +32,11 @@ export default function Navbar() {
                     {/*login with world id*/}
                     {
                         session ? (
-                            <button
-                                onClick={() => signOut()}
-                                className=" mx-4 px-3 py-1 text-white bg-theme-blue-light hover:bg-theme-blue rounded-lg "
-                            >Logout</button>
+                            <Link
+                                href="/profile"
+                                className=" px-3 py-1 text-black text-2xl rounded-lg hover:text-theme-blue font-bold"
+                            ><CgProfile />
+                            </Link>
                         ) : (
                             <button
                                 onClick={() => signIn('worldcoin')}
@@ -63,10 +65,11 @@ export default function Navbar() {
                     {/*login with world id*/}
                     {
                         session ? (
-                            <button
-                                onClick={() => signOut()}
+                            <Link
+                                href="/profile"
                                 className=" mx-4 px-3 py-1 text-white bg-theme-blue-light hover:bg-theme-blue rounded-lg "
-                            >Logout</button>
+                            >Profile
+                            </Link>
                         ) : (
                             <button
                                 onClick={() => signIn('worldcoin')}
