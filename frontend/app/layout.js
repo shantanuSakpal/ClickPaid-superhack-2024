@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Head from "next/head";
 import { Toaster } from "react-hot-toast";
 import React from "react";
+import Footer from "@/components/Footer";
 
 export default function RootLayout({ children }) {
 
@@ -16,6 +17,7 @@ export default function RootLayout({ children }) {
         <Navbar />
         <Toaster position="top-center" reverseOrder={true} />
         {children}
+        <Footer />
         </body>
         </html>
     );

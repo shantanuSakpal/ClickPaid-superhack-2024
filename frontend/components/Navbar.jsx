@@ -57,21 +57,21 @@ export default function Navbar() {
         }
     }, []);
 
-    return (<nav className="bg-theme-gray-dark  text-white fixed top-0 left-0 w-full z-10">
+    return (<nav className="fixed top-0 left-0 w-full z-10 border-b bg-white">
 
-            <div className=" mx-auto p-2">
+            <div className=" mx-auto px-3">
                 <div className="flex justify-between">
                     <div className="flex">
                         <BrandLogo/>
                     </div>
                     <div className="hidden md:flex gap-2 items-center justify-center font-bold  ">
-                        <Link href="/create" className=" px-3 py-1 rounded-lg hover:bg-theme-gray-light">
+                        <Link href="/create" className=" px-3 py-1 rounded-lg hover:text-black text-gray-500">
                             Create
                         </Link>
-                        <Link href="/vote" className=" px-3 py-1 rounded-lg hover:bg-theme-gray-light">
+                        <Link href="/vote" className=" px-3 py-1 rounded-lg hover:text-black text-gray-500">
                             Vote
                         </Link>
-                        <Link href="/earn" className=" px-3 py-1 rounded-lg hover:bg-theme-gray-light">
+                        <Link href="/earn" className=" px-3 py-1 rounded-lg hover:text-black text-gray-500">
                             Earn
                         </Link>
                         {isVerified ? (<button
@@ -79,7 +79,7 @@ export default function Navbar() {
                                     sessionStorage.removeItem('token');
                                     setIsVerified(false);
                                 }}
-                                className=" mx-4 px-3 py-1 bg-theme-purple hover:bg-theme-purple-dark rounded-lg "
+                                className=" mx-4 px-3 py-1 text-white bg-theme-blue-light hover:bg-theme-blue rounded-lg "
                             >Logout</button>) : (<IDKitWidget
                             app_id={APP_ID} // obtained from the Developer Portal
                             action={ACTION_ID} // this is your action name from the Developer Portal
@@ -89,7 +89,7 @@ export default function Navbar() {
                             verification_level="device" // minimum verification level accepted, defaults to "orb"
                         >
                             {({open}) => <button
-                                className=" mx-4 px-3 py-1 bg-theme-purple hover:bg-theme-purple-dark rounded-lg "
+                                className=" mx-4 px-3 text-white py-1 bg-theme-blue-light hover:bg-theme-blue rounded-lg "
                                 onClick={open}>Login with World Id</button>}
                         </IDKitWidget>)}
 
@@ -105,12 +105,12 @@ export default function Navbar() {
                         {isMenuOpen ? <FaTimes/> : <FaBars/>}
                     </button>
                 </div>
-                <div className="md:hidden my-2">
+                <div className="md:hidden my-2 bg-white">
                     {isMenuOpen && (<div
-                            className=" text-center flex flex-col gap-2  border-t border-theme-gray-light py-2  font-bold">
-                            <Link className=" py-1 hover:bg-theme-gray-light" href="/create">Create</Link>
-                            <Link className=" py-1 hover:bg-theme-gray-light" href="/vote">Vote</Link>
-                            <Link className=" py-1 hover:bg-theme-gray-light" href="/earn">Earn</Link>
+                            className=" text-center flex flex-col gap-2  border-t border-theme-blue-light py-2  font-bold">
+                            <Link className=" py-1 hover:text-black text-gray-500" href="/create">Create</Link>
+                            <Link className=" py-1 hover:text-black text-gray-500" href="/vote">Vote</Link>
+                            <Link className=" py-1 hover:text-black text-gray-500" href="/earn">Earn</Link>
                             <IDKitWidget
                                 app_id={APP_ID} // obtained from the Developer Portal
                                 action={ACTION_ID} // this is your action name from the Developer Portal
@@ -120,7 +120,7 @@ export default function Navbar() {
                                 verification_level="device" // minimum verification level accepted, defaults to "orb"
                             >
                                 {({open}) => <button
-                                    className=" mx-4 px-3 py-2 bg-theme-purple hover:bg-theme-purple-dark rounded-lg  font-bold"
+                                    className=" mx-4 px-3 py-2 bg-theme-blue-light hover:bg-theme-blue rounded-lg text-white font-bold"
                                     onClick={open}>Login with World Id</button>}
                             </IDKitWidget>
                         </div>)}

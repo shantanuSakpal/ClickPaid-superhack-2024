@@ -13,7 +13,7 @@ function BrandLogo(props) {
                 className="w-auto h-12"
             />
             <div
-                className="font-extrabold bg-clip-text text-transparent bg-gradient-to-l from-theme-pink to-theme-purple text-2xl">ClickPaid
+                className="font-extrabold bg-clip-text text-transparent bg-gradient-to-l from-theme-blue to-theme-blue text-2xl">ClickPaid
             </div>
         </Link>
 
