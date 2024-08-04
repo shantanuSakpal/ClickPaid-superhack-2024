@@ -120,22 +120,74 @@ const Page = () => {
   const handleSubmit = async (e) => {
     setLoading(true);
     e.preventDefault();
+  
+    // Validate the form inputs
     if (!validateForm()) {
-        setLoading(false);
+      setLoading(false);
       return;
     }
-
+  
+    // Upload images to Firebase and get URLs
     const uploadedImages = await uploadImages();
     if (uploadedImages.length === 0) {
       toast.error("Could not upload images");
-        setLoading(false);
+      setLoading(false);
       return;
     }
-    const saved = await saveSettings(uploadedImages);
-
+  
+    // Save post data to Firebase
+    try {
+      const docRef = await addDoc(collection(db, 'posts'), {
+        ...formState,
+        images: uploadedImages,
+      });
+      toast.success("Post saved to Firebase successfully!");
+  
+      // Prepare data for blockchain
+      const postID = docRef.id; // Assuming the document ID is used as postID
+      const { selectedChain, bountyReward } = formState;
+      const postDescription = formState.description;
+  
+      // Call the createPost API
+      const response = await fetch('/api/chain/op-sepolia/createPost', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          postID,
+          imageUrls: uploadedImages,
+          descriptions: new Array(uploadedImages.length).fill(''), // Replace with actual descriptions if available
+          postDescription,
+          rewardAmount: bountyReward,
+        }),
+      });
+  
+      const data = await response.json();
+      if (data.success) {
+        toast.success("Post created on blockchain successfully!");
+      } else {
+        toast.error("Failed to create post on blockchain.");
+      }
+  
+      // Reset form state
+      setFormState({
+        title: '',
+        description: '',
+        selectedChain: chains[0],
+        bountyReward: '',
+        numberOfVotes: '',
+        nftPrice: '',
+      });
+      setImageFiles([]);
+    } catch (error) {
+      console.error("Error handling submit:", error);
+      toast.error("Could not save post.");
+    }
+  
     setLoading(false);
-
   };
+  
 
   const renderDivs = () => {
     const divs = [];

@@ -9,7 +9,7 @@ const cors = require('cors');
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(cors({
-    origin: '*', // Update with your frontend domain
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true
 }));

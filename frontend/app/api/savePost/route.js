@@ -1,4 +1,4 @@
-import { db } from '../../../_lib/firebase';
+import { db } from '../../../_lib/fireBaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 
 export async function POST(request) {
