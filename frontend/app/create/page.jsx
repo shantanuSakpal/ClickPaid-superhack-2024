@@ -1,19 +1,19 @@
 "use client";
 import React, { useState } from 'react';
-import {  toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import { uploadImage } from '@/app/_utils/uploadImages'; // Import uploadImage function
 import { db } from '@/app/_lib/fireBaseConfig'; // Import db from firebaseConfig
 import { collection, addDoc } from 'firebase/firestore';
 import Image from "next/image";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
-import {ChevronDownIcon} from "@heroicons/react/20/solid";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 const chains = [
-  { name: 'OP Sepolia', image: '/chain/optimism.jpeg' },
-  { name: 'Base', image: '/chain/base.jpeg' },
-  { name: 'Mode', image: '/chain/mode.png' },
-  { name: 'WorldCoin', image: '/chain/worldcoin.png' },
+  { name: 'OP Sepolia', image: '/chain/optimism.jpeg', apiEndpoint: '/api/chain/op-sepolia/createPost' },
+  { name: 'Base Sepolia', image: '/chain/base.jpeg', apiEndpoint: '/api/chain/base-sepolia/createPost' },
+  { name: 'Mode TestNet', image: '/chain/mode.png', apiEndpoint: '/api/chain/mode-testnet/createPost' },
+  { name: 'Metal L2', image: '/chain/metal-L2.png', apiEndpoint: '/api/chain/metal-L2/createPost' },
 ];
 
 const Page = () => {
@@ -69,15 +69,10 @@ const Page = () => {
       return false;
     }
 
-    if(imageFiles.length === 0) {
-        toast.error("At least one image is required");
-        return false;
-    }
-    if(bountyReward <= 0 || numberOfVotes <= 0 || nftPrice <= 0){
-      toast.error("Values must be greater than 0");
+    if (imageFiles.length === 0) {
+      toast.error("At least one image is required");
       return false;
     }
-
 
     return true;
   };
@@ -86,47 +81,23 @@ const Page = () => {
     const uploadedImages = await Promise.all(
       imageFiles.map(file => uploadImage(file))
     );
-    //if failed to upload images, return
     if (uploadedImages.some(url => !url)) {
-        return [];
+      return [];
     }
     toast.success("Images Uploaded Successfully");
     return uploadedImages.filter(url => url);
-
-  };
-
-  const saveSettings = async (uploadedImages) => {
-    try {
-      const docRef = await addDoc(collection(db, 'posts'), {
-        ...formState,
-        images: uploadedImages,
-      });
-      toast.success("Post submitted successfully!");
-      setFormState({
-        title: '',
-        description: '',
-        selectedChain: chains[0],
-        bountyReward: '',
-        numberOfVotes: '',
-        nftPrice: '',
-      });
-      setImageFiles([]);
-    } catch (error) {
-      console.error("Error saving post:", error);
-      toast.error("Could not save post.");
-    }
   };
 
   const handleSubmit = async (e) => {
     setLoading(true);
     e.preventDefault();
-  
+
     // Validate the form inputs
     if (!validateForm()) {
       setLoading(false);
       return;
     }
-  
+
     // Upload images to Firebase and get URLs
     const uploadedImages = await uploadImages();
     if (uploadedImages.length === 0) {
@@ -134,7 +105,7 @@ const Page = () => {
       setLoading(false);
       return;
     }
-  
+
     // Save post data to Firebase
     try {
       const docRef = await addDoc(collection(db, 'posts'), {
@@ -142,14 +113,17 @@ const Page = () => {
         images: uploadedImages,
       });
       toast.success("Post saved to Firebase successfully!");
-  
+
       // Prepare data for blockchain
       const postID = docRef.id; // Assuming the document ID is used as postID
       const { selectedChain, bountyReward } = formState;
       const postDescription = formState.description;
-  
+
+      // Construct the API URL based on the selected chain
+      const apiUrl = selectedChain.apiEndpoint;
+
       // Call the createPost API
-      const response = await fetch('/api/chain/op-sepolia/createPost', {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -162,14 +136,14 @@ const Page = () => {
           rewardAmount: bountyReward,
         }),
       });
-  
+
       const data = await response.json();
       if (data.success) {
         toast.success("Post created on blockchain successfully!");
       } else {
         toast.error("Failed to create post on blockchain.");
       }
-  
+
       // Reset form state
       setFormState({
         title: '',
@@ -184,10 +158,9 @@ const Page = () => {
       console.error("Error handling submit:", error);
       toast.error("Could not save post.");
     }
-  
+
     setLoading(false);
   };
-  
 
   const renderDivs = () => {
     const divs = [];
@@ -197,7 +170,7 @@ const Page = () => {
       divs.push(
         <div key={i} className="relative w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
           <Image src={URL.createObjectURL(imageFiles[i])} alt={`uploaded-${i}`} className="absolute inset-0 w-full h-full object-cover rounded"
-          width={300} height={300}
+            width={300} height={300}
           />
           <button
             onClick={() => handleImageRemove(i)}
@@ -214,19 +187,19 @@ const Page = () => {
     // Add blank upload div
     if (imageFiles.length < 4) {
       divs.push(
-          <div key={imageFiles.length}
-               className="relative flex items-center justify-center w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
-            <label className="absolute top-1/2 flex flex-row text-black text-xl items-center gap-2 ">Upload <FaCloudUploadAlt/>
-            </label>
-            <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageUpload}
-                className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-            />
+        <div key={imageFiles.length}
+          className="relative flex items-center justify-center w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
+          <label className="absolute top-1/2 flex flex-row text-black text-xl items-center gap-2 ">Upload <FaCloudUploadAlt />
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleImageUpload}
+            className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+          />
 
-          </div>
+        </div>
       );
     }
 

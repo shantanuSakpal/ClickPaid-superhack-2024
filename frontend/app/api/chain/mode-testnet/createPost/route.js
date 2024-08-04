@@ -4,14 +4,14 @@ import fs from 'fs';
 require('dotenv').config();
 
 // Replace with your contract address
-const contractAddress = '0xABB0dE846192d45C737E3B9B401BB43697ffcFe3';
+const contractAddress = '0xa34EDe7bd7A3567D733EA69ad7E7dC5dB600495C';
 
 // Path to the ABI JSON file
 const abiFilePath = path.resolve(process.cwd(), 'public', 'abis', 'abi.json');
 const abi = JSON.parse(fs.readFileSync(abiFilePath, 'utf8'));
 
-
-const web3 = new Web3(new Web3.providers.HttpProvider(`https://optimism-sepolia.infura.io/v3/b725fe7c53164e5da34a10cc350877c4`));
+// Configure Web3 instance
+const web3 = new Web3(new Web3.providers.HttpProvider('https://sepolia.mode.network'));
 
 // Configure the contract
 const contract = new web3.eth.Contract(abi, contractAddress);
@@ -22,8 +22,13 @@ const signTransaction = async (transactionObject, privateKey) => {
   return signedTx.rawTransaction;
 };
 
+// Estimate gas for the transaction
+const estimateGas = async (transactionObject) => {
+  return await web3.eth.estimateGas(transactionObject);
+};
+
+// Export the POST function for the API route
 export async function POST(req) {
-  const res = new Response(); // Create a dummy response object for handling
   try {
     const { postID, imageUrls, descriptions, postDescription, rewardAmount } = await req.json();
 
@@ -43,7 +48,7 @@ export async function POST(req) {
 
     // Create transaction object
     const transactionObject = {
-      from: fromAddress, // Add the from address here
+      from: fromAddress,
       to: contractAddress,
       data: contract.methods.createPost(
         postID,
@@ -52,9 +57,18 @@ export async function POST(req) {
         postDescription,
         web3.utils.toWei(rewardAmount.toString(), 'ether')
       ).encodeABI(),
-      gas: 2000000, // Specify the gas limit
-      maxFeePerGas: web3.utils.toWei('50', 'gwei'), // Maximum total fee per gas
-      maxPriorityFeePerGas: web3.utils.toWei('10', 'gwei'), // Priority fee per gas
+      gas: await estimateGas({
+        from: fromAddress,
+        to: contractAddress,
+        data: contract.methods.createPost(
+          postID,
+          imageUrls,
+          descriptions,
+          postDescription,
+          web3.utils.toWei(rewardAmount.toString(), 'ether')
+        ).encodeABI()
+      }), // Estimate the gas
+      gasPrice: web3.utils.toWei('10', 'gwei'), // Set a lower gas price
     };
 
     // Sign and send the transaction

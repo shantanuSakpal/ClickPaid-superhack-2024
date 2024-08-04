@@ -3,15 +3,15 @@ import path from 'path';
 import fs from 'fs';
 require('dotenv').config();
 
-// Replace with your contract address
-const contractAddress = '0xABB0dE846192d45C737E3B9B401BB43697ffcFe3';
+// Replace with your contract address for Base Sepolia
+const contractAddress = '0xa34EDe7bd7A3567D733EA69ad7E7dC5dB600495C';
 
 // Path to the ABI JSON file
 const abiFilePath = path.resolve(process.cwd(), 'public', 'abis', 'abi.json');
 const abi = JSON.parse(fs.readFileSync(abiFilePath, 'utf8'));
 
-
-const web3 = new Web3(new Web3.providers.HttpProvider(`https://optimism-sepolia.infura.io/v3/b725fe7c53164e5da34a10cc350877c4`));
+// Configure Web3 instance with Base Sepolia RPC URL
+const web3 = new Web3(new Web3.providers.HttpProvider('https://base-sepolia.g.alchemy.com/v2/5gfYGR46TZqdOnjEY-scgyCAwjWXeorz'));
 
 // Configure the contract
 const contract = new web3.eth.Contract(abi, contractAddress);
@@ -22,6 +22,7 @@ const signTransaction = async (transactionObject, privateKey) => {
   return signedTx.rawTransaction;
 };
 
+// Export the POST function for the API route
 export async function POST(req) {
   const res = new Response(); // Create a dummy response object for handling
   try {
