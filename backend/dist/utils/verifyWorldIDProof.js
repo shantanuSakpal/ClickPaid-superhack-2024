@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyProofWithWorldcoin = void 0;
+exports.verifyProofWithWorldcoin = verifyProofWithWorldcoin;
 function verifyProofWithWorldcoin(app_id, nullifier_hash, proof, merkle_root, verification_level, action) {
     return __awaiter(this, void 0, void 0, function* () {
         const BASE_URL = 'https://developer.worldcoin.org';
@@ -36,4 +36,3 @@ function verifyProofWithWorldcoin(app_id, nullifier_hash, proof, merkle_root, ve
         return yield response.json();
     });
 }
-exports.verifyProofWithWorldcoin = verifyProofWithWorldcoin;
