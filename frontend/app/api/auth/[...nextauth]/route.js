@@ -51,7 +51,7 @@ export const authOptions = {
                     id: token.sub,
                     name: randomName,
                     walletAddress: "",
-                    tokenBalance: 0,
+                    realTokenBalance: 0,
                     trialTokenBalance: 100,
                     posts: [],
                     votes: [],
@@ -66,6 +66,10 @@ export const authOptions = {
                 const userData = userSnap.data();
                 session.user.name = userData.name;
                 session.user.id = userData.id;
+                session.user.tokens = {
+                    realTokenBalance: userData.realTokenBalance,
+                    trialTokenBalance: userData.trialTokenBalance
+                }
             }
 
             return session;

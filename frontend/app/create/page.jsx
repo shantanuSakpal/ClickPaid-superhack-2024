@@ -148,69 +148,105 @@ const Page = () => {
     }
 
     const handleSubmit = async (e) => {
-        setLoading(true);
-        e.preventDefault();
+            setLoading(true);
+            e.preventDefault();
 
-        // Validate the form inputs
-        if (!validateForm()) {
-            setLoading(false);
-            return;
-        }
-
-        // Upload images to Firebase and get URLs
-        const uploadedImages = await uploadImages();
-        if (uploadedImages.length === 0) {
-            toast.error("Could not upload images");
-            setLoading(false);
-            return;
-        }
-
-        if (!session.user.id) {
-            toast.error("Please login to create post");
-            setLoading(false);
-            return;
-        }
-
-        try {
-            // Save post data to Firebase
-            const postData = {
-                ...formState,
-                userId: session.user.id,
-                options: uploadedImages,
-                isDone: false,
-            };
-            console.log("postData", postData)
-            const docRef = await addDoc(collection(db, 'posts'), postData);
-
-            // find the user using the session.user.name and add the post id to the post array in the user document
-            const userRef = doc(db, "users", session.user.id);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-                const userDoc = userSnap.data();
-                const updatedPosts = [...userDoc.posts, docRef.id];
-                await setDoc(userRef, {posts: updatedPosts}, {merge: true});
+            // Validate the form inputs
+            if (!validateForm()) {
+                setLoading(false);
+                return;
             }
 
-            toast.success("Post published successfully!");
+            if (!session.user.id) {
+                toast.error("Please login to create post");
+                setLoading(false);
+                return;
+            }
 
-            //add data to blockchain
-            await addDataToBlockchain(postData);
 
-            // Reset form state
-            setFormState({
-                title: '',
-                description: '',
-                bountyReward: '',
-                numberOfVotes: '',
-            });
-            setImageFiles([]);
-        } catch (error) {
-            console.error("Error handling submit:", error);
-            toast.error("Could not save post.");
+            try {
+                // Check balance before proceeding
+                const userRef = doc(db, "users", session.user.id);
+                const userSnap = await getDoc(userRef);
+                let trialTokenBalance = 0;
+                let realTokenBalance = 0;
+                if (!userSnap.exists()) {
+
+                    toast.error("User not found")
+                    setLoading(false);
+                    return;
+
+
+                }
+                const userDoc = userSnap.data();
+                realTokenBalance = userDoc.realTokenBalance;
+                trialTokenBalance = userDoc.trialTokenBalance;
+                if (trialTokenBalance > 0 || realTokenBalance > 0) {
+                    if (formState.bountyReward <= trialTokenBalance) {
+                        //if user has trial tokens , deduct trial tokens
+                        trialTokenBalance = trialTokenBalance - formState.bountyReward;
+                    } else {
+                        let remainingAmt = formState.bountyReward - trialTokenBalance;
+                        trialTokenBalance = 0;
+                        if (realTokenBalance >= remainingAmt) {
+                            realTokenBalance = realTokenBalance - remainingAmt
+                        } else {
+                            toast.error("Not enough balance!")
+                            return;
+                        }
+                    }
+                } else {
+                    toast.error("Not enough balance!");
+                }
+
+                // Upload images to Firebase and get URLs
+                const uploadedImages = await uploadImages();
+                if (uploadedImages.length === 0) {
+                    toast.error("Could not upload images");
+                    setLoading(false);
+                    return;
+                }
+
+                // Save post data to Firebase
+                const postData = {
+                    ...formState,
+                    userId: session.user.id,
+                    options: uploadedImages,
+                    isDone: false,
+                };
+                console.log("postData", postData)
+                const docRef = await addDoc(collection(db, 'posts'), postData);
+
+                // Update user document with new post ID and token balances
+                await setDoc(userRef, {
+                    posts: [...userDoc.posts, docRef.id],
+                    realTokenBalance: realTokenBalance,
+                    trialTokenBalance: trialTokenBalance,
+                }, {merge: true});
+
+                toast.success("Post published successfully!");
+
+                // Add data to blockchain
+                await addDataToBlockchain(postData);
+
+                // Reset form state
+                setFormState({
+                    title: '',
+                    description: '',
+                    bountyReward: '',
+                    numberOfVotes: '',
+                });
+                setImageFiles([]);
+            } catch (error) {
+                console.error("Error handling submit:", error);
+                toast.error("Could not save post.");
+            } finally {
+                setLoading(false)
+            }
+
+            setLoading(false);
         }
-
-        setLoading(false);
-    };
+    ;
 
     const renderDivs = () => {
         const divs = [];
@@ -271,7 +307,8 @@ const Page = () => {
                     Create new post
                 </h1>
                 <p className="text-lg text-center">
-                    Upload your images and let our community help you find the most attractive and clickable thumbnail.
+                    Upload your images and let our community help you find the most attractive and clickable
+                    thumbnail.
                 </p>
             </div>
 

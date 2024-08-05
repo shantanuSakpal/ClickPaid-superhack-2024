@@ -4,7 +4,6 @@ import { useSession, signOut } from "next-auth/react";
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import { User } from "@nextui-org/user";
 import { Button } from "@nextui-org/react";
-// Import your components here
 import Balances from '@components/users/Balances'; // Adjust paths if needed
 import Transactions from '@components/users/Transactions'; // Renamed to Transactions
 import Votes from '@components/users/Votes'; // New component for Votes
