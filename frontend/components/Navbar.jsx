@@ -32,9 +32,9 @@ export default function Navbar() {
                         <Link href="/vote" className=" px-3 py-1 rounded-lg hover:text-black text-gray-500">
                             Vote
                         </Link>
-                        <Link href="/earn" className=" px-3 py-1 rounded-lg hover:text-black text-gray-500">
-                            Your Rewards
-                        </Link>
+                        {/*<Link href="/earn" className=" px-3 py-1 rounded-lg hover:text-black text-gray-500">*/}
+                        {/*    Your Rewards*/}
+                        {/*</Link>*/}
                         {
                             session && <div>
                                 {session?.user.tokens.trialTokenBalance} Trial tokens left
@@ -73,7 +73,7 @@ export default function Navbar() {
                         className=" text-center flex flex-col gap-2  border-t border-theme-blue-light py-2  font-bold">
                         <Link className=" py-1 hover:text-black text-gray-500" href="/create">Create</Link>
                         <Link className=" py-1 hover:text-black text-gray-500" href="/vote">Vote</Link>
-                        <Link className=" py-1 hover:text-black text-gray-500" href="/earn">Your Rewards</Link>
+                        {/*<Link className=" py-1 hover:text-black text-gray-500" href="/earn">Your Rewards</Link>*/}
                         {/*login with world id*/}
                         {
                             session ? (

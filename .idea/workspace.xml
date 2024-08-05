@@ -5,11 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/frontend/app/_utils/fetchTokens.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/app/api/getPost/route.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/api/auth/[...nextauth]/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/auth/[...nextauth]/route.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/create/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/create/page.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/profile/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/profile/page.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/vote/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/vote/page.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Navbar.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -91,7 +90,9 @@
       <workItem from="1722762605948" duration="10635000" />
       <workItem from="1722826920563" duration="11808000" />
       <workItem from="1722850153200" duration="704000" />
-      <workItem from="1722850864803" duration="640000" />
+      <workItem from="1722850864803" duration="827000" />
+      <workItem from="1722851708759" duration="33000" />
+      <workItem from="1722854302033" duration="1668000" />
     </task>
     <servers />
   </component>
