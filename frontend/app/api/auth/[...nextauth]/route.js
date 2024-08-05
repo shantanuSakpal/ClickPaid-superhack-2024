@@ -48,20 +48,29 @@ export const authOptions = {
 
                 // Create a new user document in Firestore
                 await setDoc(userRef, {
+                    id: token.sub,
                     name: randomName,
                     walletAddress: "",
-                    rewards: 0,
-                    balance: 0,
+                    tokenBalance: 0,
+                    trialTokenBalance: 100,
                     posts: [],
+                    votes: [],
+                    payouts: [],
                     // Add any other fields you want to store
                 });
 
                 // Update the session with the generated name
                 session.user.name = randomName;
+            } else {
+                // Retrieve user data from Firestore
+                const userData = userSnap.data();
+                session.user.name = userData.name;
+                session.user.id = userData.id;
             }
 
             return session;
         },
+
     },
     debug: true,
 };

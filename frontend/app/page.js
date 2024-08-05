@@ -14,7 +14,7 @@ export default function Home() {
             {/*header info*/}
             <div className="flex justify-center items-center w-full py-8 px-2 gap-5">
                 <div className="w-1/2 px-10 gap-3 flex flex-col">
-                    <h1 className="text-5xl font-bold text-theme-gray-dark">Create. Vote. Earn.</h1>
+                    <h1 className="text-5xl font-bold text-theme-gray-dark">Boost Your Views. <br/> Reward the Community.</h1>
                     <p className="text-2xl text-justify">Upload or Create amazing thumbnails using AI, and let the Community choose the best one! <br/>
 
                     </p>

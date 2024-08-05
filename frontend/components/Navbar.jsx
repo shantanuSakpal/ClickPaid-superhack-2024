@@ -9,7 +9,7 @@ import { CgProfile } from "react-icons/cg";
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const {data: session} = useSession()
-    console.log("session", session)
+    // console.log("session", session)
 
     return (<nav className="fixed top-0 left-0 w-full z-10 border-b bg-white">
 
@@ -26,7 +26,7 @@ export default function Navbar() {
                         Vote
                     </Link>
                     <Link href="/earn" className=" px-3 py-1 rounded-lg hover:text-black text-gray-500">
-                        Earn
+                        Your Rewards
                     </Link>
 
                     {/*login with world id*/}
@@ -61,7 +61,7 @@ export default function Navbar() {
                     className=" text-center flex flex-col gap-2  border-t border-theme-blue-light py-2  font-bold">
                     <Link className=" py-1 hover:text-black text-gray-500" href="/create">Create</Link>
                     <Link className=" py-1 hover:text-black text-gray-500" href="/vote">Vote</Link>
-                    <Link className=" py-1 hover:text-black text-gray-500" href="/earn">Earn</Link>
+                    <Link className=" py-1 hover:text-black text-gray-500" href="/earn">Your Rewards</Link>
                     {/*login with world id*/}
                     {
                         session ? (

@@ -3,12 +3,13 @@ import React, {useState} from 'react';
 import {toast} from 'react-hot-toast';
 import {uploadImage} from '@/app/_utils/uploadImages'; // Import uploadImage function
 import {db} from '@/app/_lib/fireBaseConfig'; // Import db from firebaseConfig
-import {collection, addDoc,doc, getDoc, setDoc} from 'firebase/firestore';
+import {collection, addDoc, doc, getDoc, setDoc} from 'firebase/firestore';
 import Image from "next/image";
 import {FaCloudUploadAlt} from "react-icons/fa";
 import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
 import {ChevronDownIcon} from "@heroicons/react/20/solid";
-import {useSession} from "next-auth/react"
+import {useSession, signIn} from "next-auth/react"
+
 
 const chains = [
     {name: 'OP Sepolia', image: '/chain/optimism.jpeg', apiEndpoint: '/api/chain/op-sepolia/createPost'},
@@ -21,15 +22,14 @@ const Page = () => {
     const [formState, setFormState] = useState({
         title: '',
         description: '',
-        selectedChain: chains[0],
         bountyReward: '',
         numberOfVotes: '',
-        nftPrice: '',
     });
 
     const [images, setImages] = useState([]);
     const [imageFiles, setImageFiles] = useState([]); // Store file references
     const [loading, setLoading] = useState(false);
+    const [uploadingImages, setUploadingImages] = useState(false)
     const {data: session} = useSession()
 
     const handleChange = (e) => {
@@ -58,17 +58,29 @@ const Page = () => {
 
     const validateForm = () => {
         const {title, description, bountyReward, numberOfVotes, nftPrice} = formState;
-        if (!title || !description || !bountyReward || !numberOfVotes || !nftPrice) {
+        if (!title || !bountyReward || !numberOfVotes) {
             toast.error("All fields are required");
             return false;
         }
-        if (isNaN(bountyReward) || isNaN(numberOfVotes) || isNaN(nftPrice)) {
-            toast.error("Bounty Reward, Votes, and NFT Price must be numbers");
+
+        if (Number(bountyReward) < 10) {
+            toast.error("Reward should be at least 10 tokens");
             return false;
         }
-        if (Number(bountyReward) <= 0 || Number(numberOfVotes) <= 0 || Number(nftPrice) <= 0) {
-            toast.error("Values must be greater than 0");
+        if (Number(numberOfVotes) < 10) {
+            toast.error("Votes should be at least 10");
             return false;
+        }
+
+        // Check image size
+        if (imageFiles.length > 0) {
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            for (const file of imageFiles) {
+                if (file.size > maxSize) {
+                    toast.error("Image exceeds maximum size (5MB)");
+                    return false;
+                }
+            }
         }
 
         if (imageFiles.length === 0) {
@@ -80,15 +92,60 @@ const Page = () => {
     };
 
     const uploadImages = async () => {
+        setUploadingImages(true)
         const uploadedImages = await Promise.all(
-            imageFiles.map(file => uploadImage(file))
+            imageFiles.map(async (file) => {
+                const url = await uploadImage(file);
+                if (!url) return null;
+
+                return {
+                    id: Math.random().toString(36).substring(2, 9),
+                    imageUrl: url,
+                    votes: 0,
+                };
+            })
         );
-        if (uploadedImages.some(url => !url)) {
+        if (uploadedImages.some((image) => !image)) {
+            setUploadingImages(false)
             return [];
         }
-        toast.success("Images Uploaded Successfully");
-        return uploadedImages.filter(url => url);
+        // toast.success("Images Uploaded Successfully");
+        setUploadingImages(false);
+        return uploadedImages.filter((image) => image);
     };
+
+    const addDataToBlockchain = async (postData) => {
+        // Prepare data for blockchain
+
+        // const postID = docRef.id; // Assuming the document ID is used as postID
+        // const {selectedChain, bountyReward} = formState;
+        // const postDescription = formState.description;
+        //
+        // // Construct the API URL based on the selected chain
+        // const apiUrl = selectedChain.apiEndpoint;
+        // // Call the createPost API
+        // const response = await fetch(apiUrl, {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({
+        //         postID,
+        //         imageUrls: uploadedImages,
+        //         descriptions: new Array(uploadedImages.length).fill(''), // Replace with actual descriptions if available
+        //         postDescription,
+        //         rewardAmount: bountyReward,
+        //     }),
+        // });
+        //
+        // const data = await response.json();
+        // if (data.success) {
+        //     toast.success("Post created on blockchain successfully!");
+        // } else {
+        //     toast.error("Failed to create post on blockchain.");
+        // }
+
+    }
 
     const handleSubmit = async (e) => {
         setLoading(true);
@@ -108,22 +165,25 @@ const Page = () => {
             return;
         }
 
-        if (!session) {
+        if (!session.user.id) {
             toast.error("Please login to create post");
             setLoading(false);
             return;
         }
 
-        // Save post data to Firebase
         try {
-            const docRef = await addDoc(collection(db, 'posts'), {
+            // Save post data to Firebase
+            const postData = {
                 ...formState,
-                userId: session.user.name,
-                images: uploadedImages,
-            });
+                userId: session.user.id,
+                options: uploadedImages,
+                isDone: false,
+            };
+            console.log("postData", postData)
+            const docRef = await addDoc(collection(db, 'posts'), postData);
 
-          //find the user using the session.user.name and add the post id to the post array in the user document
-            const userRef = doc(db, "users", session.user.name);
+            // find the user using the session.user.name and add the post id to the post array in the user document
+            const userRef = doc(db, "users", session.user.id);
             const userSnap = await getDoc(userRef);
             if (userSnap.exists()) {
                 const userDoc = userSnap.data();
@@ -131,46 +191,17 @@ const Page = () => {
                 await setDoc(userRef, {posts: updatedPosts}, {merge: true});
             }
 
-            toast.success("Post saved to Firebase successfully!");
+            toast.success("Post published successfully!");
 
-            // Prepare data for blockchain
-            const postID = docRef.id; // Assuming the document ID is used as postID
-            const {selectedChain, bountyReward} = formState;
-            const postDescription = formState.description;
-
-            // Construct the API URL based on the selected chain
-            const apiUrl = selectedChain.apiEndpoint;
-
-            // Call the createPost API
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    postID,
-                    imageUrls: uploadedImages,
-                    descriptions: new Array(uploadedImages.length).fill(''), // Replace with actual descriptions if available
-                    postDescription,
-                    rewardAmount: bountyReward,
-                }),
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                toast.success("Post created on blockchain successfully!");
-            } else {
-                toast.error("Failed to create post on blockchain.");
-            }
+            //add data to blockchain
+            await addDataToBlockchain(postData);
 
             // Reset form state
             setFormState({
                 title: '',
                 description: '',
-                selectedChain: chains[0],
                 bountyReward: '',
                 numberOfVotes: '',
-                nftPrice: '',
             });
             setImageFiles([]);
         } catch (error) {
@@ -212,7 +243,11 @@ const Page = () => {
                 <div key={imageFiles.length}
                      className="relative flex items-center justify-center w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
                     <label
-                        className="absolute top-1/2 flex flex-row text-black text-xl items-center gap-2 ">Upload <FaCloudUploadAlt/>
+                        className="absolute top-1/2 flex flex-col text-black text-xl items-center ">
+                        <div className="flex gap-2 items-center justify-center ">
+                            Upload <FaCloudUploadAlt/>
+                        </div>
+                        <span className="text-sm">(Max 5 Mb)</span>
                     </label>
                     <input
                         type="file"
@@ -230,145 +265,164 @@ const Page = () => {
     };
 
     return (
-        <div className="flex min-h-[100vh] px-10 ">
-            {/* Left side */}
-            <div className="w-7/12 p-4 ">
-                <div className={`grid gap-4 ${imageFiles.length === 0 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                    {renderDivs()}
+        <div className="w-full">
+            <div className="py-2 mb-5">
+                <h1 className="text-3xl text-center font-bold mb-2">
+                    Create new post
+                </h1>
+                <p className="text-lg text-center">
+                    Upload your images and let our community help you find the most attractive and clickable thumbnail.
+                </p>
+            </div>
+
+            <div className="flex min-h-[100vh] px-10 ">
+                {/* Left side */}
+                <div className="w-7/12 p-4 ">
+                    <div className={`grid gap-4 ${imageFiles.length === 0 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                        {renderDivs()}
+                    </div>
+                </div>
+
+                {/* Right side */}
+                <div className="w-5/12 p-4">
+                    <form className="space-y-4" onSubmit={handleSubmit}>
+                        <div>
+                            <label htmlFor="title" className="block text-sm font-medium text-gray-700">Post
+                                Title</label>
+                            <input
+                                type="text"
+                                id="title"
+                                name="title"
+                                value={formState.title}
+                                onChange={handleChange}
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                                placeholder="Enter post title"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="description" className="block text-sm font-medium text-gray-700">Post
+                                Description</label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                value={formState.description}
+                                onChange={handleChange}
+                                rows="4"
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                                placeholder="Tell people about this post (optional)"
+                            ></textarea>
+                        </div>
+                        <div className='flex space-x-2'>
+                            <div className='w-1/2'>
+                                <label htmlFor="bountyReward"
+                                       className="block text-sm font-medium text-gray-700">Reward</label>
+                                <input
+                                    type="number"
+                                    id="bountyReward"
+                                    name="bountyReward"
+                                    value={formState.bountyReward}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                                    placeholder="Enter reward amount for this post"
+                                />
+                            </div>
+                            <div className='w-1/2'>
+                                <label htmlFor="numberOfVotes" className="block text-sm font-medium text-gray-700">Number
+                                    of
+                                    Votes</label>
+                                <input
+                                    type="number"
+                                    id="numberOfVotes"
+                                    name="numberOfVotes"
+                                    value={formState.numberOfVotes}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                                    placeholder="Enter number of votes"
+                                />
+                            </div>
+                        </div>
+                        {/*removing nft and chain selection for now*/}
+                        {/*<div className='flex space-x-2'>*/}
+                        {/*    <div className='w-1/2'>*/}
+                        {/*        <label htmlFor="nftPrice" className="block text-sm font-medium text-gray-700">NFT*/}
+                        {/*            Price</label>*/}
+                        {/*        <input*/}
+                        {/*            type="number"*/}
+                        {/*            id="nftPrice"*/}
+                        {/*            name="nftPrice"*/}
+                        {/*            value={formState.nftPrice}*/}
+                        {/*            onChange={handleChange}*/}
+                        {/*            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"*/}
+                        {/*            placeholder="Enter NFT price"*/}
+                        {/*        />*/}
+                        {/*    </div>*/}
+                        {/*    <div className="w-1/2">*/}
+                        {/*        <label className="block text-sm font-medium text-gray-700 mb-1">Select Chain</label>*/}
+                        {/*        <Menu as="div" className="relative inline-block text-left w-full">*/}
+                        {/*            <div>*/}
+                        {/*                <MenuButton*/}
+                        {/*                    className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">*/}
+                        {/*                    <img src={formState.selectedChain.image} alt={formState.selectedChain.name}*/}
+                        {/*                         className="w-5 h-5 rounded-full mr-2"/>*/}
+                        {/*                    {formState.selectedChain.name}*/}
+                        {/*                    <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400"/>*/}
+                        {/*                </MenuButton>*/}
+                        {/*            </div>*/}
+                        {/*            <MenuItems*/}
+                        {/*                transition*/}
+                        {/*                className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"*/}
+                        {/*            >*/}
+                        {/*                <div className="py-1">*/}
+                        {/*                    {chains.map((chain) => (*/}
+                        {/*                        <MenuItem key={chain.name}>*/}
+                        {/*                            {({active}) => (*/}
+                        {/*                                <button*/}
+                        {/*                                    type="button"*/}
+                        {/*                                    onClick={() => setFormState({*/}
+                        {/*                                        ...formState,*/}
+                        {/*                                        selectedChain: chain*/}
+                        {/*                                    })}*/}
+                        {/*                                    className={`block w-full px-4 py-2 text-left text-sm ${active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'}`}*/}
+                        {/*                                >*/}
+                        {/*                                    <img src={chain.image} alt={chain.name}*/}
+                        {/*                                         className="w-5 h-5 rounded-full mr-2 inline"/>*/}
+                        {/*                                    {chain.name}*/}
+                        {/*                                </button>*/}
+                        {/*                            )}*/}
+                        {/*                        </MenuItem>*/}
+                        {/*                    ))}*/}
+                        {/*                </div>*/}
+                        {/*            </MenuItems>*/}
+                        {/*        </Menu>*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
+                        {
+                            session ? (
+                                <button
+                                    type="submit"
+                                    className={`w-full mt-4  font-semibold py-2 rounded-md  ${loading ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        uploadingImages ? "Uploading images..." : "Creating post..."
+                                    ) : 'Publish Post'}
+                                </button>
+                            ) : (
+                                <button
+                                    type="button"
+                                    className="w-full mt-4 bg-theme-blue-light text-white font-semibold py-2 rounded-md hover:bg-theme-blue"
+                                    onClick={() => {
+                                        signIn("worldcoin")
+                                    }}
+                                >
+                                    Login to Publish Post
+                                </button>
+                            )
+                        }
+                    </form>
                 </div>
             </div>
 
-            {/* Right side */}
-            <div className="w-5/12 p-4">
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                    <div>
-                        <label htmlFor="title" className="block text-sm font-medium text-gray-700">Post Title</label>
-                        <input
-                            type="text"
-                            id="title"
-                            name="title"
-                            value={formState.title}
-                            onChange={handleChange}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
-                            placeholder="Enter post title"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700">Post
-                            Description</label>
-                        <textarea
-                            id="description"
-                            name="description"
-                            value={formState.description}
-                            onChange={handleChange}
-                            rows="4"
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
-                            placeholder="Enter post description"
-                        ></textarea>
-                    </div>
-                    <div className='flex space-x-2'>
-                        <div className='w-1/2'>
-                            <label htmlFor="bountyReward" className="block text-sm font-medium text-gray-700">Bounty
-                                Reward</label>
-                            <input
-                                type="number"
-                                id="bountyReward"
-                                name="bountyReward"
-                                value={formState.bountyReward}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
-                                placeholder="Enter bounty reward"
-                            />
-                        </div>
-                        <div className='w-1/2'>
-                            <label htmlFor="numberOfVotes" className="block text-sm font-medium text-gray-700">Number of
-                                Votes</label>
-                            <input
-                                type="number"
-                                id="numberOfVotes"
-                                name="numberOfVotes"
-                                value={formState.numberOfVotes}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
-                                placeholder="Enter number of votes"
-                            />
-                        </div>
-                    </div>
-                    <div className='flex space-x-2'>
-                        <div className='w-1/2'>
-                            <label htmlFor="nftPrice" className="block text-sm font-medium text-gray-700">NFT
-                                Price</label>
-                            <input
-                                type="number"
-                                id="nftPrice"
-                                name="nftPrice"
-                                value={formState.nftPrice}
-                                onChange={handleChange}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
-                                placeholder="Enter NFT price"
-                            />
-                        </div>
-                        <div className="w-1/2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Select Chain</label>
-                            <Menu as="div" className="relative inline-block text-left w-full">
-                                <div>
-                                    <MenuButton
-                                        className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                                        <img src={formState.selectedChain.image} alt={formState.selectedChain.name}
-                                             className="w-5 h-5 rounded-full mr-2"/>
-                                        {formState.selectedChain.name}
-                                        <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400"/>
-                                    </MenuButton>
-                                </div>
-                                <MenuItems
-                                    transition
-                                    className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                >
-                                    <div className="py-1">
-                                        {chains.map((chain) => (
-                                            <MenuItem key={chain.name}>
-                                                {({active}) => (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setFormState({
-                                                            ...formState,
-                                                            selectedChain: chain
-                                                        })}
-                                                        className={`block w-full px-4 py-2 text-left text-sm ${active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'}`}
-                                                    >
-                                                        <img src={chain.image} alt={chain.name}
-                                                             className="w-5 h-5 rounded-full mr-2 inline"/>
-                                                        {chain.name}
-                                                    </button>
-                                                )}
-                                            </MenuItem>
-                                        ))}
-                                    </div>
-                                </MenuItems>
-                            </Menu>
-                        </div>
-                    </div>
-                    {
-                        session ? (
-                            <button
-                                type="submit"
-                                className="w-full mt-4 bg-theme-blue-light text-white font-semibold py-2 rounded-md hover:bg-theme-blue"
-                                disabled={loading}
-                            >
-                                {loading ? 'Creating Post...' : 'Create Post'}
-                            </button>
-                        ) : (
-                            <button
-                                type="button"
-                                className="w-full mt-4 bg-theme-blue-light text-white font-semibold py-2 rounded-md hover:bg-theme-blue"
-                                onClick={() => toast.error("Please login to create post")}
-                            >
-                                Login to Publish Post
-                            </button>
-                        )
-                    }
-                </form>
-            </div>
         </div>
     );
 };

@@ -31,7 +31,10 @@ function Page() {
                 />
                 
                 {/* Sign Out Button */}
-                <Button color="default" className="p-4 rounded" onClick={() => signOut()}>Sign Out</Button>
+                <Button color="default" className="p-4 rounded" onClick={() => {
+                    localStorage.removeItem('user');
+                    signOut()
+                }}>Sign Out</Button>
 
             </div>
 

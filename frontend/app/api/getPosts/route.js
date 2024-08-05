@@ -13,7 +13,7 @@ export async function GET() {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error("Error fetching posts:", error);
-    return new Response('Failed to fetch posts', { status: 500 });
+    console.error("Error fetching getPosts:", error);
+    return new Response('Failed to fetch getPosts', { status: 500 });
   }
 }

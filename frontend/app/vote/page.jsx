@@ -17,14 +17,15 @@ export default function Home() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await fetch('/api/posts');
+        const response = await fetch('/api/getPosts');
         if (!response.ok) {
-          throw new Error('Failed to fetch posts');
+          throw new Error('Failed to fetch getPosts');
         }
         const data = await response.json();
+        console.log('Fetched getPosts:', data);
         setPosts(data);
       } catch (error) {
-        console.error('Error fetching posts:', error);
+        console.error('Error fetching getPosts:', error);
       }
     };
 
@@ -47,7 +48,7 @@ export default function Home() {
         {/* Center Section for Scrolling Posts */}
         <div className="flex-1 bg-gray-100 p-4 w-3/5 rounded shadow overflow-y-scroll h-screen">
           <h2 className="font-bold mb-4">Posts</h2>
-          {/* Display posts */}
+          {/* Display getPosts */}
           {posts.map(post => (
             <div
               key={post.id}

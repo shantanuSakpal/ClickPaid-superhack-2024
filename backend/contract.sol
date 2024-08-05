@@ -111,7 +111,7 @@ contract ThumbnailVoting {
         return (user.posts, user.balance);
     }
 
-    // Get user posts
+    // Get user getPosts
     function getUserPosts() public view returns (string[] memory) {
         return users[msg.sender].posts;
     }
