@@ -1,44 +1,73 @@
 "use client";
-import React, {useState} from 'react';
-import {toast} from 'react-hot-toast';
-import {uploadImage} from '@/app/_utils/uploadImages'; // Import uploadImage function
-import {db} from '@/app/_lib/fireBaseConfig'; // Import db from firebaseConfig
-import {collection, addDoc, doc, getDoc, setDoc} from 'firebase/firestore';
+import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { uploadImage } from '@/app/_utils/uploadImages'; // Import uploadImage function
+import { db } from '@/app/_lib/fireBaseConfig'; // Import db from firebaseConfig
+import { collection, addDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 import Image from "next/image";
-import {FaCloudUploadAlt} from "react-icons/fa";
-import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
-import {ChevronDownIcon} from "@heroicons/react/20/solid";
-import {useSession, signIn} from "next-auth/react"
+import { FaCloudUploadAlt } from "react-icons/fa";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { useSession, signIn } from "next-auth/react"
+// import ConnectButtonComponent from '@/components/connectButtonComponent';
+import { ThirdwebProvider, ConnectButton } from "thirdweb/react";
+import { createThirdwebClient } from "thirdweb";
+import { createWallet, walletConnect, useActiveAccount} from "thirdweb/wallets";
+// import { useAddress } from "@thirdweb-dev/react";
+
+ 
+
+
+require('dotenv').config();
+
+
+const client = createThirdwebClient({
+    clientId: 'eb0c9674ea623026a3d848191fd7adbc',
+    secretKey: 'zNb-xzG0RwNid64FLXMHzyeV63zjKHNhZOuhr0a3v4zSufIX3Ew2X3aTV1BdmGD1uq52modp_h2ekm43YPr0I'
+});
+
+
+const wallets = [
+    createWallet("io.metamask"),
+    createWallet("com.coinbase.wallet"),
+    walletConnect(),
+    createWallet("com.trustwallet.app"),
+    createWallet("io.zerion.wallet"),
+    createWallet("me.rainbow"),
+    createWallet("app.phantom"),
+];
 
 
 const chains = [
-    {name: 'OP Sepolia', image: '/chain/optimism.jpeg', apiEndpoint: '/api/chain/op-sepolia/createPost'},
-    {name: 'Base Sepolia', image: '/chain/base.jpeg', apiEndpoint: '/api/chain/base-sepolia/createPost'},
-    {name: 'Mode TestNet', image: '/chain/mode.png', apiEndpoint: '/api/chain/mode-testnet/createPost'},
-    {name: 'Metal L2', image: '/chain/metal-L2.png', apiEndpoint: '/api/chain/metal-L2/createPost'},
+    { name: 'OP Sepolia', image: '/chain/optimism.jpeg', apiEndpoint: '/api/chain/op-sepolia/createPost' },
+    { name: 'Base Sepolia', image: '/chain/base.jpeg', apiEndpoint: '/api/chain/base-sepolia/createPost' },
+    { name: 'Mode TestNet', image: '/chain/mode.png', apiEndpoint: '/api/chain/mode-testnet/createPost' },
+    { name: 'Metal L2', image: '/chain/metal-L2.png', apiEndpoint: '/api/chain/metal-L2/createPost' },
 ];
 
-const Page = () => {
+   function Page () {
     const [formState, setFormState] = useState({
         title: '',
         description: '',
         bountyReward: '',
         numberOfVotes: '',
     });
-
+    const activeAccount = useActiveAccount();
     const [images, setImages] = useState([]);
     const [imageFiles, setImageFiles] = useState([]); // Store file references
     const [loading, setLoading] = useState(false);
     const [uploadingImages, setUploadingImages] = useState(false)
-    const {data: session} = useSession()
-
+    const { data: session } = useSession()
+    const [userAddress, setUserAddress] = useState('');
     const handleChange = (e) => {
-        const {name, value} = e.target;
+        const { name, value } = e.target;
         setFormState({
             ...formState,
             [name]: value,
         });
     };
+    // const activeAccount = useActiveAccount(client);
+    // console.log("activeAccount", activeAccount)
 
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
@@ -50,6 +79,13 @@ const Page = () => {
         setImageFiles(prevFiles => [...prevFiles, ...files].slice(0, 4)); // Append new files and ensure the total count doesn't exceed 4
     };
 
+    const handleConnect = async (wallet) => {
+        console.log("Connected wallet:", wallet);
+
+        setUserAddress(address);
+    };
+
+
     const handleImageRemove = (index) => {
         const updatedFiles = [...imageFiles];
         updatedFiles.splice(index, 1);
@@ -57,7 +93,7 @@ const Page = () => {
     };
 
     const validateForm = () => {
-        const {title, description, bountyReward, numberOfVotes, nftPrice} = formState;
+        const { title, description, bountyReward, numberOfVotes, nftPrice } = formState;
         if (!title || !bountyReward || !numberOfVotes) {
             toast.error("All fields are required");
             return false;
@@ -148,105 +184,105 @@ const Page = () => {
     }
 
     const handleSubmit = async (e) => {
-            setLoading(true);
-            e.preventDefault();
+        setLoading(true);
+        e.preventDefault();
 
-            // Validate the form inputs
-            if (!validateForm()) {
-                setLoading(false);
-                return;
-            }
-
-            if (!session.user.id) {
-                toast.error("Please login to create post");
-                setLoading(false);
-                return;
-            }
-
-
-            try {
-                // Check balance before proceeding
-                const userRef = doc(db, "users", session.user.id);
-                const userSnap = await getDoc(userRef);
-                let trialTokenBalance = 0;
-                let realTokenBalance = 0;
-                if (!userSnap.exists()) {
-
-                    toast.error("User not found")
-                    setLoading(false);
-                    return;
-
-
-                }
-                const userDoc = userSnap.data();
-                realTokenBalance = userDoc.realTokenBalance;
-                trialTokenBalance = userDoc.trialTokenBalance;
-                if (trialTokenBalance > 0 || realTokenBalance > 0) {
-                    if (formState.bountyReward <= trialTokenBalance) {
-                        //if user has trial tokens , deduct trial tokens
-                        trialTokenBalance = trialTokenBalance - formState.bountyReward;
-                    } else {
-                        let remainingAmt = formState.bountyReward - trialTokenBalance;
-                        trialTokenBalance = 0;
-                        if (realTokenBalance >= remainingAmt) {
-                            realTokenBalance = realTokenBalance - remainingAmt
-                        } else {
-                            toast.error("Not enough balance!")
-                            return;
-                        }
-                    }
-                } else {
-                    toast.error("Not enough balance!");
-                }
-
-                // Upload images to Firebase and get URLs
-                const uploadedImages = await uploadImages();
-                if (uploadedImages.length === 0) {
-                    toast.error("Could not upload images");
-                    setLoading(false);
-                    return;
-                }
-
-                // Save post data to Firebase
-                const postData = {
-                    ...formState,
-                    userId: session.user.id,
-                    options: uploadedImages,
-                    isDone: false,
-                };
-                console.log("postData", postData)
-                const docRef = await addDoc(collection(db, 'posts'), postData);
-
-                // Update user document with new post ID and token balances
-                await setDoc(userRef, {
-                    posts: [...userDoc.posts, docRef.id],
-                    realTokenBalance: realTokenBalance,
-                    trialTokenBalance: trialTokenBalance,
-                }, {merge: true});
-
-                toast.success("Post published successfully!");
-
-                // Add data to blockchain
-                await addDataToBlockchain(postData);
-
-                // Reset form state
-                setFormState({
-                    title: '',
-                    description: '',
-                    bountyReward: '',
-                    numberOfVotes: '',
-                });
-                setImageFiles([]);
-            } catch (error) {
-                console.error("Error handling submit:", error);
-                toast.error("Could not save post.");
-            } finally {
-                setLoading(false)
-            }
-
+        // Validate the form inputs
+        if (!validateForm()) {
             setLoading(false);
+            return;
         }
-    ;
+
+        if (!session.user.id) {
+            toast.error("Please login to create post");
+            setLoading(false);
+            return;
+        }
+
+
+        try {
+            // Check balance before proceeding
+            const userRef = doc(db, "users", session.user.id);
+            const userSnap = await getDoc(userRef);
+            let trialTokenBalance = 0;
+            let realTokenBalance = 0;
+            if (!userSnap.exists()) {
+
+                toast.error("User not found")
+                setLoading(false);
+                return;
+
+
+            }
+            const userDoc = userSnap.data();
+            realTokenBalance = userDoc.realTokenBalance;
+            trialTokenBalance = userDoc.trialTokenBalance;
+            if (trialTokenBalance > 0 || realTokenBalance > 0) {
+                if (formState.bountyReward <= trialTokenBalance) {
+                    //if user has trial tokens , deduct trial tokens
+                    trialTokenBalance = trialTokenBalance - formState.bountyReward;
+                } else {
+                    let remainingAmt = formState.bountyReward - trialTokenBalance;
+                    trialTokenBalance = 0;
+                    if (realTokenBalance >= remainingAmt) {
+                        realTokenBalance = realTokenBalance - remainingAmt
+                    } else {
+                        toast.error("Not enough balance!")
+                        return;
+                    }
+                }
+            } else {
+                toast.error("Not enough balance!");
+            }
+
+            // Upload images to Firebase and get URLs
+            const uploadedImages = await uploadImages();
+            if (uploadedImages.length === 0) {
+                toast.error("Could not upload images");
+                setLoading(false);
+                return;
+            }
+
+            // Save post data to Firebase
+            const postData = {
+                ...formState,
+                userId: session.user.id,
+                options: uploadedImages,
+                isDone: false,
+            };
+            console.log("postData", postData)
+            const docRef = await addDoc(collection(db, 'posts'), postData);
+
+            // Update user document with new post ID and token balances
+            await setDoc(userRef, {
+                posts: [...userDoc.posts, docRef.id],
+                realTokenBalance: realTokenBalance,
+                trialTokenBalance: trialTokenBalance,
+            }, { merge: true });
+
+            toast.success("Post published successfully!");
+
+            // Add data to blockchain
+            await addDataToBlockchain(postData);
+
+            // Reset form state
+            setFormState({
+                title: '',
+                description: '',
+                bountyReward: '',
+                numberOfVotes: '',
+            });
+            setImageFiles([]);
+        } catch (error) {
+            console.error("Error handling submit:", error);
+            toast.error("Could not save post.");
+        } finally {
+            setLoading(false)
+        }
+
+        setLoading(false);
+    }
+        ;
 
     const renderDivs = () => {
         const divs = [];
@@ -256,17 +292,17 @@ const Page = () => {
             divs.push(
                 <div key={i} className="relative w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
                     <Image src={URL.createObjectURL(imageFiles[i])} alt={`uploaded-${i}`}
-                           className="absolute inset-0 w-full h-full object-cover rounded"
-                           width={300} height={300}
+                        className="absolute inset-0 w-full h-full object-cover rounded"
+                        width={300} height={300}
                     />
                     <button
                         onClick={() => handleImageRemove(i)}
                         className="absolute top-2 right-2 bg-white bg-opacity-50 rounded-full p-1"
                     >
                         <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                             xmlns="http://www.w3.org/2000/svg">
+                            xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                  d="M6 18L18 6M6 6l12 12"></path>
+                                d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
@@ -277,11 +313,11 @@ const Page = () => {
         if (imageFiles.length < 4) {
             divs.push(
                 <div key={imageFiles.length}
-                     className="relative flex items-center justify-center w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
+                    className="relative flex items-center justify-center w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
                     <label
                         className="absolute top-1/2 flex flex-col text-black text-xl items-center ">
                         <div className="flex gap-2 items-center justify-center ">
-                            Upload <FaCloudUploadAlt/>
+                            Upload <FaCloudUploadAlt />
                         </div>
                         <span className="text-sm">(Max 5 Mb)</span>
                     </label>
@@ -352,7 +388,7 @@ const Page = () => {
                         <div className='flex space-x-2'>
                             <div className='w-1/2'>
                                 <label htmlFor="bountyReward"
-                                       className="block text-sm font-medium text-gray-700">Reward</label>
+                                    className="block text-sm font-medium text-gray-700">Reward</label>
                                 <input
                                     type="number"
                                     id="bountyReward"
@@ -434,6 +470,8 @@ const Page = () => {
                         {/*    </div>*/}
                         {/*</div>*/}
                         {
+
+
                             session ? (
                                 <button
                                     type="submit"
@@ -456,7 +494,18 @@ const Page = () => {
                                 </button>
                             )
                         }
+
                     </form>
+                    <div className="mt-4">
+                        <ConnectButton
+                            client={client}
+                            wallets={wallets}
+                            theme={"dark"}
+                            connectModal={{ size: "wide" }}
+
+
+                        />
+                    </div>
                 </div>
             </div>
 

@@ -5,7 +5,7 @@ import {Toaster} from "react-hot-toast";
 import React from "react";
 import Footer from "@/components/Footer";
 import Providers from "@/components/Providers";
-
+import { ThirdwebProvider } from 'thirdweb/react';  
 export const metadata = {
     title: 'ClickPaid',
     description: 'Create, vote, earn',
@@ -26,7 +26,9 @@ export default function RootLayout({children}) {
         <Providers>
             <Navbar/>
             <Toaster position="top-center" reverseOrder={true}/>
+ 
             {children}
+ 
             <Footer/>
         </Providers>
         </body>
