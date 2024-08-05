@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from '../../_lib/fireBaseConfig';
+import { db } from '@/app/_lib/fireBaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 
 export async function POST(request) {
@@ -13,6 +13,7 @@ export async function POST(request) {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             const post = { id: docSnap.id, ...docSnap.data() };
+
             return new NextResponse(JSON.stringify(post), {
                 status: 200,
                 headers: { 'Content-Type': 'application/json' },

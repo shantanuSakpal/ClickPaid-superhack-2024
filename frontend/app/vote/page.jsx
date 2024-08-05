@@ -3,6 +3,7 @@ import Head from 'next/head';
 import {useRouter} from 'next/navigation';
 import {useEffect, useState} from 'react';
 import LoadingSpinner from "@components/LoadingSpinner";
+import {useSession} from "next-auth/react";
 
 const chains = [
     {name: 'OP Mainnet', image: '/img/1.jpeg'},
@@ -14,11 +15,41 @@ const chains = [
 export default function Home() {
     const router = useRouter();
     const [posts, setPosts] = useState([]);
+    const {data: session} = useSession()
+    /*
+    {
+        "id": "cvmJepDi6GvAAGIn8Hpd",
+        "options": [
+            {
+                "id": "dvkg2zz",
+                "votes": 3,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/clickpaid-suprhacks.appspot.com/o/images%2Fclickpaid_logo.png?alt=media&token=3eba1045-b8f9-4b81-8939-7f58baac3b33"
+            },
+            {
+                "votes": 2,
+                "id": "1knprhq",
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/clickpaid-suprhacks.appspot.com/o/images%2Fpexels-bertellifotografia-25078481.jpg?alt=media&token=09e0d215-b973-4ec5-b544-f2f3928ae0c2"
+            }
+        ],
+        "description": "",
+        "numberOfVotes": "10",
+        "userId": "0x176b5380f242c71d6a7b76a22424e6234b889b7d261fad92ebad57323b37a766",
+        "isDone": false,
+        "title": "new post",
+        "bountyReward": "100"
+    }
+     */
     const [loading, setLoading] = useState(false);
     const fetchPosts = async () => {
         try {
             setLoading(true);
-            const response = await fetch('/api/getPosts');
+            const response = await fetch('/api/getPosts', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    userId : session.user.id
+                }), // Send body as JSON
+            });
             if (!response.ok) {
                 throw new Error('Failed to fetch getPosts');
             }
@@ -33,9 +64,10 @@ export default function Home() {
     };
 
     useEffect(() => {
-
-        fetchPosts();
-    }, []);
+        if (session) {
+            fetchPosts();
+        }
+    }, [session]);
 
     const handlePostClick = (postId) => {
         router.push(`/post/${postId}`);
@@ -82,7 +114,8 @@ export default function Home() {
                                         </div>
                                         <div>{post.description}</div>
                                         <div>Bounty Reward: {post.bountyReward}</div>
-                                        <div>Number of Votes: {post.numberOfVotes}</div>
+                                        <div>Number of
+                                            Votes: {post.options.reduce((acc, option) => acc + option.votes, 0)}/{post.numberOfVotes}</div>
                                     </div>
                                 ))}
                             </div>

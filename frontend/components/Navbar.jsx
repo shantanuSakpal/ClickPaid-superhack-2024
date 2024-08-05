@@ -14,7 +14,7 @@ export default function Navbar() {
         trialTokenBalance: 0
     })
     const {data: session} = useSession()
-    // console.log("session", session)
+    console.log("session", session)
 
 
     return (
@@ -36,9 +36,16 @@ export default function Navbar() {
                         {/*    Your Rewards*/}
                         {/*</Link>*/}
                         {
-                            session && <div>
-                                {session?.user.tokens.trialTokenBalance} Trial tokens left
-                            </div>
+                            session && (
+                                <>
+                                    <div className="bg-theme-blue-light text-white text-sm rounded-lg px-3 py-1">
+                                        {session?.user.tokens.realTokenBalance} tokens left
+                                    </div>
+                                    <div className="bg-theme-blue-light text-white text-sm rounded-lg px-3 py-1">
+                                        {session?.user.tokens.trialTokenBalance} Trial tokens left
+                                    </div>
+                                </>
+                            )
                         }
 
                         {/*login with world id*/}
