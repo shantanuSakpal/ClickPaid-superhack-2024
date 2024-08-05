@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/frontend/app/api/getPost/route.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/components/LoadingSpinner.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/api/getPost/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/getPost/route.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/app/vote/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/vote/page.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Navbar.jsx" afterDir="false" />
@@ -92,7 +93,8 @@
       <workItem from="1722850153200" duration="704000" />
       <workItem from="1722850864803" duration="827000" />
       <workItem from="1722851708759" duration="33000" />
-      <workItem from="1722854302033" duration="1668000" />
+      <workItem from="1722854302033" duration="2316000" />
+      <workItem from="1722856628362" duration="1706000" />
     </task>
     <servers />
   </component>

@@ -14,7 +14,7 @@ export default function Navbar() {
         trialTokenBalance: 0
     })
     const {data: session} = useSession()
-    console.log("session", session)
+    // console.log("session", session)
 
 
     return (
