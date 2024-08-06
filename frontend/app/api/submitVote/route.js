@@ -6,8 +6,17 @@ import abi from "@/app/abis/abi"
 
 const contractABI = abi; // Replace with your actual contract ABI
 const contractAddress = '0x8C992ba2293dd69dB74bE621F61fF9E14E76F262'; // Replace with your deployed contract address
-const privateKey = process.env.NEXT_PRIVATE_KEY; // Your private key stored in an environment variable
 
+const web3 = new Web3(new Web3.providers.HttpProvider(`https://optimism-sepolia.infura.io/v3/b725fe7c53164e5da34a10cc350877c4`));
+
+// Configure the contract
+const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+// Middleware to sign transactions
+const signTransaction = async (transactionObject, privateKey) => {
+    const signedTx = await web3.eth.accounts.signTransaction(transactionObject, privateKey);
+    return signedTx.rawTransaction;
+};
 
 export async function POST(request) {
     if (!request) {
@@ -16,39 +25,33 @@ export async function POST(request) {
     try {
         const {userId, optionId, postId, reward} = await request.json(); // Receive postId from JSON
 
-        // Initialize Web3 instance
-        const web3 = new Web3("https://opt-sepolia.g.alchemy.com/v2/5gfYGR46TZqdOnjEY-scgyCAwjWXeorz");
-
-        // Create contract instance
-        const contract = new web3.eth.Contract(contractABI, contractAddress);
-
-        // Function to send transaction with a specific private key
-        async function sendTransaction(privateKey, fromAddress, toAddress, value, data) {
-            const nonce = await web3.eth.getTransactionCount(fromAddress, 'latest');
-            const tx = {
-                nonce: nonce,
-                gasPrice: '20000000000',
-                gasLimit: 30000,
-                to: toAddress,
-                value: web3.utils.toWei(value, 'ether'),
-                data: data,
-            };
-
-            const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey);
-            const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-            return receipt;
+        if (!userId || !optionId || !postId || !reward) {
+            console.error("Missing required parameters:", { userId, optionId, postId, reward });
+            return new Response(JSON.stringify({ error: 'Missing required parameters' }), { status: 400 });
         }
 
-        // Call the vote function on the smart contract using the private key
+        const privateKey = process.env.NEXT_PRIVATE_KEY;
+        if (!privateKey) {
+            console.error("Private key is missing.");
+            return new Response(JSON.stringify({ error: 'Private key is not configured' }), { status: 500 });
+        }
+
+        // Get the from address from the private key
         const fromAddress = web3.eth.accounts.privateKeyToAccount(privateKey).address;
-        const voteData = contract.methods.vote(postId, userId, optionId).encodeABI();
 
-        await sendTransaction(privateKey, fromAddress, contractAddress, '0', voteData);
+        // Create transaction object
+        const transactionObject = {
+            from: fromAddress, // Add the from address here
+            to: contractAddress,
+            data: contract.methods.vote(postId, userId, optionId).encodeABI(),
+            gas: 2000000, // Specify the gas limit
+            maxFeePerGas: web3.utils.toWei('50', 'gwei'), // Maximum total fee per gas
+            maxPriorityFeePerGas: web3.utils.toWei('10', 'gwei'), // Priority fee per gas
+        };
 
-
-        return new NextResponse('Vote submitted', {
-            status: 200
-        });
+        // Sign and send the transaction
+        const rawTx = await signTransaction(transactionObject, privateKey);
+        const txReceipt = await web3.eth.sendSignedTransaction(rawTx);
 
         //find the post and update the votes
         const postDocRef = doc(db, 'posts', postId);
@@ -91,6 +94,10 @@ export async function POST(request) {
         //add the post id to votes array in user
         user.votes.push(postId);
         await setDoc(userDocRef, user);
+
+        return new NextResponse('Vote submitted', {
+            status: 200
+        });
 
 
     } catch (error) {
