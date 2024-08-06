@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "@components/LoadingSpinner";
 import Link from "next/link";
-
+import {useRouter} from "next/navigation";
 
 function Page() {
     const { data: session } = useSession();
@@ -10,7 +10,7 @@ function Page() {
     const [expandedPostId, setExpandedPostId] = useState(null);
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(false);
-
+    const router = useRouter();
 
     const fetchPosts = async () => {
         try {
@@ -35,9 +35,10 @@ function Page() {
         }
     };
 
-    const handlePostClick = (id) => {
-        setExpandedPostId(expandedPostId === id ? null : id);
+    const handlePostClick = (postId) => {
+        router.push(`/post/${postId}`);
     };
+
 
     useEffect(() => {
         if(session) {

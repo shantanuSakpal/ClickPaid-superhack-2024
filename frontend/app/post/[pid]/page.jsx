@@ -57,7 +57,8 @@ const Layout = () => {
             });
             const data = await response.json();
             //check if curr user is post owner
-            if (session && data.userId === session?.user.id) {
+                console.log(data.userId, session?.user.id)
+            if (data.userId == session?.user.id) {
                 setIsOwner(true);
             }
             setPost(data);
@@ -117,8 +118,10 @@ const Layout = () => {
     }
 
     useEffect(() => {
-        fetchPost();
-    }, []);
+        if(session){
+            fetchPost();
+        }
+    }, [session]);
 
     return (
         <div className="min-h-screen text-black">
@@ -149,20 +152,23 @@ const Layout = () => {
                         ))}
                     </div>
                     <div className="flex justify-center gap-5 mt-5">
-                        <button
-                            disabled={loading}
-                            onClick={(e) => {
-                                if (session) {
-                                    handleSubmitVote(e)
-                                } else {
-                                    signIn("worldcoin")
-                                }
-                            }} // Pass event object here
-                            className={`bg-theme-blue-light hover:bg-theme-blue text-white px-5 py-2 rounded-md mt-5  ${submitting ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}>
-                            {
-                                session ? (submitting ? 'Submitting...' : 'Submit') : "Login to vote"
-                            }
-                        </button>
+                        {
+                            !isOwner && (
+                                <button
+                                    disabled={loading}
+                                    onClick={(e) => {
+                                        if (session) {
+                                            handleSubmitVote(e)
+                                        } else {
+                                            signIn("worldcoin")
+                                        }
+                                    }} // Pass event object here
+                                    className={`bg-theme-blue-light hover:bg-theme-blue text-white px-5 py-2 rounded-md mt-5  ${submitting ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}>
+                                    {
+                                        session ? (submitting ? 'Submitting...' : 'Submit') : "Login to vote"
+                                    }
+                                </button>)
+                        }
                     </div>
                 </div>
             ))

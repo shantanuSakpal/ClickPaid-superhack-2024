@@ -15,30 +15,7 @@ const chains = [
 export default function Home() {
     const router = useRouter();
     const [posts, setPosts] = useState([]);
-    const {data: session} = useSession()
-    /*
-    {
-        "id": "cvmJepDi6GvAAGIn8Hpd",
-        "options": [
-            {
-                "id": "dvkg2zz",
-                "votes": 3,
-                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/clickpaid-suprhacks.appspot.com/o/images%2Fclickpaid_logo.png?alt=media&token=3eba1045-b8f9-4b81-8939-7f58baac3b33"
-            },
-            {
-                "votes": 2,
-                "id": "1knprhq",
-                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/clickpaid-suprhacks.appspot.com/o/images%2Fpexels-bertellifotografia-25078481.jpg?alt=media&token=09e0d215-b973-4ec5-b544-f2f3928ae0c2"
-            }
-        ],
-        "description": "",
-        "numberOfVotes": "10",
-        "userId": "0x176b5380f242c71d6a7b76a22424e6234b889b7d261fad92ebad57323b37a766",
-        "isDone": false,
-        "title": "new post",
-        "bountyReward": "100"
-    }
-     */
+    const {data: session} = useSession();
     const [loading, setLoading] = useState(false);
     const fetchPosts = async () => {
         try {
@@ -62,6 +39,31 @@ export default function Home() {
             setLoading(false);
         }
     };
+    const [loggingIn, setLoggingIn] = useState(false);
+
+    /*
+    {
+        "id": "cvmJepDi6GvAAGIn8Hpd",
+        "options": [
+            {
+                "id": "dvkg2zz",
+                "votes": 3,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/clickpaid-suprhacks.appspot.com/o/images%2Fclickpaid_logo.png?alt=media&token=3eba1045-b8f9-4b81-8939-7f58baac3b33"
+            },
+            {
+                "votes": 2,
+                "id": "1knprhq",
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/clickpaid-suprhacks.appspot.com/o/images%2Fpexels-bertellifotografia-25078481.jpg?alt=media&token=09e0d215-b973-4ec5-b544-f2f3928ae0c2"
+            }
+        ],
+        "description": "",
+        "numberOfVotes": "10",
+        "userId": "0x176b5380f242c71d6a7b76a22424e6234b889b7d261fad92ebad57323b37a766",
+        "isDone": false,
+        "title": "new post",
+        "bountyReward": "100"
+    }
+     */
 
     useEffect(() => {
         if (session) {
@@ -94,8 +96,10 @@ export default function Home() {
                     !session && (
                         <button
                             onClick={() => {
+                                setLoggingIn(true);
                                 signIn("worldcoin")
                             }}
+                            disabled={loggingIn}
                             className="w-fit mt-5 mx-auto bg-theme-blue-light hover:bg-theme-blue   font-bold text-xl  rounded-full py-2 px-5 flex flex-row items-center justify-center text-white">
                             <svg version="1.1" id="katman_1" xmlns="http://www.w3.org/2000/svg"
                                  x="0px" y="0px"
@@ -112,7 +116,9 @@ export default function Home() {
 	c-1.4,10.9-4.7,21.1-9.5,30.5H223.6z"/>
                             </svg>
 
-                            <span>Login to start voting!</span>
+                            <span>{
+                                loggingIn ? 'Logging in...' : 'Login to start voting!'
+                            }</span>
                         </button>
                     )
                 }
@@ -145,7 +151,9 @@ export default function Home() {
                                 ))}
                             </div>
                         ):(
-                            <div className="w-full text-center mt-10 text-lg">No more posts. Come back tomorrow for more votes, more rewards!</div>
+                            session && (
+                                <div className="w-full text-center mt-10 text-lg">No more posts. Come back tomorrow for
+                                    more votes, more rewards!</div>)
                         )
                     )
                 }

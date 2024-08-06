@@ -1,36 +1,46 @@
 "use client";
 import React, {useEffect, useState} from 'react';
-import { useSession, signOut } from "next-auth/react";
-import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
-import { Button } from "@nextui-org/react";
+import {useSession, signOut} from "next-auth/react";
+import {Tabs, Tab, Card, CardBody} from "@nextui-org/react";
+import {Button} from "@nextui-org/react";
 import Balances from '@components/users/Balances'; // Adjust paths if needed
 import Transactions from '@components/users/Transactions'; // Renamed to Transactions
 import Votes from '@components/users/Votes'; // New component for Votes
 import Posts from '@components/users/Posts';
 import {client} from "@/app/_utils/thirdwebClient";
 import {ConnectButton} from "thirdweb/react";
-import {useRouter} from "next/navigation";
-import { useActiveAccount } from "thirdweb/react";
+import {useActiveAccount, useDisconnect, useActiveWallet} from "thirdweb/react";
 
 
 function Page() {
-    const { data: session } = useSession();
+    const {data: session} = useSession();
     const [activeTab, setActiveTab] = useState('Posts');
     const [nameInitials, setNameInitials] = useState('');
-    const navigate = useRouter();
     const handleTabChange = (key) => {
         setActiveTab(key);
     };
+    const {disconnect} = useDisconnect();
+    const wallet = useActiveWallet();
+    const [loading, setLoading] = useState(false);
+
 
     const chains = [
-        { name: 'OP Sepolia', image: '/chain/optimism.jpeg', apiEndpoint: '/api/chain/op-sepolia/createPost' },
-        { name: 'Base Sepolia', image: '/chain/base.jpeg', apiEndpoint: '/api/chain/base-sepolia/createPost' },
-        { name: 'Mode TestNet', image: '/chain/mode.png', apiEndpoint: '/api/chain/mode-testnet/createPost' },
-        { name: 'Metal L2', image: '/chain/metal-L2.png', apiEndpoint: '/api/chain/metal-L2/createPost' },
+        {name: 'OP Sepolia', image: '/chain/optimism.jpeg', apiEndpoint: '/api/chain/op-sepolia/createPost'},
+        {name: 'Base Sepolia', image: '/chain/base.jpeg', apiEndpoint: '/api/chain/base-sepolia/createPost'},
+        {name: 'Mode TestNet', image: '/chain/mode.png', apiEndpoint: '/api/chain/mode-testnet/createPost'},
+        {name: 'Metal L2', image: '/chain/metal-L2.png', apiEndpoint: '/api/chain/metal-L2/createPost'},
     ];
 
 
     const account = useActiveAccount();
+
+    const handleSignOut = async () => {
+        setLoading(true);
+        await disconnect(wallet);
+        localStorage.removeItem('user');
+        await signOut({ callbackUrl: 'http://localhost:3000/' })
+        setLoading(false)
+    }
 
     useEffect(() => {
         if (session?.user.name) {
@@ -40,7 +50,7 @@ function Page() {
     }, [session]);
 
     return (
-        <div className='px-20 '>
+        <div className='px-20 min-h-screen'>
             {/* User Component */}
             <div className='flex items-center gap-10 mb-10'>
                 <div className='flex items-center space-x-4'>
@@ -55,11 +65,13 @@ function Page() {
                 </div>
 
                 {/* Sign Out Button */}
-                <button className="px-4 py-2 ml-5 rounded-lg bg-gray-300 hover:bg-red-500" onClick={() => {
-                    localStorage.removeItem('user');
-                    signOut()
-                    navigate.push('/')
-                }}>Sign Out
+                <button
+                    disabled={loading}
+                    className="px-4 py-2 ml-5 rounded-lg bg-gray-300 hover:bg-red-500" onClick={() => {
+                    handleSignOut();
+                }}>{
+                    loading ? 'Signing out...' : 'Sign Out'
+                }
                 </button>
 
                 <div>
@@ -68,12 +80,7 @@ function Page() {
 
             </div>
 
-            <div>
-                <p>Wallet address: {account?.address}</p>
-                <p>
-                    Wallet balance: {balance?.displayValue} {balance?.symbol}
-                </p>
-            </div>
+
 
             {/* Tabs Component */}
             <div className="flex w-full  flex-col justify-center">
