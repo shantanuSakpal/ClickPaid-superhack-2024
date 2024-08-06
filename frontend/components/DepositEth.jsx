@@ -60,22 +60,14 @@ const DepositForm = () => {
         }
     }, [session]);
     return (
-        <div>
-            <h2>Deposit ETH</h2>
+        <div className="p-5 mt-5 flex flex-col gap-3 border-2 rounded ">
+            <h2 className="text-lg font-bold">Deposit ETH</h2>
             <form onSubmit={handleDeposit}>
-                <div>
-                    <label htmlFor="userId">User ID:</label>
-                    <input
-                        type="text"
-                        id="userId"
-                        value={userId}
-                        onChange={(e) => setUserId(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
+
+                <div className="mb-3">
                     <label htmlFor="ethAmount">ETH Amount:</label>
                     <input
+                        className="border-2 rounded mx-3"
                         type="number"
                         id="ethAmount"
                         step="0.01"
@@ -84,7 +76,7 @@ const DepositForm = () => {
                         required
                     />
                 </div>
-                <button type="submit">Deposit</button>
+                <button className="px-4 py-2 rounded bg-theme-blue-light hover:bg-theme-blue text-white" type="submit">Deposit</button>
             </form>
             {status && <p>{status}</p>}
         </div>

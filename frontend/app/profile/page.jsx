@@ -111,7 +111,7 @@ function Page() {
                 </Menu>
             </div>
 
-            <DepositEth/>
+
             {/* Tabs Component */}
             <div className="flex w-full  flex-col justify-center">
                 <Tabs aria-label="Options" onChange={handleTabChange}>

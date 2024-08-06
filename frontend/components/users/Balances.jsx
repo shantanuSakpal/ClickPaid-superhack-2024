@@ -2,6 +2,8 @@ import React, {useEffect, useState} from "react";
 import {useSession} from "next-auth/react";
 import LoadingSpinner from "@components/LoadingSpinner";
 import Link from "next/link";
+import DepositEth from "@components/DepositEth";
+import WithdrawTokens from "@components/WithdrawTokens";
 
 
 export default function Balances() {
@@ -51,17 +53,9 @@ export default function Balances() {
                         <div className="mt-4">
                             <h2 className="text-lg font-semibold">Trial Token Balance: {tokenBalance.trialTokenBalance}</h2>
                         </div>
-                        <div className="mt-5 flex gap-5 items-center">
-                            {/*form to buy tokens*/}
-                            <button
-                                className="px-4 py-2 bg-theme-blue-light hover:bg-theme-blue rounded-lg text-white font-bold">
-                                Buy Tokens
-                            </button>
-                            <button
-                                className="px-4 py-2 bg-theme-blue-light hover:bg-theme-blue rounded-lg text-white font-bold">
-                                Withdraw Tokens
-                            </button>
-                        </div>
+                        <DepositEth/>
+
+                        <WithdrawTokens/>
                     </div>
                 )
             }
