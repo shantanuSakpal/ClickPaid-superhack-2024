@@ -1,5 +1,5 @@
 "use client";
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {toast} from 'react-hot-toast';
 import {uploadImage} from '@/app/_utils/uploadImages'; // Import uploadImage function
 import {db} from '@/app/_lib/fireBaseConfig'; // Import db from firebaseConfig
@@ -9,15 +9,32 @@ import {FaCloudUploadAlt} from "react-icons/fa";
 import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
 import {ChevronDownIcon} from "@heroicons/react/20/solid";
 import {useSession, signIn} from "next-auth/react"
+import Web3 from 'web3';
+import abi from "@/app/abis/abi";
 
 require('dotenv').config();
 
 function Page() {
     const chains = [
-        {name: 'OP Sepolia', id:"op-sepolia", image: '/chain/optimism.jpeg', apiEndpoint: '/api/chain/op-sepolia/createPost'},
-        {name: 'Base Sepolia',  id:"base-sepolia", image: '/chain/base.jpeg', apiEndpoint: '/api/chain/base-sepolia/createPost'},
-        {name: 'Mode TestNet',  id:"mode-testnet", image: '/chain/mode.png', apiEndpoint: '/api/chain/mode-testnet/createPost'},
-        {name: 'Metal L2',  id:"metal-l2", image: '/chain/metal-L2.png', apiEndpoint: '/api/chain/metal-L2/createPost'},
+        {
+            name: 'OP Sepolia',
+            id: "op-sepolia",
+            image: '/chain/optimism.jpeg',
+            apiEndpoint: '/api/chain/op-sepolia/createPost'
+        },
+        {
+            name: 'Base Sepolia',
+            id: "base-sepolia",
+            image: '/chain/base.jpeg',
+            apiEndpoint: '/api/chain/base-sepolia/createPost'
+        },
+        {
+            name: 'Mode TestNet',
+            id: "mode-testnet",
+            image: '/chain/mode.png',
+            apiEndpoint: '/api/chain/mode-testnet/createPost'
+        },
+        {name: 'Metal L2', id: "metal-l2", image: '/chain/metal-L2.png', apiEndpoint: '/api/chain/metal-L2/createPost'},
     ];
 
     const [formState, setFormState] = useState({
@@ -25,8 +42,11 @@ function Page() {
         description: '',
         bountyReward: '',
         numberOfVotes: '',
-        selectedChain:chains[0],
+        selectedChain: chains[0],
     });
+    const [web3, setWeb3] = useState(null);
+    const [contract, setContract] = useState(null);
+
     // const activeAccount = useActiveAccount();
     const [images, setImages] = useState([]);
     const [imageFiles, setImageFiles] = useState([]); // Store file references
@@ -34,7 +54,6 @@ function Page() {
     const [uploadingImages, setUploadingImages] = useState(false)
     const {data: session} = useSession()
     const [userAddress, setUserAddress] = useState('');
-
 
 
     const handleChange = (e) => {
@@ -119,38 +138,53 @@ function Page() {
         return uploadedImages.filter((image) => image);
     };
 
-    const addDataToBlockchain = async (postData) => {
-        // Prepare data for blockchain
 
-        // const postID = docRef.id; // Assuming the document ID is used as postID
-        // const {selectedChain, bountyReward} = formState;
-        // const postDescription = formState.description;
-        //
-        // // Construct the API URL based on the selected chain
-        // const apiUrl = selectedChain.apiEndpoint;
-        // // Call the createPost API
-        // const response = await fetch(apiUrl, {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({
-        //         postID,
-        //         imageUrls: uploadedImages,
-        //         descriptions: new Array(uploadedImages.length).fill(''), // Replace with actual descriptions if available
-        //         postDescription,
-        //         rewardAmount: bountyReward,
-        //     }),
-        // });
-        //
-        // const data = await response.json();
-        // if (data.success) {
-        //     toast.success("Post created on blockchain successfully!");
-        // } else {
-        //     toast.error("Failed to create post on blockchain.");
-        // }
+    const addDataToBlockchain = async (postData, postId) => {
+        if (!web3 || !contract) {
+            toast.error("Web3 or contract not initialized");
+            return;
+        }
 
-    }
+        try {
+            // Connect to Web3
+            if (typeof window.ethereum !== 'undefined') {
+                const web3 = new Web3(window.ethereum);
+                await window.ethereum.enable();
+
+                // Get the current account
+                const accounts = await web3.eth.getAccounts();
+                const account = accounts[0];
+
+                // Contract address and ABI (you need to replace these with your actual values)
+                const contractAddress = '0x8C992ba2293dd69dB74bE621F61fF9E14E76F262';
+                const contractABI = abi; // Add your contract ABI here
+
+                // Create contract instance
+                const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+                // Convert ETH to Wei
+
+                const userId = session?.user.id;
+                const bounty = postData.bountyReward;
+                const numVoters = postData.numberOfVotes;
+                const optionIDs = postData.options.map(option => option.id);
+
+                // Then, create the post
+                await contract.methods.createPost(postId, bounty, numVoters, userId, optionIDs).send({
+                    from: account
+                });
+
+                console.log({postId, bounty, numVoters, userId, optionIDs})
+                toast.success("lets go!!")
+            } else {
+                toast.error("bc")
+            }
+        } catch (error) {
+            console.error('Detailed error:', error);
+            toast.error(`Contract interaction failed: ${error.message}`);
+        }
+    };
+
 
     const handleSubmit = async (e) => {
         setLoading(true);
@@ -229,10 +263,12 @@ function Page() {
                 trialTokenBalance: trialTokenBalance,
             }, {merge: true});
 
+            const postId = docRef.id;
+
             toast.success("Post published successfully!");
 
             // Add data to blockchain
-            await addDataToBlockchain(postData);
+            await addDataToBlockchain(postData, postId);
 
             // Reset form state
             setFormState({
@@ -240,7 +276,7 @@ function Page() {
                 description: '',
                 bountyReward: '',
                 numberOfVotes: '',
-                selectedChain:chains[0],
+                selectedChain: chains[0],
             });
             setImageFiles([]);
         } catch (error) {
@@ -305,6 +341,10 @@ function Page() {
         return divs;
     };
 
+
+    useEffect(() => {
+
+    }, []);
     return (
         <div className="w-full">
             <div className="py-2 mb-5">

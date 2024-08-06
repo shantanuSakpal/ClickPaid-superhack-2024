@@ -5,6 +5,8 @@ import Image from "next/image";
 import LoadingSpinner from "@components/LoadingSpinner";
 import {useSession, signIn} from "next-auth/react";
 import {useRouter} from "next/navigation";
+import Web3 from 'web3';
+import abi from "@/app/abis/abi";
 
 const chains = [
     {name: 'OP Mainnet', image: '/img/1.jpeg', votes: 120},
@@ -69,6 +71,7 @@ const Layout = () => {
             setLoading(false)
         }
     }
+
 
     const handleSubmitVote = async (e) => {
         e.preventDefault(); // Add this line
