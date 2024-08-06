@@ -1,32 +1,70 @@
-import React from "react";
-import { Button, ButtonGroup } from "@nextui-org/react";
+import React, {useEffect, useState} from "react";
+import {useSession} from "next-auth/react";
+import LoadingSpinner from "@components/LoadingSpinner";
+import Link from "next/link";
 
-const chains = [
-  { name: 'OP Sepolia', image: '/chain/optimism.jpeg', balance: '$1,200.00' },
-  { name: 'Base Sepolia', image: '/chain/base.jpeg', balance: '$800.00' },
-  { name: 'Mode TestNet', image: '/chain/mode.png', balance: '$600.00' },
-  { name: 'Metal L2', image: '/chain/metal-L2.png', balance: '$1,000.00' },
-  { name: 'World Coin', image: '/chain/worldcoin.png', balance: '$1,400.00' },
-];
 
 export default function Balances() {
-  return (
-    <div className="p-4 ml-[30vh]">
-      {chains.map((chain, index) => (
-        <div key={index} className="flex items-center justify-between p-4 mb-2 w-[80%] h-[15vh] border border-gray-250 rounded-xl ">
-          <div className="flex items-center space-x-4">
-            <img src={chain.image} alt={chain.name} className="w-12 h-12 rounded-full" />
-            <p className="font-semibold">{chain.name}</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <p className="font-medium">{chain.balance}</p>
-            <ButtonGroup >
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [tokenBalance, setTokenBalance] = useState({});
+    const {data: session} = useSession();
+    const userId = session?.user?.id;
 
-              <Button color="default" className="rounded-xl" >Withdraw</Button>
-            </ButtonGroup>
-          </div>
+    const getTokenBalance = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch('/api/getUserTokenBalance', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({userId}),
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch posts');
+            }
+            const data = await response.json();
+            setTokenBalance(data);
+            /*
+            tokenBalance = {
+                "realTokenBalance": 2,
+                "trialTokenBalance": 0
+            }
+             */
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        getTokenBalance();
+    }, []);
+    return (
+        <div className="p-4">
+            {
+                loading ? <LoadingSpinner/> : error ? <p>{error}</p> : (
+                    <div>
+                        <div className="mt-4">
+                            <h2 className="text-lg font-semibold">Token Balance: {tokenBalance.realTokenBalance}</h2>
+                        </div>
+                        <div className="mt-4">
+                            <h2 className="text-lg font-semibold">Trial Token Balance: {tokenBalance.trialTokenBalance}</h2>
+                        </div>
+                        <div className="mt-5 flex gap-5 items-center">
+                            {/*form to buy tokens*/}
+                            <button
+                                className="px-4 py-2 bg-theme-blue-light hover:bg-theme-blue rounded-lg text-white font-bold">
+                                Buy Tokens
+                            </button>
+                            <button
+                                className="px-4 py-2 bg-theme-blue-light hover:bg-theme-blue rounded-lg text-white font-bold">
+                                Withdraw Tokens
+                            </button>
+                        </div>
+                    </div>
+                )
+            }
         </div>
-      ))}
-    </div>
-  );
+    );
 }

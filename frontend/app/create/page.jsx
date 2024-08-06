@@ -12,7 +12,7 @@ import { useSession, signIn } from "next-auth/react"
 // import ConnectButtonComponent from '@/components/connectButtonComponent';
 import { ThirdwebProvider, ConnectButton } from "thirdweb/react";
 import { createThirdwebClient } from "thirdweb";
-import { createWallet, walletConnect, useActiveAccount} from "thirdweb/wallets";
+import { createWallet, walletConnect} from "thirdweb/wallets";
 // import { useAddress } from "@thirdweb-dev/react";
 
  
@@ -52,7 +52,7 @@ const chains = [
         bountyReward: '',
         numberOfVotes: '',
     });
-    const activeAccount = useActiveAccount();
+    // const activeAccount = useActiveAccount();
     const [images, setImages] = useState([]);
     const [imageFiles, setImageFiles] = useState([]); // Store file references
     const [loading, setLoading] = useState(false);

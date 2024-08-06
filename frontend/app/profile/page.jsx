@@ -1,8 +1,7 @@
 "use client";
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { useSession, signOut } from "next-auth/react";
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
-import { User } from "@nextui-org/user";
 import { Button } from "@nextui-org/react";
 import Balances from '@components/users/Balances'; // Adjust paths if needed
 import Transactions from '@components/users/Transactions'; // Renamed to Transactions
@@ -11,47 +10,58 @@ import Posts from '@components/users/Posts';
 
 function Page() {
     const { data: session } = useSession();
-    const [activeTab, setActiveTab] = React.useState('Balances');
+    const [activeTab, setActiveTab] = useState('Posts');
+    const [nameInitials, setNameInitials] = useState('');
 
     const handleTabChange = (key) => {
         setActiveTab(key);
     };
 
+    useEffect(() => {
+        if (session?.user.name) {
+            const initials = session.user.name.split(' ').map((n) => n[0]).join('');
+            setNameInitials(initials);
+        }
+    }, [session]);
+
     return (
         <div className='px-20 '>
             {/* User Component */}
-            <div className='flex items-center space-x-4 p-4 min-h-[15vh]'>
-                <User
-                    name={session?.user.name || "Jane Doe"}
-                    description="Product Designer"
-                    avatarProps={{
-                        src: "https://i.pravatar.cc/150?u=a04258114e29026702d"
-                    }}
-                />
-                
+            <div className='flex items-center gap-10 mb-10'>
+                <div className='flex items-center space-x-4'>
+                    <div className='w-12 h-12 bg-theme-blue-light font-bold text-lg rounded-full flex items-center justify-center'>
+                        {nameInitials}
+                    </div>
+                    <div className="flex flex-col">
+                        <div className="text-lg font-bold">{session?.user.name}</div>
+                        <div className="text-sm">{session?.user.tokens.realTokenBalance} tokens</div>
+                    </div>
+                </div>
+
                 {/* Sign Out Button */}
-                <Button color="default" className="p-4 rounded" onClick={() => {
+                <button  className="px-4 py-2 ml-5 rounded-lg bg-gray-300 hover:bg-red-500" onClick={() => {
                     localStorage.removeItem('user');
                     signOut()
-                }}>Sign Out</Button>
+                }}>Sign Out</button>
 
             </div>
 
             {/* Tabs Component */}
-            <div className="flex w-full min-h-[90vh] flex-col">
+            <div className="flex w-full  flex-col justify-center">
                 <Tabs aria-label="Options" onChange={handleTabChange}>
+                    <Tab key="Posts" className='min-w-[15vh]' title="Posts">
+                        <Posts />
+                    </Tab>
                     <Tab key="Balances" className='min-w-[15vh]' title="Balances">
                         <Balances />
                     </Tab>
                     <Tab key="Transactions" className='min-w-[15vh]' title="Transactions">
                         <Transactions />
                     </Tab>
-                    <Tab key="Votes" className='min-w-[15vh]' title="Votes">
-                        <Votes />
-                    </Tab>
-                    <Tab key="Posts" className='min-w-[15vh]' title="Posts">
-                        <Posts />
-                    </Tab>
+                    {/*<Tab key="Votes" className='min-w-[15vh]' title="Votes">*/}
+                    {/*    <Votes />*/}
+                    {/*</Tab>*/}
+
                 </Tabs>
             </div>
         </div>
