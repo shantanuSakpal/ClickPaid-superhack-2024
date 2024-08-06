@@ -26,6 +26,8 @@ export async function POST(request) {
         let filteredPosts = posts.filter(post => !userVotes.includes(post.id));
         //also remove users post
         filteredPosts = filteredPosts.filter(post => post.userId !== userId);
+        //remove post which are done
+        filteredPosts = filteredPosts.filter(post => !post.done);
         return new NextResponse(JSON.stringify(filteredPosts), {
             status: 200,
             headers: {'Content-Type': 'application/json'},

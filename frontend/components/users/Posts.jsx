@@ -43,7 +43,7 @@ function Page() {
         if(session) {
             fetchPosts();
         }
-    }, []);
+    }, [session]);
 
 
     return (
@@ -80,7 +80,7 @@ function Page() {
                         </div>
                     ):(
                         <div className="w-full text-center mt-10 text-lg">No posts created.
-                            <Link href="/create" className="">Create now!</Link>
+                            <Link href="/create" className="text-theme-blue-light hover:text-theme-blue mx-3 ">Create now!</Link>
                         </div>
                     )
                 )
