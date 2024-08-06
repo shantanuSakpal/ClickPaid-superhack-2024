@@ -61,6 +61,11 @@ export const authOptions = {
 
                 // Update the session with the generated name
                 session.user.name = randomName;
+                session.user.id = token.sub;
+                session.user.tokens = {
+                    realTokenBalance: 0,
+                    trialTokenBalance: 100
+                }
             } else {
                 // Retrieve user data from Firestore
                 const userData = userSnap.data();

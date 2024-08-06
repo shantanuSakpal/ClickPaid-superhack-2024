@@ -3,7 +3,7 @@ import React, {useState, useEffect} from 'react';
 import {toast, Toaster} from 'react-hot-toast';
 import Image from "next/image";
 import LoadingSpinner from "@components/LoadingSpinner";
-import {useSession} from "next-auth/react";
+import {useSession, signIn} from "next-auth/react";
 import {useRouter} from "next/navigation";
 
 const chains = [
@@ -19,6 +19,7 @@ const Layout = () => {
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [isOwner, setIsOwner] = useState(false)
     const navigate = useRouter();
     /*
     post = {
@@ -42,7 +43,7 @@ const Layout = () => {
     const fetchPost = async () => {
         setLoading(true);
         const postId = window.location.pathname.split('/').pop();
-        if(!postId) {
+        if (!postId) {
             toast.error("Post not found");
             return;
         }
@@ -55,6 +56,10 @@ const Layout = () => {
                 body: JSON.stringify({postId}), // Send postId as JSON
             });
             const data = await response.json();
+            //check if curr user is post owner
+            if (session && data.userId === session?.user.id) {
+                setIsOwner(true);
+            }
             setPost(data);
             console.log("data", data);
         } catch (error) {
@@ -71,6 +76,10 @@ const Layout = () => {
 
         if (!selectedOptionId) {
             toast.error("Please select an option");
+            return;
+        }
+        if (!session) {
+            toast.error("Please login to submit vote")
             return;
         }
         console.log("selectedOptionId", selectedOptionId);
@@ -93,6 +102,7 @@ const Layout = () => {
                 toast.error(errorMessage); // Display the error message to the user
             } else {
                 toast.success("Vote submitted");
+                navigate.push('/vote')
             }
 
         } catch (error) {
@@ -124,23 +134,33 @@ const Layout = () => {
                     <div className="grid grid-cols-2 gap-8 my-5">
                         {post.options.map((option, i) => (
                             <div key={i}
-                                 className={`flex flex-col border-2 items-center gap-3 justify-center hover:cursor-pointer  rounded hover:shadow-lg hover:shadow-gray-400 p-2 ${selectedOptionId === option.id ? 'border-theme-blue-light shadow-lg shadow-gray-400' : 'border-gray-200'}`}
+                                 className={`flex flex-col border-2 items-center  justify-center hover:cursor-pointer  rounded hover:shadow-lg hover:shadow-gray-400 p-2 ${selectedOptionId === option.id ? 'border-theme-blue-light shadow-lg shadow-gray-400' : 'border-gray-200'}`}
                                  onClick={() => setSelectedOptionId(option.id)}
                             >
                                 <img src={option?.imageUrl} alt="Option"
                                      width={150} height={150}
-                                     className="w-full h-52  object-contain rounded"/>
+                                     className="w-full h-52 mb-3 object-contain rounded"/>
                                 <div>Option {i + 1}</div>
+                                {
+                                    isOwner && <div>{option.votes} votes</div>
+
+                                }
                             </div>
                         ))}
                     </div>
                     <div className="flex justify-center gap-5 mt-5">
                         <button
                             disabled={loading}
-                            onClick={(e) => handleSubmitVote(e)} // Pass event object here
+                            onClick={(e) => {
+                                if (session) {
+                                    handleSubmitVote(e)
+                                } else {
+                                    signIn("worldcoin")
+                                }
+                            }} // Pass event object here
                             className={`bg-theme-blue-light hover:bg-theme-blue text-white px-5 py-2 rounded-md mt-5  ${submitting ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}>
                             {
-                                submitting ? 'Submitting...' : 'Submit'
+                                session ? (submitting ? 'Submitting...' : 'Submit') : "Login to vote"
                             }
                         </button>
                     </div>

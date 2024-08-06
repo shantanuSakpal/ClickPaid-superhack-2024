@@ -41,9 +41,14 @@ export default function Navbar() {
                                     <div className="bg-theme-blue-light text-white text-sm rounded-lg px-3 py-1">
                                         {session?.user.tokens.realTokenBalance} tokens left
                                     </div>
-                                    <div className="bg-theme-blue-light text-white text-sm rounded-lg px-3 py-1">
-                                        {session?.user.tokens.trialTokenBalance} Trial tokens left
-                                    </div>
+                                    {
+                                        session?.user.tokens.trialTokenBalance > 0 && (
+                                            <div className="bg-theme-blue-light text-white text-sm rounded-lg px-3 py-1">
+                                                {session?.user.tokens.trialTokenBalance} trial tokens left
+                                            </div>
+                                        )
+
+                                    }
                                 </>
                             )
                         }

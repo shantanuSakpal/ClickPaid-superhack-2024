@@ -1,9 +1,9 @@
 "use client";
 import Head from 'next/head';
 import {useRouter} from 'next/navigation';
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import LoadingSpinner from "@components/LoadingSpinner";
-import {useSession} from "next-auth/react";
+import {signIn, useSession} from "next-auth/react";
 
 const chains = [
     {name: 'OP Mainnet', image: '/img/1.jpeg'},
@@ -47,7 +47,7 @@ export default function Home() {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    userId : session.user.id
+                    userId: session.user.id
                 }), // Send body as JSON
             });
             if (!response.ok) {
@@ -67,7 +67,7 @@ export default function Home() {
         if (session) {
             fetchPosts();
         }
-    }, [session]);
+    }, []);
 
     const handlePostClick = (postId) => {
         router.push(`/post/${postId}`);
@@ -90,10 +90,35 @@ export default function Home() {
 
                 {/* Center Section for Scrolling Posts */}
                 <h2 className="font-bold  text-2xl px-5">Recent posts</h2>
+                {
+                    !session && (
+                        <button
+                            onClick={() => {
+                                signIn("worldcoin")
+                            }}
+                            className="w-fit mt-5 mx-auto bg-theme-blue-light hover:bg-theme-blue   font-bold text-xl  rounded-full py-2 px-5 flex flex-row items-center justify-center text-white">
+                            <svg version="1.1" id="katman_1" xmlns="http://www.w3.org/2000/svg"
+                                 x="0px" y="0px"
+                                 viewBox="0 0 445.2 315.2"
+                                 fill="white"
+                                 className="h-10 w-auto"
+                            >
+                                <path className="st0" d="M327.6,115.2c-3-7.5-6.8-14.6-11.3-21.3c-20.3-30-54.7-49.7-93.6-49.7c-62.4,0-112.9,50.6-112.9,112.9
+	c0,62.4,50.6,113,112.9,113c39,0,73.3-19.7,93.6-49.7c4.5-6.6,8.2-13.7,11.3-21.2c5.2-13,8.1-27.2,8.1-42
+	C335.6,142.4,332.8,128.2,327.6,115.2z M312.5,145.7H183.2c2-7,5.7-13.2,10.7-18.1c7.6-7.6,18.1-12.3,29.7-12.3H303
+	C307.9,124.6,311.1,134.8,312.5,145.7z M222.1,66.1c25.7,0,49,10.7,65.6,27.9h-61.3c-17.5,0-33.3,7.1-44.7,18.5
+	c-8.9,8.9-15.1,20.3-17.4,33.2h-32.5C137.4,100.8,175.7,66.1,222.1,66.1z M222.1,248.4c-46.4,0-84.7-34.7-90.4-79.6h32.5
+	c5.4,29.4,31.2,51.7,62.2,51.7h61.3C271.2,237.7,247.9,248.4,222.1,248.4z M223.6,199.3c-19.2,0-35.4-12.9-40.4-30.5h129.3
+	c-1.4,10.9-4.7,21.1-9.5,30.5H223.6z"/>
+                            </svg>
 
+                            <span>Login to start voting!</span>
+                        </button>
+                    )
+                }
                 {
                     loading ? (<LoadingSpinner/>) : (
-                        posts && (
+                        posts && posts.length>0 ? (
                             <div className="p-4">
                                 {/* Display getPosts */}
                                 {posts.map(post => (
@@ -119,6 +144,8 @@ export default function Home() {
                                     </div>
                                 ))}
                             </div>
+                        ):(
+                            <div className="w-full text-center mt-10 text-lg">No more posts. Come back tomorrow for more votes, more rewards!</div>
                         )
                     )
                 }

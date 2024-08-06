@@ -119,8 +119,8 @@ const chains = [
             }
         }
 
-        if (imageFiles.length === 0) {
-            toast.error("At least one image is required");
+        if (imageFiles.length <2) {
+            toast.error("At least two images required");
             return false;
         }
 
