@@ -4,13 +4,15 @@ import Link from "next/link";
 import {useSession, signIn, signOut} from "next-auth/react"
 import React from "react";
 import { FaArrowRightLong } from "react-icons/fa6";
-
+import LogoCloud from "../components/LogoCloud";
 export default function Home() {
     const {data: session} = useSession()
     // console.log("session", session)
 
 
-    return (<main className="flex  flex-col items-center justify-between ">
+    return (<>
+
+    <main className="flex  flex-col items-center justify-between ">
             {/*header info*/}
             <div className="flex justify-center items-center w-full py-8 px-2 gap-5">
                 <div className="w-1/2 px-10 gap-3 flex flex-col">
@@ -101,7 +103,7 @@ export default function Home() {
                     </Link>
                 </div>
             </div>
-
+            <LogoCloud  />
             {/*video tutorial*/}
             <div className="flex justify-center items-center w-full my-10 p-10">
                 <div className="w-1/2 rounded-lg overflow-clip shadow-lg shadow-gray-500">
@@ -118,5 +120,8 @@ export default function Home() {
                     </p>
                 </div>
             </div>
-        </main>);
+        </main>
+ 
+        </>
+    );
 }

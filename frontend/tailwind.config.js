@@ -10,6 +10,15 @@ module.exports = {
   ],
     theme: {
         extend: {
+            keyframes: {
+              scroll: {
+                '0%': { transform: 'translateX(0)' },
+                '100%': { transform: 'translateX(calc(-250% - 20px))' },
+              },
+            },
+            animation: {
+              scroll: 'scroll 60s linear infinite',
+            },
             colors: {
                 "theme-gray-dark": "#111827",
                 "theme-gray-light": "#232a3e",
