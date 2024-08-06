@@ -129,7 +129,11 @@ const Layout = () => {
                 <LoadingSpinner/>
             ) : (post && (
                 <div className="p-5">
-                    <div className="">
+                    <div className="relative">
+                        <div className=" absolute right-5 items-center justify-center  flex gap-4">
+                            <img src={post.selectedChain.image} className="w-10 h-auto rounded-full overflow-clip" alt=""/>
+                            <span className="font-bold">On {post.selectedChain.name}</span>
+                        </div>
                         <h2 className="text-3xl  font-bold">{post.title}</h2>
                         <div className="">Reward: {post.bountyReward / post.numberOfVotes} tokens</div>
                     </div>

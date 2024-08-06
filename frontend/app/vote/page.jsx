@@ -130,11 +130,15 @@ export default function Home() {
                                 {posts.map(post => (
                                     <div
                                         key={post.id}
-                                        className="bg-white p-4 rounded border-1 mb-4 cursor-pointer hover:shadow-lg hover:shadow-gray-200"
+                                        className="bg-white p-4 rounded border-1 mb-4 cursor-pointer hover:shadow-lg hover:shadow-gray-200n relative"
                                         onClick={() => handlePostClick(post.id)}
                                     >
-                                        <h3 className="font-bold text-xl mb-2">{post.title}</h3>
-                                        <div className="flex gap-2 mb-2">
+                                        <div className="w-10 absolute right-5 h-auto rounded-full overflow-clip">
+                                            <img src={post.selectedChain.image} alt=""/>
+                                        </div>
+                                        <h3 className="font-bold text-xl ">{post.title}</h3>
+                                        <div className="mb-2">{post.description}</div>
+                                        <div className="flex gap-2 mb-2 mt-5">
                                             {post.options.map((option, i) => (
                                                 <div key={i}
                                                      className="relative w-72 h-auto bg-gray-300 border border-gray-300 rounded aspect-video">
@@ -143,7 +147,6 @@ export default function Home() {
                                                 </div>
                                             ))}
                                         </div>
-                                        <div>{post.description}</div>
                                         <div>Bounty Reward: {post.bountyReward}</div>
                                         <div>Number of
                                             Votes: {post.options.reduce((acc, option) => acc + option.votes, 0)}/{post.numberOfVotes}</div>

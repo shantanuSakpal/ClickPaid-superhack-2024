@@ -1,37 +1,44 @@
 "use client";
-import React, { useState } from 'react';
-import { toast } from 'react-hot-toast';
-import { uploadImage } from '@/app/_utils/uploadImages'; // Import uploadImage function
-import { db } from '@/app/_lib/fireBaseConfig'; // Import db from firebaseConfig
-import { collection, addDoc, doc, getDoc, setDoc } from 'firebase/firestore';
+import React, {useState} from 'react';
+import {toast} from 'react-hot-toast';
+import {uploadImage} from '@/app/_utils/uploadImages'; // Import uploadImage function
+import {db} from '@/app/_lib/fireBaseConfig'; // Import db from firebaseConfig
+import {collection, addDoc, doc, getDoc, setDoc} from 'firebase/firestore';
 import Image from "next/image";
-import { FaCloudUploadAlt } from "react-icons/fa";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { useSession, signIn } from "next-auth/react"
-
-
+import {FaCloudUploadAlt} from "react-icons/fa";
+import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
+import {ChevronDownIcon} from "@heroicons/react/20/solid";
+import {useSession, signIn} from "next-auth/react"
 
 require('dotenv').config();
 
+function Page() {
+    const chains = [
+        {name: 'OP Sepolia', id:"op-sepolia", image: '/chain/optimism.jpeg', apiEndpoint: '/api/chain/op-sepolia/createPost'},
+        {name: 'Base Sepolia',  id:"base-sepolia", image: '/chain/base.jpeg', apiEndpoint: '/api/chain/base-sepolia/createPost'},
+        {name: 'Mode TestNet',  id:"mode-testnet", image: '/chain/mode.png', apiEndpoint: '/api/chain/mode-testnet/createPost'},
+        {name: 'Metal L2',  id:"metal-l2", image: '/chain/metal-L2.png', apiEndpoint: '/api/chain/metal-L2/createPost'},
+    ];
 
-
-   function Page () {
     const [formState, setFormState] = useState({
         title: '',
         description: '',
         bountyReward: '',
         numberOfVotes: '',
+        selectedChain:chains[0],
     });
     // const activeAccount = useActiveAccount();
     const [images, setImages] = useState([]);
     const [imageFiles, setImageFiles] = useState([]); // Store file references
     const [loading, setLoading] = useState(false);
     const [uploadingImages, setUploadingImages] = useState(false)
-    const { data: session } = useSession()
+    const {data: session} = useSession()
     const [userAddress, setUserAddress] = useState('');
+
+
+
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormState({
             ...formState,
             [name]: value,
@@ -48,13 +55,6 @@ require('dotenv').config();
         setImageFiles(prevFiles => [...prevFiles, ...files].slice(0, 4)); // Append new files and ensure the total count doesn't exceed 4
     };
 
-    const handleConnect = async (wallet) => {
-        console.log("Connected wallet:", wallet);
-
-        setUserAddress(address);
-    };
-
-
     const handleImageRemove = (index) => {
         const updatedFiles = [...imageFiles];
         updatedFiles.splice(index, 1);
@@ -62,7 +62,7 @@ require('dotenv').config();
     };
 
     const validateForm = () => {
-        const { title, description, bountyReward, numberOfVotes, nftPrice } = formState;
+        const {title, description, bountyReward, numberOfVotes, nftPrice} = formState;
         if (!title || !bountyReward || !numberOfVotes) {
             toast.error("All fields are required");
             return false;
@@ -88,7 +88,7 @@ require('dotenv').config();
             }
         }
 
-        if (imageFiles.length <2) {
+        if (imageFiles.length < 2) {
             toast.error("At least two images required");
             return false;
         }
@@ -227,7 +227,7 @@ require('dotenv').config();
                 posts: [...userDoc.posts, docRef.id],
                 realTokenBalance: realTokenBalance,
                 trialTokenBalance: trialTokenBalance,
-            }, { merge: true });
+            }, {merge: true});
 
             toast.success("Post published successfully!");
 
@@ -240,6 +240,7 @@ require('dotenv').config();
                 description: '',
                 bountyReward: '',
                 numberOfVotes: '',
+                selectedChain:chains[0],
             });
             setImageFiles([]);
         } catch (error) {
@@ -251,7 +252,6 @@ require('dotenv').config();
 
         setLoading(false);
     }
-        ;
 
     const renderDivs = () => {
         const divs = [];
@@ -261,17 +261,17 @@ require('dotenv').config();
             divs.push(
                 <div key={i} className="relative w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
                     <Image src={URL.createObjectURL(imageFiles[i])} alt={`uploaded-${i}`}
-                        className="absolute inset-0 w-full h-full object-cover rounded"
-                        width={300} height={300}
+                           className="absolute inset-0 w-full h-full object-cover rounded"
+                           width={300} height={300}
                     />
                     <button
                         onClick={() => handleImageRemove(i)}
                         className="absolute top-2 right-2 bg-white bg-opacity-50 rounded-full p-1"
                     >
                         <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
+                             xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                d="M6 18L18 6M6 6l12 12"></path>
+                                  d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
@@ -282,11 +282,11 @@ require('dotenv').config();
         if (imageFiles.length < 4) {
             divs.push(
                 <div key={imageFiles.length}
-                    className="relative flex items-center justify-center w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
+                     className="relative flex items-center justify-center w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
                     <label
                         className="absolute top-1/2 flex flex-col text-black text-xl items-center ">
                         <div className="flex gap-2 items-center justify-center ">
-                            Upload <FaCloudUploadAlt />
+                            Upload <FaCloudUploadAlt/>
                         </div>
                         <span className="text-sm">(Max 5 Mb)</span>
                     </label>
@@ -357,7 +357,7 @@ require('dotenv').config();
                         <div className='flex space-x-2'>
                             <div className='w-1/2'>
                                 <label htmlFor="bountyReward"
-                                    className="block text-sm font-medium text-gray-700">Reward</label>
+                                       className="block text-sm font-medium text-gray-700">Reward</label>
                                 <input
                                     type="number"
                                     id="bountyReward"
@@ -384,60 +384,61 @@ require('dotenv').config();
                             </div>
                         </div>
                         {/*removing nft and chain selection for now*/}
-                        {/*<div className='flex space-x-2'>*/}
-                        {/*    <div className='w-1/2'>*/}
-                        {/*        <label htmlFor="nftPrice" className="block text-sm font-medium text-gray-700">NFT*/}
-                        {/*            Price</label>*/}
-                        {/*        <input*/}
-                        {/*            type="number"*/}
-                        {/*            id="nftPrice"*/}
-                        {/*            name="nftPrice"*/}
-                        {/*            value={formState.nftPrice}*/}
-                        {/*            onChange={handleChange}*/}
-                        {/*            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"*/}
-                        {/*            placeholder="Enter NFT price"*/}
-                        {/*        />*/}
-                        {/*    </div>*/}
-                        {/*    <div className="w-1/2">*/}
-                        {/*        <label className="block text-sm font-medium text-gray-700 mb-1">Select Chain</label>*/}
-                        {/*        <Menu as="div" className="relative inline-block text-left w-full">*/}
-                        {/*            <div>*/}
-                        {/*                <MenuButton*/}
-                        {/*                    className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">*/}
-                        {/*                    <img src={formState.selectedChain.image} alt={formState.selectedChain.name}*/}
-                        {/*                         className="w-5 h-5 rounded-full mr-2"/>*/}
-                        {/*                    {formState.selectedChain.name}*/}
-                        {/*                    <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400"/>*/}
-                        {/*                </MenuButton>*/}
-                        {/*            </div>*/}
-                        {/*            <MenuItems*/}
-                        {/*                transition*/}
-                        {/*                className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"*/}
-                        {/*            >*/}
-                        {/*                <div className="py-1">*/}
-                        {/*                    {chains.map((chain) => (*/}
-                        {/*                        <MenuItem key={chain.name}>*/}
-                        {/*                            {({active}) => (*/}
-                        {/*                                <button*/}
-                        {/*                                    type="button"*/}
-                        {/*                                    onClick={() => setFormState({*/}
-                        {/*                                        ...formState,*/}
-                        {/*                                        selectedChain: chain*/}
-                        {/*                                    })}*/}
-                        {/*                                    className={`block w-full px-4 py-2 text-left text-sm ${active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'}`}*/}
-                        {/*                                >*/}
-                        {/*                                    <img src={chain.image} alt={chain.name}*/}
-                        {/*                                         className="w-5 h-5 rounded-full mr-2 inline"/>*/}
-                        {/*                                    {chain.name}*/}
-                        {/*                                </button>*/}
-                        {/*                            )}*/}
-                        {/*                        </MenuItem>*/}
-                        {/*                    ))}*/}
-                        {/*                </div>*/}
-                        {/*            </MenuItems>*/}
-                        {/*        </Menu>*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
+                        <div className='flex space-x-2'>
+                            {/*<div className='w-1/2'>*/}
+                            {/*    <label htmlFor="nftPrice" className="block text-sm font-medium text-gray-700">NFT*/}
+                            {/*        Price</label>*/}
+                            {/*    <input*/}
+                            {/*        type="number"*/}
+                            {/*        id="nftPrice"*/}
+                            {/*        name="nftPrice"*/}
+                            {/*        value={formState.nftPrice}*/}
+                            {/*        onChange={handleChange}*/}
+                            {/*        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"*/}
+                            {/*        placeholder="Enter NFT price"*/}
+                            {/*    />*/}
+                            {/*</div>*/}
+                            <div className="w-1/2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Select Chain</label>
+                                <Menu as="div" className="relative inline-block text-left w-full">
+                                    <div>
+                                        <MenuButton
+                                            className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                            <img src={formState.selectedChain.image} alt={formState.selectedChain.name}
+                                                 className="w-5 h-5 rounded-full mr-2"/>
+                                            {formState.selectedChain.name}
+                                            <ChevronDownIcon aria-hidden="true"
+                                                             className="-mr-1 h-5 w-5 text-gray-400"/>
+                                        </MenuButton>
+                                    </div>
+                                    <MenuItems
+                                        transition
+                                        className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                    >
+                                        <div className="py-1">
+                                            {chains.map((chain) => (
+                                                <MenuItem key={chain.name}>
+                                                    {({active}) => (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setFormState({
+                                                                ...formState,
+                                                                selectedChain: chain
+                                                            })}
+                                                            className={`block w-full px-4 py-2 text-left text-sm ${active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'}`}
+                                                        >
+                                                            <img src={chain.image} alt={chain.name}
+                                                                 className="w-5 h-5 rounded-full mr-2 inline"/>
+                                                            {chain.name}
+                                                        </button>
+                                                    )}
+                                                </MenuItem>
+                                            ))}
+                                        </div>
+                                    </MenuItems>
+                                </Menu>
+                            </div>
+                        </div>
                         {
 
 
