@@ -23,7 +23,9 @@ export async function POST(request) {
 
         //filter all the posts in which user has already voted
         const userVotes = user.votes;
-        const filteredPosts = posts.filter(post => !userVotes.includes(post.id));
+        let filteredPosts = posts.filter(post => !userVotes.includes(post.id));
+        //also remove users post
+        filteredPosts = filteredPosts.filter(post => post.userId !== userId);
         return new NextResponse(JSON.stringify(filteredPosts), {
             status: 200,
             headers: {'Content-Type': 'application/json'},

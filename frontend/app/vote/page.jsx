@@ -67,7 +67,7 @@ export default function Home() {
         if (session) {
             fetchPosts();
         }
-    }, []);
+    }, [session]);
 
     const handlePostClick = (postId) => {
         router.push(`/post/${postId}`);

@@ -9,41 +9,12 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useSession, signIn } from "next-auth/react"
-// import ConnectButtonComponent from '@/components/connectButtonComponent';
-import { ThirdwebProvider, ConnectButton } from "thirdweb/react";
-import { createThirdwebClient } from "thirdweb";
-import { createWallet, walletConnect} from "thirdweb/wallets";
-// import { useAddress } from "@thirdweb-dev/react";
 
- 
 
 
 require('dotenv').config();
 
 
-const client = createThirdwebClient({
-    clientId: '',
-    secretKey: ''
-});
-
-
-const wallets = [
-    createWallet("io.metamask"),
-    createWallet("com.coinbase.wallet"),
-    walletConnect(),
-    createWallet("com.trustwallet.app"),
-    createWallet("io.zerion.wallet"),
-    createWallet("me.rainbow"),
-    createWallet("app.phantom"),
-];
-
-
-const chains = [
-    { name: 'OP Sepolia', image: '/chain/optimism.jpeg', apiEndpoint: '/api/chain/op-sepolia/createPost' },
-    { name: 'Base Sepolia', image: '/chain/base.jpeg', apiEndpoint: '/api/chain/base-sepolia/createPost' },
-    { name: 'Mode TestNet', image: '/chain/mode.png', apiEndpoint: '/api/chain/mode-testnet/createPost' },
-    { name: 'Metal L2', image: '/chain/metal-L2.png', apiEndpoint: '/api/chain/metal-L2/createPost' },
-];
 
    function Page () {
     const [formState, setFormState] = useState({
@@ -66,8 +37,6 @@ const chains = [
             [name]: value,
         });
     };
-    // const activeAccount = useActiveAccount(client);
-    // console.log("activeAccount", activeAccount)
 
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
@@ -496,16 +465,7 @@ const chains = [
                         }
 
                     </form>
-                    <div className="mt-4">
-                        <ConnectButton
-                            client={client}
-                            wallets={wallets}
-                            theme={"dark"}
-                            connectModal={{ size: "wide" }}
 
-
-                        />
-                    </div>
                 </div>
             </div>
 

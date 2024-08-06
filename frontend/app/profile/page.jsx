@@ -7,6 +7,8 @@ import Balances from '@components/users/Balances'; // Adjust paths if needed
 import Transactions from '@components/users/Transactions'; // Renamed to Transactions
 import Votes from '@components/users/Votes'; // New component for Votes
 import Posts from '@components/users/Posts';
+import {client} from "@/app/_utils/thirdwebClient";
+import {ConnectButton} from "thirdweb/react";
 
 function Page() {
     const { data: session } = useSession();
@@ -16,6 +18,13 @@ function Page() {
     const handleTabChange = (key) => {
         setActiveTab(key);
     };
+
+    const chains = [
+        { name: 'OP Sepolia', image: '/chain/optimism.jpeg', apiEndpoint: '/api/chain/op-sepolia/createPost' },
+        { name: 'Base Sepolia', image: '/chain/base.jpeg', apiEndpoint: '/api/chain/base-sepolia/createPost' },
+        { name: 'Mode TestNet', image: '/chain/mode.png', apiEndpoint: '/api/chain/mode-testnet/createPost' },
+        { name: 'Metal L2', image: '/chain/metal-L2.png', apiEndpoint: '/api/chain/metal-L2/createPost' },
+    ];
 
     useEffect(() => {
         if (session?.user.name) {
@@ -43,6 +52,10 @@ function Page() {
                     localStorage.removeItem('user');
                     signOut()
                 }}>Sign Out</button>
+
+                <div>
+                    <ConnectButton client={client} />
+                </div>
 
             </div>
 
