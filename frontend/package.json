@@ -30,7 +30,6 @@
     "react-hot-toast": "^2.4.1",
     "react-icons": "^5.2.1",
     "react-shadow": "^20.5.0",
-    "thirdweb": "^5.44.0",
     "unique-names-generator": "^4.7.1",
     "web3": "^4.11.1"
   },

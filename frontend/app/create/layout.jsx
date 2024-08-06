@@ -1,5 +1,4 @@
-import { ThirdwebProvider } from "thirdweb/react";
-require('dotenv').config(); 
+require('dotenv').config();
 const Layout = ({ children }) => {
 
     return (

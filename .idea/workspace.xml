@@ -5,11 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/frontend/app/abis/abi.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/components/DepositEth.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/create/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/create/page.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/_utils/thirdwebClient.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/create/layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/create/layout.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/app/profile/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/profile/page.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/vote/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/vote/page.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/Providers.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Providers.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/public/abis/abi.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/abis/abi.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,9 +64,9 @@
       <recent name="$PROJECT_DIR$/server" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/frontend/app" />
       <recent name="$PROJECT_DIR$/frontend/public/img" />
       <recent name="$PROJECT_DIR$/frontend" />
-      <recent name="$PROJECT_DIR$/frontend/app" />
       <recent name="$PROJECT_DIR$" />
     </key>
   </component>
@@ -99,6 +104,9 @@
       <workItem from="1722896043304" duration="2925000" />
       <workItem from="1722879175471" duration="1449000" />
       <workItem from="1722912585739" duration="790000" />
+      <workItem from="1722932003120" duration="77000" />
+      <workItem from="1722939492989" duration="1569000" />
+      <workItem from="1722951727737" duration="2245000" />
     </task>
     <servers />
   </component>

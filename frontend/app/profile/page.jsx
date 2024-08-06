@@ -7,9 +7,8 @@ import Balances from '@components/users/Balances'; // Adjust paths if needed
 import Transactions from '@components/users/Transactions'; // Renamed to Transactions
 import Votes from '@components/users/Votes'; // New component for Votes
 import Posts from '@components/users/Posts';
-import {client} from "@/app/_utils/thirdwebClient";
-import {ConnectButton} from "thirdweb/react";
-import {useActiveAccount, useDisconnect, useActiveWallet} from "thirdweb/react";
+import DepositEth from "@components/DepositEth";
+
 import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
 import {ChevronDownIcon} from "@heroicons/react/20/solid";
 
@@ -29,21 +28,14 @@ function Page() {
     const handleTabChange = (key) => {
         setActiveTab(key);
     };
-    const {disconnect} = useDisconnect();
-    const wallet = useActiveWallet();
     const [loading, setLoading] = useState(false);
     const [selectedChain, setSelectedChain] = useState(chains[0]);
 
-    const account = useActiveAccount();
 
     const handleSignOut = async () => {
         setLoading(true);
-        //if wallete is connected, disconnect it
-        if (wallet) {
-            await disconnect(wallet);
-        }
         localStorage.removeItem('user');
-        await signOut({ callbackUrl: 'http://localhost:3000/' })
+        await signOut({callbackUrl: 'http://localhost:3000/'})
         setLoading(false)
     }
 
@@ -79,9 +71,6 @@ function Page() {
                 }
                 </button>
 
-                <div>
-                    <ConnectButton client={client}/>
-                </div>
 
             </div>
             <div className="w-fit mb-10">
@@ -122,7 +111,7 @@ function Page() {
                 </Menu>
             </div>
 
-
+            <DepositEth/>
             {/* Tabs Component */}
             <div className="flex w-full  flex-col justify-center">
                 <Tabs aria-label="Options" onChange={handleTabChange}>
