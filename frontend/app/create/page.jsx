@@ -80,6 +80,8 @@ function Page() {
         const blob = base64ToBlob(base64string);
         const file = new File([blob], 'image.png', { type: 'image/png' });
         setImageFiles((prevFiles) => [...prevFiles, file]);
+        //scroll to top smoothly
+        window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
     const base64ToBlob = (base64string) => {
@@ -583,6 +585,7 @@ function Page() {
                     <h1 className="text-3xl text-center font-bold mb-2">
                         Generate thumbnails using AI
                     </h1>
+                    <p className="text-center text-lg">Click on any image to add to uploads</p>
                     <div className="flex  px-10 ">
                         {/* images container */}
                         <div className="w-7/12 p-4 ">
@@ -590,7 +593,7 @@ function Page() {
                                 <div className="grid grid-cols-1 gap-4">
                                     {aiGeneratedImages.map((image, index) => (
                                         <div key={index}
-                                             className="relative w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded"
+                                             className="relative w-full pt-[56.25%] bg-gray-300  rounded hover:cursor-pointer border-4 border-transparent hover:border-theme-blue-light"
                                              onClick={() => addAIgeneratedImageToImageArray(image)}
                                         >
 
