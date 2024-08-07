@@ -56,6 +56,7 @@ export const authOptions = {
                     posts: [],
                     votes: [],
                     payouts: [],
+                    aiGeneratedImages: [],
                     // Add any other fields you want to store
                 });
 

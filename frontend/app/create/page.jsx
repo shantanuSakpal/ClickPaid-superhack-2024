@@ -44,13 +44,15 @@ function Page() {
         numberOfVotes: '',
         selectedChain: chains[0],
     });
+    const [loading, setLoading] = useState(false);
     const [web3, setWeb3] = useState(null);
     const [contract, setContract] = useState(null);
 
     // const activeAccount = useActiveAccount();
     const [images, setImages] = useState([]);
     const [imageFiles, setImageFiles] = useState([]); // Store file references
-    const [loading, setLoading] = useState(false);
+    const [aiGeneratedImages, setAiGeneratedImages] = useState([]);
+    const [generatingImage, setGeneratingImage] = useState(false);
     const [uploadingImages, setUploadingImages] = useState(false)
     const {data: session} = useSession()
     const [userAddress, setUserAddress] = useState('');
@@ -72,6 +74,21 @@ function Page() {
         }
 
         setImageFiles(prevFiles => [...prevFiles, ...files].slice(0, 4)); // Append new files and ensure the total count doesn't exceed 4
+    };
+
+    const addAIgeneratedImageToImageArray = (base64string) => {
+        const blob = base64ToBlob(base64string);
+        const file = new File([blob], 'image.png', { type: 'image/png' });
+        setImageFiles((prevFiles) => [...prevFiles, file]);
+    };
+
+    const base64ToBlob = (base64string) => {
+        const bytes = atob(base64string.split(',')[1]);
+        const array = [];
+        for (let i = 0; i < bytes.length; i++) {
+            array.push(bytes.charCodeAt(i));
+        }
+        return new Blob([new Uint8Array(array)], { type: 'image/png' });
     };
 
     const handleImageRemove = (index) => {
@@ -185,6 +202,54 @@ function Page() {
         }
     };
 
+    const handleGenerateImage = async (e) => {
+        e.preventDefault();
+        try {
+            setGeneratingImage(true);
+            const body = {
+                topic: e.target.topic.value,
+                text: e.target.text.value,
+                description: e.target.description.value,
+            }
+            const response = await fetch(`/api/generateImageUsingAi`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({body}),
+            });
+            if (!response.ok) {
+                throw new Error('Failed to generate image');
+            }
+            const data = await response.json();
+            const newImage = `data:image/png;base64,${data.imageData}`;
+
+            // Update state with the new image
+            setAiGeneratedImages(prevImages => [...prevImages, newImage]);
+
+            // Save the image to Firebase
+            const imageRef = await uploadImage(newImage);
+            if (!imageRef) {
+                throw new Error('Failed to save image');
+            }
+            const userRef = doc(db, 'users', session.user.id);
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) {
+                toast.error("User not found")
+                return;
+            }
+            const userDoc = userSnap.data();
+            // Update user document with generated image url
+            await setDoc(userRef, {
+                aiGeneratedImages: [...userDoc.aiGeneratedImages, imageRef],
+            }, {merge: true});
+
+
+        } catch (error) {
+            console.error('Error generating image:', error);
+            toast.error('Failed to generate image');
+        } finally {
+            setGeneratingImage(false);
+        }
+    };
 
     const handleSubmit = async (e) => {
         setLoading(true);
@@ -236,6 +301,7 @@ function Page() {
                 }
             } else {
                 toast.error("Not enough balance!");
+                return;
             }
 
             // Upload images to Firebase and get URLs
@@ -288,6 +354,7 @@ function Page() {
 
         setLoading(false);
     }
+
 
     const renderDivs = () => {
         const divs = [];
@@ -357,7 +424,7 @@ function Page() {
                 </p>
             </div>
 
-            <div className="flex min-h-[100vh] px-10 ">
+            <div className="flex  px-10 ">
                 {/* Left side */}
                 <div className="w-7/12 p-4 ">
                     <div className={`grid gap-4 ${imageFiles.length === 0 ? 'grid-cols-1' : 'grid-cols-2'}`}>
@@ -507,6 +574,92 @@ function Page() {
 
                     </form>
 
+                </div>
+            </div>
+
+            {/*AI image generation*/}
+            <div className="flex flex-col w-full my-10">
+                <div className="py-2 mb-5">
+                    <h1 className="text-3xl text-center font-bold mb-2">
+                        Generate thumbnails using AI
+                    </h1>
+                    <div className="flex  px-10 ">
+                        {/* images container */}
+                        <div className="w-7/12 p-4 ">
+                            {aiGeneratedImages.length > 0 ? (
+                                <div className="grid grid-cols-1 gap-4">
+                                    {aiGeneratedImages.map((image, index) => (
+                                        <div key={index}
+                                             className="relative w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded"
+                                             onClick={() => addAIgeneratedImageToImageArray(image)}
+                                        >
+
+                                            <Image
+                                                src={image}
+                                                alt={`AI Generated Thumbnail ${index + 1}`}
+                                                className="absolute inset-0 w-full h-full object-cover rounded"
+                                                width={1024}
+                                                height={576}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="w-full flex justify-center items-center h-full bg-gray-300 rounded-lg">
+                                    Your AI generated thumbnails will appear here
+                                </div>
+                            )}
+                        </div>
+
+                        {/* form */}
+                        <div className="w-5/12 p-4">
+                            <form className="space-y-4" onSubmit={handleGenerateImage}>
+                                <div>
+                                    <label htmlFor="title"
+                                           className="block text-sm font-medium text-gray-700">Topic</label>
+                                    <input
+                                        type="text"
+                                        id="topic"
+                                        name="topic"
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                                        placeholder="What is this thumbnail about?"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="title"
+                                           className="block text-sm font-medium text-gray-700">Text</label>
+                                    <input
+                                        type="text"
+                                        id="text"
+                                        name="text"
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                                        placeholder="Any text you want to add to the image?"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">Thumbnail
+                                        Description</label>
+                                    <textarea
+                                        id="description"
+                                        name="description"
+                                        rows="4"
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                                        placeholder="Give a description about the thumbnail, the longer, the better!"
+                                    ></textarea>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="w-full mt-4 bg-theme-blue-light text-white font-semibold py-2 rounded-md hover:bg-theme-blue"
+                                    disabled={generatingImage}
+                                >
+                                    {generatingImage ? "Generating Image..." : "Generate New Thumbnail"}
+                                </button>
+
+                            </form>
+
+                        </div>
+                    </div>
                 </div>
             </div>
 

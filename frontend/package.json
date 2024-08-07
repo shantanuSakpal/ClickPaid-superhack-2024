@@ -19,6 +19,8 @@
     "@nextui-org/user": "^2.0.33",
     "@worldcoin/idkit": "^1.2.2",
     "axios": "^1.7.3",
+    "base64-to-image": "^1.0.2",
+    "convert-base64-to-image": "^0.0.16",
     "dotenv": "^16.4.5",
     "ethers": "^6.13.2",
     "firebase": "^10.12.5",
