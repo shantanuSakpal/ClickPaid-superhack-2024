@@ -8,7 +8,8 @@ import {ChevronDownIcon} from "@heroicons/react/20/solid";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
 import SwitchChains from "@components/SwitchChains";
-
+import {useActiveAccount} from "thirdweb/react";
+import ConnectWallet from "@components/ConnectWallet";
 
 export default function Home() {
     const router = useRouter();
@@ -16,7 +17,7 @@ export default function Home() {
     const {data: session} = useSession();
     const [loading, setLoading] = useState(false);
     const {selectedChain, setSelectedChain} = useContext(GlobalContext);
-
+    const activeAccount = useActiveAccount();
     const fetchPosts = async () => {
         try {
             setLoading(true);
@@ -67,7 +68,7 @@ export default function Home() {
      */
 
     useEffect(() => {
-        if (session) {
+        if (session && selectedChain) {
             fetchPosts();
         }
     }, [session, selectedChain]);
@@ -85,15 +86,18 @@ export default function Home() {
                 </p>
             </div>
 
-            <div className="flex flex-row gap-2 items-center w-fit mx-10 ">
-                <p className="whitespace-nowrap">On chain:</p>
-                <div className="flex flex-row gap-2 items-center">
+            {
+                activeAccount ? (<div className="flex flex-row gap-2 items-center mx-10 w-full justify-center">
                     <img src={selectedChain.image} alt={selectedChain.name}
                          className="w-7 h-7 rounded-full"/>
                     <span className="whitespace-nowrap font-semibold">{selectedChain.name}</span>
-                </div>
-                <SwitchChains/> {/* Switch Chain Button */}
-            </div>
+                    <SwitchChains/>
+                </div>) : (
+                    <div className="w-full flex justify-center">
+                        <ConnectWallet title="Connect wallet to start voting!"/>
+                    </div>
+                )
+            }
 
             <main className="">
                 {/* Left Sidebar for Trending Section */}
@@ -166,8 +170,7 @@ export default function Home() {
                             </div>
                         ) : (
                             session && (
-                                <div className="w-full text-center mt-10 text-lg">No more posts. Come back tomorrow for
-                                    more votes, more rewards!</div>)
+                                <div className="w-full text-center mt-10 text-lg">No more posts on this chain, try switching network!</div>)
                         )
                     )
                 }

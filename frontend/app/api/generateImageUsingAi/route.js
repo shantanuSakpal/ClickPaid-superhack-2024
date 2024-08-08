@@ -61,7 +61,7 @@ export async function POST(request) {
             throw new Error(`${response.status}: ${response.data.toString()}`);
         }
     } catch (error) {
-        console.error("Error generating image:", error);
+        console.error("Error generating image:", error.message);
         return new NextResponse('Failed to generate image', {status: 500});
     }
 }

@@ -198,7 +198,7 @@ function Page() {
 
         } catch (error) {
             console.error('Error generating image:', error);
-            toast.error('Failed to generate image');
+            toast.error('Failed to generate image, maybe out of credits :(');
         } finally {
             setGeneratingImage(false);
         }
@@ -547,7 +547,7 @@ function Page() {
 
                                 <button
                                     type="submit"
-                                    className="w-full mt-4 bg-theme-blue-light text-white font-semibold py-2 rounded-md hover:bg-theme-blue"
+                                    className={`w-full mt-4 bg-theme-blue-light text-white font-semibold py-2 rounded-md  ${generatingImage ? "bg-gray-300 text-black cursor-not-allowed" : "hover:bg-theme-blue"}`}
                                     disabled={generatingImage}
                                 >
                                     {generatingImage ? "Generating Image..." : "Generate New Thumbnail"}

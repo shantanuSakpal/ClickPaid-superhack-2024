@@ -68,9 +68,8 @@ export default function SwitchChains() {
       client,
       theme: "light",
       sections: [
-        { label: "Recently used", chains: [baseSepolia, optimismSepolia,modeTestnet, metalL2Testnet, sepolia] },
-        { label: "Popular", chains: [base, ethereum] },
-        { label: "Test networks", chains: [baseSepolia, optimismSepolia, modeTestnet, metalL2Testnet, sepolia] }
+        { label: "Currently supported", chains: [baseSepolia, optimismSepolia,modeTestnet, metalL2Testnet] },
+        { label: "Test networks", chains: [baseSepolia, optimismSepolia, modeTestnet, metalL2Testnet] }
 
       ],
       onSwitch: (chain) => {
