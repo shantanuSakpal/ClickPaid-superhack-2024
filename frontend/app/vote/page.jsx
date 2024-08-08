@@ -7,7 +7,6 @@ import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
 import {ChevronDownIcon} from "@heroicons/react/20/solid";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
-import ChainSelect from "@components/ChainSelect";
 import SwitchChains from "@components/SwitchChains";
 
 

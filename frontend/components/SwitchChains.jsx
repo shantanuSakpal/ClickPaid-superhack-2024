@@ -29,7 +29,7 @@ export default function SwitchChains() {
       apiEndpoint: '/api/chain/base-sepolia/createPost'
     },
     {
-      name: 'Mode TestNet',
+      name: 'Mode Testnet',
       id: "mode-testnet",
       image: '/chain/mode.png',
       apiEndpoint: '/api/chain/mode-testnet/createPost'
@@ -85,5 +85,5 @@ export default function SwitchChains() {
 
   // console.log("activeChain", activeChain);
 
-  return <button className="bg-black hover:bg-theme-gray-dark text-white font-bold rounded-lg px-3 py-2" onClick={handleClick}> Switch Network </button>;
+  return <div className="hover:cursor-pointer bg-black hover:bg-theme-gray-dark text-white font-bold rounded-lg px-3 py-2" onClick={handleClick}> Switch Network </div>;
 }

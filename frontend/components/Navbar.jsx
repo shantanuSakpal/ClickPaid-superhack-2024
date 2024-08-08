@@ -7,8 +7,8 @@ import {useSession, signIn} from "next-auth/react"
 import {CgProfile} from "react-icons/cg";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
-import {ConnectButton} from "thirdweb/react";
-import {client} from "@/app/_lib/client";
+import ConnectWallet from "@components/ConnectWallet";
+
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,18 +17,11 @@ export default function Navbar() {
 
     useEffect(() => {
         setUserData(session?.user);
-        if (!selectedChain) {
-            setSelectedChain({
-                id: "op-sepolia",
-                name: 'OP Sepolia',
-                image: '/chain/optimism.jpeg',
-                apiEndpoint: '/api/chain/op-sepolia/createPost'
-            })
-        }
+        console.log(userData)
     }, [session])
 
     return (
-        <nav className="fixed top-0 py-2 left-0 w-full z-10 border-b bg-white">
+        <nav className="fixed top-0 py-1 left-0 w-full z-10 border-b bg-white">
 
             <div className=" mx-auto px-3">
                 <div className="flex justify-between">
@@ -58,9 +51,13 @@ export default function Navbar() {
                                     <div className="text-sm pr-5 border-r-2 whitespace-nowrap">
                                         {userData?.rewards ? `Rewards: ${userData.rewards}` : "Rewards: 0"} USD
                                     </div>
-
-                                    <ConnectButton client={client} theme="dark" />
-
+                                    {
+                                        selectedChain && <div className="flex flex-row gap-2 items-center">
+                                            <img src={selectedChain.image} alt={selectedChain.name}
+                                                 className="w-7 h-7 rounded-full"/>
+                                        </div>
+                                    }
+                                    <ConnectWallet/>
                                 </div>
                             ) : <div>
                                 <button

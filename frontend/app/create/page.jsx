@@ -13,14 +13,16 @@ import Web3 from 'web3';
 import abi from "@/app/abis/abi";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
-import ChainSelect from "@components/ChainSelect";
 import SwitchChains from "@components/SwitchChains";
+import {useActiveAccount} from "thirdweb/react";
+import ConnectWallet from "@components/ConnectWallet";
+import {client} from "@/app/_lib/client";
 
 require('dotenv').config();
 
 function Page() {
-    const { userData, setUserData, selectedChain, setSelectedChain } = useContext(GlobalContext);
-
+    const {userData, setUserData, selectedChain, setSelectedChain} = useContext(GlobalContext);
+    const activeAccount = useActiveAccount();
 
     const [formState, setFormState] = useState({
         title: '',
@@ -62,7 +64,7 @@ function Page() {
 
     const addAIgeneratedImageToImageArray = (base64string) => {
         const blob = base64ToBlob(base64string);
-        const file = new File([blob], 'image.png', { type: 'image/png' });
+        const file = new File([blob], 'image.png', {type: 'image/png'});
         setImageFiles((prevFiles) => [...prevFiles, file]);
         //scroll to top smoothly
         window.scrollTo({top: 0, behavior: 'smooth'});
@@ -74,7 +76,7 @@ function Page() {
         for (let i = 0; i < bytes.length; i++) {
             array.push(bytes.charCodeAt(i));
         }
-        return new Blob([new Uint8Array(array)], { type: 'image/png' });
+        return new Blob([new Uint8Array(array)], {type: 'image/png'});
     };
 
     const handleImageRemove = (index) => {
@@ -143,45 +145,10 @@ function Page() {
 
 
     const addDataToBlockchain = async (postData, postId) => {
-        if (!web3 || !contract) {
-            toast.error("Web3 or contract not initialized");
-            return;
-        }
 
         try {
             // Connect to Web3
-            if (typeof window.ethereum !== 'undefined') {
-                const web3 = new Web3(window.ethereum);
-                await window.ethereum.enable();
 
-                // Get the current account
-                const accounts = await web3.eth.getAccounts();
-                const account = accounts[0];
-
-                // Contract address and ABI (you need to replace these with your actual values)
-                const contractAddress = '0x8C992ba2293dd69dB74bE621F61fF9E14E76F262';
-                const contractABI = abi; // Add your contract ABI here
-
-                // Create contract instance
-                const contract = new web3.eth.Contract(contractABI, contractAddress);
-
-                // Convert ETH to Wei
-
-                const userId = session?.user.id;
-                const bounty = postData.bountyReward;
-                const numVoters = postData.numberOfVotes;
-                const optionIDs = postData.options.map(option => option.id);
-
-                // Then, create the post
-                await contract.methods.createPost(postId, bounty, numVoters, userId, optionIDs).send({
-                    from: account
-                });
-
-                console.log({postId, bounty, numVoters, userId, optionIDs})
-                toast.success("lets go!!")
-            } else {
-                toast.error("bc")
-            }
         } catch (error) {
             console.error('Detailed error:', error);
             toast.error(`Contract interaction failed: ${error.message}`);
@@ -279,8 +246,8 @@ function Page() {
             // Save post data to Firebase
             const postData = {
                 ...formState,
-                selectedChain : selectedChain,
-                selectedChainId : selectedChain.id,
+                selectedChain: selectedChain,
+                selectedChainId: selectedChain.id,
                 userId: session.user.id,
                 options: uploadedImages,
                 isDone: false,
@@ -453,44 +420,52 @@ function Page() {
                             </div>
                         </div>
                         {/*removing nft and chain selection for now*/}
-                          <div className="flex flex-col">
-                                  <label className="block text-sm font-medium text-gray-700">Posting on</label>
-                              <div className="flex flex-row gap-5 justify-between items-center mt-2">
-                                  <div className="flex flex-row gap-2 items-center">
-                                      <img src={selectedChain.image} alt={selectedChain.name}
-                                           className="w-7 h-7 rounded-full"/>
-                                      <span className="whitespace-nowrap font-semibold">{selectedChain.name}</span>
-                                  </div>
-                                  <div>
-                                      <SwitchChains/>
-                                  </div>
-                              </div>
+                        {
+                            activeAccount && (
+                                <div className="flex flex-col">
+                                    <label className="block text-sm font-medium text-gray-700">Posting on</label>
+                                    <div className="flex flex-row gap-5 justify-between items-center mt-2">
+                                        {
+                                            selectedChain && <div className="flex flex-row gap-2 items-center">
+                                                <img src={selectedChain.image} alt={selectedChain.name}
+                                                     className="w-7 h-7 rounded-full"/>
+                                                <span className="whitespace-nowrap font-semibold">{selectedChain.name}</span>
+                                            </div>
+                                        }
+                                        <div>
+                                            <SwitchChains/>
+                                        </div>
+                                    </div>
 
-                          </div>
+                                </div>
+                            )
+                        }
                         {
 
 
-                            session ? (
-                                <button
-                                    type="submit"
-                                    className={`w-full mt-4  font-semibold py-2 rounded-md  ${loading ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
-                                    disabled={loading}
-                                >
-                                    {loading ? (
-                                        uploadingImages ? "Uploading images..." : "Creating post..."
-                                    ) : 'Pay and Publish Post'}
-                                </button>
-                            ) : (
-                                <button
-                                    type="button"
-                                    className="w-full mt-4 bg-theme-blue-light text-white font-semibold py-2 rounded-md hover:bg-theme-blue"
-                                    onClick={() => {
-                                        signIn("worldcoin")
-                                    }}
-                                >
-                                    Login to Publish Post
-                                </button>
-                            )
+                          activeAccount ? (  session ? (
+                              <button
+                                  type="submit"
+                                  className={`w-full mt-4  font-semibold py-2 rounded-md  ${loading ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
+                                  disabled={loading}
+                              >
+                                  {loading ? (
+                                      uploadingImages ? "Uploading images..." : "Creating post..."
+                                  ) : 'Pay and Publish Post'}
+                              </button>
+                          ) : (
+                              <button
+                                  type="button"
+                                  className="w-full mt-4 bg-theme-blue-light text-white font-semibold py-2 rounded-md hover:bg-theme-blue"
+                                  onClick={() => {
+                                      signIn("worldcoin")
+                                  }}
+                              >
+                                  Login to Publish Post
+                              </button>
+                          )):(
+                                    <ConnectWallet title="Connect Wallet to Publish Post"/>
+                          )
                         }
 
                     </form>

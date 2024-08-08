@@ -8,15 +8,12 @@ import Transactions from '@components/users/Transactions'; // Renamed to Transac
 import Votes from '@components/users/Votes'; // New component for Votes
 import Posts from '@components/users/Posts';
 import DepositEth from "@components/DepositEth";
-
-import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
-import {ChevronDownIcon} from "@heroicons/react/20/solid";
+import { useDisconnect, useActiveWallet } from "thirdweb/react";
 
 
 function Page() {
-
-
-
+    const { disconnect } = useDisconnect();
+    const wallet = useActiveWallet();
     const {data: session} = useSession();
     const [activeTab, setActiveTab] = useState('Posts');
     const [nameInitials, setNameInitials] = useState('');
@@ -29,6 +26,7 @@ function Page() {
     const handleSignOut = async () => {
         setLoading(true);
         localStorage.removeItem('user');
+        await  disconnect(wallet);
         await signOut({callbackUrl: 'http://localhost:3000/'})
         setLoading(false)
     }
