@@ -9,6 +9,7 @@ const PriceConverter = () => {
   const priceId = "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"; // ETH/USD price id
 
   const [ethPrice, setEthPrice] = useState(0);
+  const [lastPrice, setLastPrice] = useState(0);
   const [usdInput, setUsdInput] = useState('');
   const [ethInput, setEthInput] = useState('');
 
@@ -20,7 +21,7 @@ const PriceConverter = () => {
       // Extract the price value and convert to a usable format
       const priceValue = parseFloat(ethPriceData.price) / 1e8; // Convert from integer to float (assuming price is in smallest unit)
       setEthPrice(priceValue);
-      console.log(currentPrices);
+      setLastPrice(ethPrice); // Update lastPrice with the previous ethPrice
     } catch (error) {
       console.error("Error fetching prices:", error);
     }
@@ -28,7 +29,7 @@ const PriceConverter = () => {
 
   useEffect(() => {
     fetchPrices();
-    const interval = setInterval(fetchPrices, 15000); // Fetch every 15 seconds
+    const interval = setInterval(fetchPrices, 5000); // Fetch every 5 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -76,8 +77,10 @@ const PriceConverter = () => {
         />
       </div>
       <div className="mt-4">
-        <p className="font-semibold">Current ETH Price:</p>
-        <p>1 ETH: ${ethPrice.toFixed(2)}</p>
+        <span className="font-semibold mr-2">Current ETH Price : </span>
+        <span className={`${ethPrice > lastPrice ? 'text-green-500' : 'text-red-500'}`}>
+          1 ETH: ${ethPrice.toFixed(2)}
+        </span>
       </div>
     </div>
   );
