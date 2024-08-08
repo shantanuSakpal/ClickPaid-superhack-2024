@@ -23,6 +23,7 @@ export const authOptions = {
             clientSecret: process.env.NEXT_PUBLIC_WLD_CLIENT_SECRET,
             idToken: true,
             checks: ["state", "nonce", "pkce"],
+
             profile(profile) {
                 return {
                     id: profile.sub,
@@ -33,6 +34,7 @@ export const authOptions = {
             },
         },
     ],
+
     callbacks: {
         async jwt({ token }) {
             token.userRole = "admin";
@@ -78,6 +80,7 @@ export const authOptions = {
 
     },
     debug: true,
+    secret: process.env.SECRET
 };
 
 export default NextAuth(authOptions);
