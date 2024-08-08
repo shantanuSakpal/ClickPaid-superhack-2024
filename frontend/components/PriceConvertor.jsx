@@ -77,7 +77,7 @@ const PriceConverter = () => {
       </div>
       <div className="mt-4">
         <p className="font-semibold">Current ETH Price:</p>
-        <p>ETH: ${ethPrice.toFixed(2)}</p>
+        <p>1 ETH: ${ethPrice.toFixed(2)}</p>
       </div>
     </div>
   );

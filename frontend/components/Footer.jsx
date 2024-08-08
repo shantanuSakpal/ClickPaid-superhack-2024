@@ -5,7 +5,7 @@ import Link from "next/link";
 
 function Footer(props) {
     return (
-        <div className="bg-theme-blue-light flex flex-row py-3 mt-10 px-10 justify-between items-center">
+        <div className="bg-white border-t-2 flex flex-row py-3 mt-10 px-10 justify-between items-center">
             <div className="font-bold ">
                 ClickPaid © 2024
             </div>

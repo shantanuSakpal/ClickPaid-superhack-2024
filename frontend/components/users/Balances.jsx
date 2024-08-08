@@ -58,7 +58,6 @@ export default function Balances() {
                         <DepositEth/>
 
                         <WithdrawTokens/>
-                        <PriceConverter />
                     </div>
                 )
             }

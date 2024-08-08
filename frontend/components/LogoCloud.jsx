@@ -28,7 +28,7 @@ const LogoCloud = () => {
             </Slider.Slide>
             <Slider.Slide className='flex items-center'>
                 <img src="/chain/worldcoin.png" alt="WorldCoin" className='w-12 h-12 rounded-full mr-4' />
-                <span className='text-black text-2xl font-semibold'>WorldCoin</span>
+                <span className='text-black text-xl font-semibold'>WorldCoin</span>
             </Slider.Slide>
     
         </Slider>
