@@ -7,6 +7,9 @@ import {useSession, signIn} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import Web3 from 'web3';
 import abi from "@/app/abis/abi";
+import {GlobalContext} from "@/app/contexts/UserContext";
+import {useContext} from "react";
+
 
 const chains = [
     {name: 'OP Mainnet', image: '/img/1.jpeg', votes: 120},
@@ -23,6 +26,8 @@ const Layout = () => {
     const [submitting, setSubmitting] = useState(false);
     const [isOwner, setIsOwner] = useState(false)
     const navigate = useRouter();
+    const { userData, setUserData, selectedChain, setSelectedChain } = useContext(GlobalContext);
+
     /*
     post = {
         "id": "3A3xlC2vxbc0mEnNLSGU",
@@ -105,6 +110,7 @@ const Layout = () => {
                 console.error('Error submitting vote:', errorMessage);
                 toast.error(errorMessage); // Display the error message to the user
             } else {
+                setUserData({...userData, rewards: userData.rewards + post.bountyReward / post.numberOfVotes})
                 toast.success("Vote submitted");
                 navigate.push('/vote')
             }
@@ -138,7 +144,7 @@ const Layout = () => {
                             <span className="font-bold">On {post.selectedChain.name}</span>
                         </div>
                         <h2 className="text-3xl  font-bold">{post.title}</h2>
-                        <div className="">Reward: {post.bountyReward / post.numberOfVotes} tokens</div>
+                        <div className="">Reward: {post.bountyReward / post.numberOfVotes} USD</div>
                     </div>
                     <p className="text-lg">{post.description}</p>
                     <div className="grid grid-cols-2 gap-8 my-5">

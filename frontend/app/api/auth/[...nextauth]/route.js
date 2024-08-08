@@ -51,31 +51,26 @@ export const authOptions = {
                     id: token.sub,
                     name: randomName,
                     walletAddress: "",
-                    realTokenBalance: 0,
-                    trialTokenBalance: 100,
                     posts: [],
                     votes: [],
                     payouts: [],
                     aiGeneratedImages: [],
+                    rewards:0,
                     // Add any other fields you want to store
                 });
 
                 // Update the session with the generated name
                 session.user.name = randomName;
                 session.user.id = token.sub;
-                session.user.tokens = {
-                    realTokenBalance: 0,
-                    trialTokenBalance: 100
-                }
+                session.rewards = 0;
+
             } else {
                 // Retrieve user data from Firestore
                 const userData = userSnap.data();
                 session.user.name = userData.name;
                 session.user.id = userData.id;
-                session.user.tokens = {
-                    realTokenBalance: userData.realTokenBalance,
-                    trialTokenBalance: userData.trialTokenBalance
-                }
+                session.user.rewards = userData.rewards;
+
             }
 
             return session;

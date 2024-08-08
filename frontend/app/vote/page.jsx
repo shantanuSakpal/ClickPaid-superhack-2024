@@ -1,15 +1,31 @@
 "use client";
-import Head from 'next/head';
 import {useRouter} from 'next/navigation';
 import React, {useEffect, useState} from 'react';
 import LoadingSpinner from "@components/LoadingSpinner";
 import {signIn, useSession} from "next-auth/react";
+import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
+import {ChevronDownIcon} from "@heroicons/react/20/solid";
 
 const chains = [
-    {name: 'OP Mainnet', image: '/img/1.jpeg'},
-    {name: 'Base', image: '/img/2.jpeg'},
-    {name: 'Mode', image: '/img/3.jpeg'},
-    {name: 'WorldCoin', image: '/img/4.jpeg'},
+    {
+        name: 'OP Sepolia',
+        id: "op-sepolia",
+        image: '/chain/optimism.jpeg',
+        apiEndpoint: '/api/chain/op-sepolia/createPost'
+    },
+    {
+        name: 'Base Sepolia',
+        id: "base-sepolia",
+        image: '/chain/base.jpeg',
+        apiEndpoint: '/api/chain/base-sepolia/createPost'
+    },
+    {
+        name: 'Mode TestNet',
+        id: "mode-testnet",
+        image: '/chain/mode.png',
+        apiEndpoint: '/api/chain/mode-testnet/createPost'
+    },
+    {name: 'Metal L2', id: "metal-l2", image: '/chain/metal-L2.png', apiEndpoint: '/api/chain/metal-L2/createPost'},
 ];
 
 export default function Home() {
@@ -17,6 +33,8 @@ export default function Home() {
     const [posts, setPosts] = useState([]);
     const {data: session} = useSession();
     const [loading, setLoading] = useState(false);
+    const [selectedChain, setSelectedChain] = useState(chains[0]);
+
     const fetchPosts = async () => {
         try {
             setLoading(true);
@@ -24,7 +42,8 @@ export default function Home() {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    userId: session.user.id
+                    userId: session.user.id,
+                    selectedChainId: selectedChain.id,
                 }), // Send body as JSON
             });
             if (!response.ok) {
@@ -69,7 +88,7 @@ export default function Home() {
         if (session) {
             fetchPosts();
         }
-    }, [session]);
+    }, [session, selectedChain]);
 
     const handlePostClick = (postId) => {
         router.push(`/post/${postId}`);
@@ -83,6 +102,46 @@ export default function Home() {
                     Select any post and vote with a simple click, get a share of the reward for the post.
                 </p>
             </div>
+            <div className="w-fit flex gap-2 items-center flex-row mx-5">
+                <h1 className="whitespace-nowrap font-bold ">Select chain:</h1>
+                <Menu as="div" className="relative inline-block text-left w-full">
+                    <div>
+                        <MenuButton
+                            className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                            <img src={selectedChain?.image} alt={selectedChain?.name}
+                                 className="w-5 h-5 rounded-full mr-2"/>
+                            {selectedChain?.name}
+                            <ChevronDownIcon aria-hidden="true"
+                                             className="-mr-1 h-5 w-5 text-gray-400"/>
+                        </MenuButton>
+                    </div>
+                    <MenuItems
+                        transition
+                        className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                    >
+                        <div className="py-1">
+                            {chains.map((chain) => (
+                                <MenuItem key={chain.name}>
+                                    {({active}) => (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setSelectedChain(chain);
+                                                localStorage.setItem("selectedChain", JSON.stringify(chain));
+                                            }}
+                                            className={`block w-full px-4 py-2 text-left text-sm ${active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'}`}
+                                        >
+                                            <img src={chain.image} alt={chain.name}
+                                                 className="w-5 h-5 rounded-full mr-2 inline"/>
+                                            {chain.name}
+                                        </button>
+                                    )}
+                                </MenuItem>
+                            ))}
+                        </div>
+                    </MenuItems>
+                </Menu>
+            </div>
             <main className="">
                 {/* Left Sidebar for Trending Section */}
                 {/*<aside className="w-1/5 bg-white p-4 rounded shadow">*/}
@@ -91,7 +150,6 @@ export default function Home() {
                 {/*</aside>*/}
 
                 {/* Center Section for Scrolling Posts */}
-                <h2 className="font-bold  text-2xl px-5">Recent posts</h2>
                 {
                     !session && (
                         <button
@@ -124,7 +182,7 @@ export default function Home() {
                 }
                 {
                     loading ? (<LoadingSpinner/>) : (
-                        posts && posts.length>0 ? (
+                        posts && posts.length > 0 ? (
                             <div className="p-4">
                                 {/* Display getPosts */}
                                 {posts.map(post => (
@@ -153,7 +211,7 @@ export default function Home() {
                                     </div>
                                 ))}
                             </div>
-                        ):(
+                        ) : (
                             session && (
                                 <div className="w-full text-center mt-10 text-lg">No more posts. Come back tomorrow for
                                     more votes, more rewards!</div>)

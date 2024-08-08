@@ -29,29 +29,29 @@ export async function POST(request) {
             console.error("Missing required parameters:", { userId, optionId, postId, reward });
             return new Response(JSON.stringify({ error: 'Missing required parameters' }), { status: 400 });
         }
-
-        const privateKey = process.env.NEXT_PRIVATE_KEY;
-        if (!privateKey) {
-            console.error("Private key is missing.");
-            return new Response(JSON.stringify({ error: 'Private key is not configured' }), { status: 500 });
-        }
-
-        // Get the from address from the private key
-        const fromAddress = web3.eth.accounts.privateKeyToAccount(privateKey).address;
-
-        // Create transaction object
-        const transactionObject = {
-            from: fromAddress, // Add the from address here
-            to: contractAddress,
-            data: contract.methods.vote(postId, userId, optionId).encodeABI(),
-            gas: 2000000, // Specify the gas limit
-            maxFeePerGas: web3.utils.toWei('50', 'gwei'), // Maximum total fee per gas
-            maxPriorityFeePerGas: web3.utils.toWei('10', 'gwei'), // Priority fee per gas
-        };
-
-        // Sign and send the transaction
-        const rawTx = await signTransaction(transactionObject, privateKey);
-        const txReceipt = await web3.eth.sendSignedTransaction(rawTx);
+        //vote on blockchain
+        // const privateKey = process.env.NEXT_PRIVATE_KEY;
+        // if (!privateKey) {
+        //     console.error("Private key is missing.");
+        //     return new Response(JSON.stringify({ error: 'Private key is not configured' }), { status: 500 });
+        // }
+        //
+        // // Get the from address from the private key
+        // const fromAddress = web3.eth.accounts.privateKeyToAccount(privateKey).address;
+        //
+        // // Create transaction object
+        // const transactionObject = {
+        //     from: fromAddress, // Add the from address here
+        //     to: contractAddress,
+        //     data: contract.methods.vote(postId, userId, optionId).encodeABI(),
+        //     gas: 2000000, // Specify the gas limit
+        //     maxFeePerGas: web3.utils.toWei('50', 'gwei'), // Maximum total fee per gas
+        //     maxPriorityFeePerGas: web3.utils.toWei('10', 'gwei'), // Priority fee per gas
+        // };
+        //
+        // // Sign and send the transaction
+        // const rawTx = await signTransaction(transactionObject, privateKey);
+        // const txReceipt = await web3.eth.sendSignedTransaction(rawTx);
 
         //find the post and update the votes
         const postDocRef = doc(db, 'posts', postId);
@@ -83,14 +83,14 @@ export async function POST(request) {
             reward
         });
 
-        //update the users tokens
+        //update the users rewards
         const userDocRef = doc(db, 'users', userId);
         const userDocSnap = await getDoc(userDocRef);
         if (!userDocSnap.exists()) {
             return new NextResponse('User not found', {status: 404});
         }
         const user = userDocSnap.data();
-        user.realTokenBalance += Number(reward);
+        user.rewards += Number(reward);
         //add the post id to votes array in user
         user.votes.push(postId);
         await setDoc(userDocRef, user);

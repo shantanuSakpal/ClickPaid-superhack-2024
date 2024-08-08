@@ -106,8 +106,8 @@ function Page() {
             return false;
         }
 
-        if (Number(bountyReward) < 10) {
-            toast.error("Reward should be at least 10 tokens");
+        if (Number(bountyReward) < 5) {
+            toast.error("Reward should be at least 5 USD");
             return false;
         }
         if (Number(numberOfVotes) < 10) {
@@ -274,37 +274,15 @@ function Page() {
             // Check balance before proceeding
             const userRef = doc(db, "users", session.user.id);
             const userSnap = await getDoc(userRef);
-            let trialTokenBalance = 0;
-            let realTokenBalance = 0;
             if (!userSnap.exists()) {
 
                 toast.error("User not found")
                 setLoading(false);
                 return;
 
-
             }
             const userDoc = userSnap.data();
-            realTokenBalance = userDoc.realTokenBalance;
-            trialTokenBalance = userDoc.trialTokenBalance;
-            if (trialTokenBalance > 0 || realTokenBalance > 0) {
-                if (formState.bountyReward <= trialTokenBalance) {
-                    //if user has trial tokens , deduct trial tokens
-                    trialTokenBalance = trialTokenBalance - formState.bountyReward;
-                } else {
-                    let remainingAmt = formState.bountyReward - trialTokenBalance;
-                    trialTokenBalance = 0;
-                    if (realTokenBalance >= remainingAmt) {
-                        realTokenBalance = realTokenBalance - remainingAmt
-                    } else {
-                        toast.error("Not enough balance!")
-                        return;
-                    }
-                }
-            } else {
-                toast.error("Not enough balance!");
-                return;
-            }
+
 
             // Upload images to Firebase and get URLs
             const uploadedImages = await uploadImages();
@@ -317,6 +295,7 @@ function Page() {
             // Save post data to Firebase
             const postData = {
                 ...formState,
+                selectedChainId : formState.selectedChain.id,
                 userId: session.user.id,
                 options: uploadedImages,
                 isDone: false,
@@ -327,8 +306,7 @@ function Page() {
             // Update user document with new post ID and token balances
             await setDoc(userRef, {
                 posts: [...userDoc.posts, docRef.id],
-                realTokenBalance: realTokenBalance,
-                trialTokenBalance: trialTokenBalance,
+
             }, {merge: true});
 
             const postId = docRef.id;
@@ -336,7 +314,7 @@ function Page() {
             toast.success("Post published successfully!");
 
             // Add data to blockchain
-            await addDataToBlockchain(postData, postId);
+            // await addDataToBlockchain(postData, postId);
 
             // Reset form state
             setFormState({
@@ -474,7 +452,7 @@ function Page() {
                                     value={formState.bountyReward}
                                     onChange={handleChange}
                                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
-                                    placeholder="Enter reward amount for this post"
+                                    placeholder="Enter reward in USD"
                                 />
                             </div>
                             <div className='w-1/2'>

@@ -5,11 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/frontend/app/contexts/UserContext.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/page.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/page.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/Footer.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Footer.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/LogoCloud.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/LogoCloud.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/api/auth/[...nextauth]/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/auth/[...nextauth]/route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/api/getPosts/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/getPosts/route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/api/submitVote/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/submitVote/route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/create/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/create/page.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/profile/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/profile/page.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/vote/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/vote/page.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Navbar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/Providers.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Providers.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/components/users/Balances.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/users/Balances.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/users/Posts.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/users/Posts.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
