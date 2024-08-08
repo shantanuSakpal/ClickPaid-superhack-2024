@@ -8,6 +8,7 @@ import {ChevronDownIcon} from "@heroicons/react/20/solid";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
 import ChainSelect from "@components/ChainSelect";
+import SwitchChains from "@components/SwitchChains";
 
 
 export default function Home() {
@@ -85,10 +86,15 @@ export default function Home() {
                 </p>
             </div>
 
-           <div className="flex flex-row gap-2 items-center w-fit mx-10 ">
-               <p className="whitespace-nowrap">On chain:</p>
-               <ChainSelect/>
-           </div>
+            <div className="flex flex-row gap-2 items-center w-fit mx-10 ">
+                <p className="whitespace-nowrap">On chain:</p>
+                <div className="flex flex-row gap-2 items-center">
+                    <img src={selectedChain.image} alt={selectedChain.name}
+                         className="w-7 h-7 rounded-full"/>
+                    <span className="whitespace-nowrap font-semibold">{selectedChain.name}</span>
+                </div>
+                <SwitchChains/> {/* Switch Chain Button */}
+            </div>
 
             <main className="">
                 {/* Left Sidebar for Trending Section */}

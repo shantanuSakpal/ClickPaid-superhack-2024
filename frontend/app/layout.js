@@ -22,7 +22,7 @@ export const viewport = {
 export default function RootLayout({children}) {
     return (
         <html lang="en">
-        <body className="pt-20">
+        <body className="pt-24">
         <Providers>
             <Navbar/>
             <Toaster position="top-center" reverseOrder={true}/>

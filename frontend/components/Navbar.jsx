@@ -28,7 +28,7 @@ export default function Navbar() {
     }, [session])
 
     return (
-        <nav className="fixed top-0 left-0 w-full z-10 border-b bg-white">
+        <nav className="fixed top-0 py-2 left-0 w-full z-10 border-b bg-white">
 
             <div className=" mx-auto px-3">
                 <div className="flex justify-between">
@@ -36,15 +36,15 @@ export default function Navbar() {
                         <BrandLogo/>
                     </div>
                     <div className="hidden md:flex gap-2 items-center justify-center font-bold">
-                        <Link href="/create" className=" px-3 py-1 rounded-lg hover:text-black text-gray-500">
+                        <Link href="/create" className=" px-3 py-1 rounded-lg text-lg hover:text-black text-gray-500">
                             Create
                         </Link>
-                        <Link href="/vote" className=" px-3 py-1 rounded-lg hover:text-black text-gray-500">
+                        <Link href="/vote" className=" px-3 py-1 rounded-lg text-lg hover:text-black text-gray-500">
                             Vote
                         </Link>
                         <Link
                             href="/profile"
-                            className=" px-3 py-1 rounded-lg hover:text-black text-gray-500 "
+                            className=" px-3 py-1 rounded-lg text-lg hover:text-black text-gray-500 "
                         >Profile
                         </Link>
 
@@ -59,7 +59,7 @@ export default function Navbar() {
                                         {userData?.rewards ? `Rewards: ${userData.rewards}` : "Rewards: 0"} USD
                                     </div>
 
-                                    <ConnectButton client={client} theme="light"/>
+                                    <ConnectButton client={client} theme="dark" />
 
                                 </div>
                             ) : <div>
