@@ -14,6 +14,7 @@ import abi from "@/app/abis/abi";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
 import ChainSelect from "@components/ChainSelect";
+import SwitchChains from "@components/SwitchChains";
 
 require('dotenv').config();
 
@@ -452,7 +453,20 @@ function Page() {
                             </div>
                         </div>
                         {/*removing nft and chain selection for now*/}
-                            <ChainSelect/>
+                          <div className="flex flex-col">
+                                  <label className="block text-sm font-medium text-gray-700">Posting on</label>
+                              <div className="flex flex-row gap-5 justify-between items-center mt-2">
+                                  <div className="flex flex-row gap-2 items-center">
+                                      <img src={selectedChain.image} alt={selectedChain.name}
+                                           className="w-7 h-7 rounded-full"/>
+                                      <span className="whitespace-nowrap font-semibold">{selectedChain.name}</span>
+                                  </div>
+                                  <div>
+                                      <SwitchChains/>
+                                  </div>
+                              </div>
+
+                          </div>
                         {
 
 

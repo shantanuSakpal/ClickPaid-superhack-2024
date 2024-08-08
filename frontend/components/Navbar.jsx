@@ -5,11 +5,10 @@ import {FaBars, FaTimes} from "react-icons/fa";
 import BrandLogo from "@/components/BrandLogo";
 import {useSession, signIn} from "next-auth/react"
 import {CgProfile} from "react-icons/cg";
-import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
-import {ChevronDownIcon} from "@heroicons/react/20/solid";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
-import ChainSelect from "@components/ChainSelect";
+import {ConnectButton} from "thirdweb/react";
+import {client} from "@/app/_lib/client";
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,7 +17,7 @@ export default function Navbar() {
 
     useEffect(() => {
         setUserData(session?.user);
-        if(!selectedChain){
+        if (!selectedChain) {
             setSelectedChain({
                 id: "op-sepolia",
                 name: 'OP Sepolia',
@@ -55,27 +54,20 @@ export default function Navbar() {
                         {/*login with world id*/}
                         {
                             session && userData ? (
-                                <>
-
-                                    <ChainSelect/>
-
+                                <div className="flex flex-row gap-3 items-center">
                                     <div className="text-sm pr-5 border-r-2 whitespace-nowrap">
                                         {userData?.rewards ? `Rewards: ${userData.rewards}` : "Rewards: 0"} USD
                                     </div>
-                                    <div
-                                        className=" flex flex-row gap-2 items-center"
-                                    >
-                                        <Link href="/profile" className="text-xl">
-                                            <CgProfile/>
-                                        </Link>
 
-                                    </div>
-                                </>
+                                    <ConnectButton client={client} theme="light"/>
+
+                                </div>
                             ) : <div>
                                 <button
                                     onClick={() => signIn('worldcoin')}
                                     className=" px-3 py-1 text-white bg-theme-blue-light hover:bg-theme-blue rounded-lg "
-                                >Login with World ID</button>
+                                >Login with World ID
+                                </button>
                             </div>
                         }
 
