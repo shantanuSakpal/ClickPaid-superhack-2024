@@ -479,7 +479,6 @@ function Page() {
                     <h1 className="text-3xl text-center font-bold mb-2">
                         Generate thumbnails using AI
                     </h1>
-                    <p className="text-center text-lg">Click on any image to add to uploads</p>
                     <div className="flex  px-10 ">
                         {/* images container */}
                         <div className="w-7/12 p-4 ">
@@ -552,6 +551,7 @@ function Page() {
                                 >
                                     {generatingImage ? "Generating Image..." : "Generate New Thumbnail"}
                                 </button>
+                                <div className="font-bold text-center ">Click on generated thumbnails to add them to uploads</div>
 
                             </form>
 
