@@ -56,7 +56,8 @@ function Page() {
                         {nameInitials}
                     </div>
                     <div className="flex flex-col">
-                        <div className="text-lg font-bold">Rewards: {session?.rewards}</div>
+                        <div className="text-lg font-bold">{session?.user.name}</div>
+                        <div className="text-sm">{session?.user.rewards} USD</div>
                     </div>
                 </div>
 
