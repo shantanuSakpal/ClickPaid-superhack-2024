@@ -6,7 +6,7 @@ import { PriceServiceConnection } from "@pythnetwork/price-service-client";
 const PriceConverter = () => {
   const connection = new PriceServiceConnection("https://hermes.pyth.network");
 
-  const priceId = "0x385f64d993f7b77d8182ed5003d97c60aa3361f3cecfe711544d2d59165e9bdf"; // ETH/USD price id
+  const priceId = "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"; // ETH/USD price id
 
   const [ethPrice, setEthPrice] = useState(0);
   const [usdInput, setUsdInput] = useState('');
