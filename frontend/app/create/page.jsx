@@ -11,38 +11,21 @@ import {ChevronDownIcon} from "@heroicons/react/20/solid";
 import {useSession, signIn} from "next-auth/react"
 import Web3 from 'web3';
 import abi from "@/app/abis/abi";
+import {GlobalContext} from "@/app/contexts/UserContext";
+import {useContext} from "react";
+import ChainSelect from "@components/ChainSelect";
 
 require('dotenv').config();
 
 function Page() {
-    const chains = [
-        {
-            name: 'OP Sepolia',
-            id: "op-sepolia",
-            image: '/chain/optimism.jpeg',
-            apiEndpoint: '/api/chain/op-sepolia/createPost'
-        },
-        {
-            name: 'Base Sepolia',
-            id: "base-sepolia",
-            image: '/chain/base.jpeg',
-            apiEndpoint: '/api/chain/base-sepolia/createPost'
-        },
-        {
-            name: 'Mode TestNet',
-            id: "mode-testnet",
-            image: '/chain/mode.png',
-            apiEndpoint: '/api/chain/mode-testnet/createPost'
-        },
-        {name: 'Metal L2', id: "metal-l2", image: '/chain/metal-L2.png', apiEndpoint: '/api/chain/metal-L2/createPost'},
-    ];
+    const { userData, setUserData, selectedChain, setSelectedChain } = useContext(GlobalContext);
+
 
     const [formState, setFormState] = useState({
         title: '',
         description: '',
         bountyReward: '',
         numberOfVotes: '',
-        selectedChain: chains[0],
     });
     const [loading, setLoading] = useState(false);
     const [web3, setWeb3] = useState(null);
@@ -295,7 +278,8 @@ function Page() {
             // Save post data to Firebase
             const postData = {
                 ...formState,
-                selectedChainId : formState.selectedChain.id,
+                selectedChain : selectedChain,
+                selectedChainId : selectedChain.id,
                 userId: session.user.id,
                 options: uploadedImages,
                 isDone: false,
@@ -322,7 +306,7 @@ function Page() {
                 description: '',
                 bountyReward: '',
                 numberOfVotes: '',
-                selectedChain: chains[0],
+                selectedChain: selectedChain,
             });
             setImageFiles([]);
         } catch (error) {
@@ -389,9 +373,6 @@ function Page() {
     };
 
 
-    useEffect(() => {
-
-    }, []);
     return (
         <div className="w-full">
             <div className="py-2 mb-5">
@@ -471,61 +452,7 @@ function Page() {
                             </div>
                         </div>
                         {/*removing nft and chain selection for now*/}
-                        <div className='flex space-x-2'>
-                            {/*<div className='w-1/2'>*/}
-                            {/*    <label htmlFor="nftPrice" className="block text-sm font-medium text-gray-700">NFT*/}
-                            {/*        Price</label>*/}
-                            {/*    <input*/}
-                            {/*        type="number"*/}
-                            {/*        id="nftPrice"*/}
-                            {/*        name="nftPrice"*/}
-                            {/*        value={formState.nftPrice}*/}
-                            {/*        onChange={handleChange}*/}
-                            {/*        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"*/}
-                            {/*        placeholder="Enter NFT price"*/}
-                            {/*    />*/}
-                            {/*</div>*/}
-                            <div className="w-1/2">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Select Chain</label>
-                                <Menu as="div" className="relative inline-block text-left w-full">
-                                    <div>
-                                        <MenuButton
-                                            className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                                            <img src={formState.selectedChain.image} alt={formState.selectedChain.name}
-                                                 className="w-5 h-5 rounded-full mr-2"/>
-                                            {formState.selectedChain.name}
-                                            <ChevronDownIcon aria-hidden="true"
-                                                             className="-mr-1 h-5 w-5 text-gray-400"/>
-                                        </MenuButton>
-                                    </div>
-                                    <MenuItems
-                                        transition
-                                        className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                    >
-                                        <div className="py-1">
-                                            {chains.map((chain) => (
-                                                <MenuItem key={chain.name}>
-                                                    {({active}) => (
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setFormState({
-                                                                ...formState,
-                                                                selectedChain: chain
-                                                            })}
-                                                            className={`block w-full px-4 py-2 text-left text-sm ${active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'}`}
-                                                        >
-                                                            <img src={chain.image} alt={chain.name}
-                                                                 className="w-5 h-5 rounded-full mr-2 inline"/>
-                                                            {chain.name}
-                                                        </button>
-                                                    )}
-                                                </MenuItem>
-                                            ))}
-                                        </div>
-                                    </MenuItems>
-                                </Menu>
-                            </div>
-                        </div>
+                            <ChainSelect/>
                         {
 
 

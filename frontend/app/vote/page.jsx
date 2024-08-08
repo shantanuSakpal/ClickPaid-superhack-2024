@@ -5,35 +5,17 @@ import LoadingSpinner from "@components/LoadingSpinner";
 import {signIn, useSession} from "next-auth/react";
 import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
 import {ChevronDownIcon} from "@heroicons/react/20/solid";
+import {GlobalContext} from "@/app/contexts/UserContext";
+import {useContext} from "react";
+import ChainSelect from "@components/ChainSelect";
 
-const chains = [
-    {
-        name: 'OP Sepolia',
-        id: "op-sepolia",
-        image: '/chain/optimism.jpeg',
-        apiEndpoint: '/api/chain/op-sepolia/createPost'
-    },
-    {
-        name: 'Base Sepolia',
-        id: "base-sepolia",
-        image: '/chain/base.jpeg',
-        apiEndpoint: '/api/chain/base-sepolia/createPost'
-    },
-    {
-        name: 'Mode TestNet',
-        id: "mode-testnet",
-        image: '/chain/mode.png',
-        apiEndpoint: '/api/chain/mode-testnet/createPost'
-    },
-    {name: 'Metal L2', id: "metal-l2", image: '/chain/metal-L2.png', apiEndpoint: '/api/chain/metal-L2/createPost'},
-];
 
 export default function Home() {
     const router = useRouter();
     const [posts, setPosts] = useState([]);
     const {data: session} = useSession();
     const [loading, setLoading] = useState(false);
-    const [selectedChain, setSelectedChain] = useState(chains[0]);
+    const {selectedChain, setSelectedChain} = useContext(GlobalContext);
 
     const fetchPosts = async () => {
         try {
@@ -102,46 +84,12 @@ export default function Home() {
                     Select any post and vote with a simple click, get a share of the reward for the post.
                 </p>
             </div>
-            <div className="w-fit flex gap-2 items-center flex-row mx-5">
-                <h1 className="whitespace-nowrap font-bold ">Select chain:</h1>
-                <Menu as="div" className="relative inline-block text-left w-full">
-                    <div>
-                        <MenuButton
-                            className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                            <img src={selectedChain?.image} alt={selectedChain?.name}
-                                 className="w-5 h-5 rounded-full mr-2"/>
-                            {selectedChain?.name}
-                            <ChevronDownIcon aria-hidden="true"
-                                             className="-mr-1 h-5 w-5 text-gray-400"/>
-                        </MenuButton>
-                    </div>
-                    <MenuItems
-                        transition
-                        className="absolute right-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                    >
-                        <div className="py-1">
-                            {chains.map((chain) => (
-                                <MenuItem key={chain.name}>
-                                    {({active}) => (
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setSelectedChain(chain);
-                                                localStorage.setItem("selectedChain", JSON.stringify(chain));
-                                            }}
-                                            className={`block w-full px-4 py-2 text-left text-sm ${active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'}`}
-                                        >
-                                            <img src={chain.image} alt={chain.name}
-                                                 className="w-5 h-5 rounded-full mr-2 inline"/>
-                                            {chain.name}
-                                        </button>
-                                    )}
-                                </MenuItem>
-                            ))}
-                        </div>
-                    </MenuItems>
-                </Menu>
-            </div>
+
+           <div className="flex flex-row gap-2 items-center w-fit mx-10 ">
+               <p className="whitespace-nowrap">On chain:</p>
+               <ChainSelect/>
+           </div>
+
             <main className="">
                 {/* Left Sidebar for Trending Section */}
                 {/*<aside className="w-1/5 bg-white p-4 rounded shadow">*/}

@@ -9,24 +9,23 @@ import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
 import {ChevronDownIcon} from "@heroicons/react/20/solid";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
+import ChainSelect from "@components/ChainSelect";
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const {data: session} = useSession()
-    console.log("session", session)
-    const { userData, setUserData, selectedChain, setSelectedChain } = useContext(GlobalContext);
-
-    const chains = [
-        {name: 'OP Sepolia', image: '/chain/optimism.jpeg', apiEndpoint: '/api/chain/op-sepolia/createPost'},
-        {name: 'Base Sepolia', image: '/chain/base.jpeg', apiEndpoint: '/api/chain/base-sepolia/createPost'},
-        {name: 'Mode TestNet', image: '/chain/mode.png', apiEndpoint: '/api/chain/mode-testnet/createPost'},
-        {name: 'Metal L2', image: '/chain/metal-L2.png', apiEndpoint: '/api/chain/metal-L2/createPost'},
-    ];
+    const {userData, setUserData, selectedChain, setSelectedChain} = useContext(GlobalContext);
 
     useEffect(() => {
-        setSelectedChain(chains[0]);
         setUserData(session?.user);
-        localStorage.setItem("selectedChain", JSON.stringify(chains[0]));
+        if(!selectedChain){
+            setSelectedChain({
+                id: "op-sepolia",
+                name: 'OP Sepolia',
+                image: '/chain/optimism.jpeg',
+                apiEndpoint: '/api/chain/op-sepolia/createPost'
+            })
+        }
     }, [session])
 
     return (
@@ -37,33 +36,47 @@ export default function Navbar() {
                     <div className="flex">
                         <BrandLogo/>
                     </div>
-                    <div className="hidden md:flex gap-2 items-center justify-center font-bold  ">
+                    <div className="hidden md:flex gap-2 items-center justify-center font-bold">
                         <Link href="/create" className=" px-3 py-1 rounded-lg hover:text-black text-gray-500">
                             Create
                         </Link>
                         <Link href="/vote" className=" px-3 py-1 rounded-lg hover:text-black text-gray-500">
                             Vote
                         </Link>
+                        <Link
+                            href="/profile"
+                            className=" px-3 py-1 rounded-lg hover:text-black text-gray-500 "
+                        >Profile
+                        </Link>
 
-                        <div>
-                            {userData?.rewards ? `Rewards: ${userData.rewards}` : "Rewards: 0"} USD
-                        </div>
-
+                    </div>
+                    <div className="hidden md:flex gap-2 items-center justify-center font-bold  ">
 
                         {/*login with world id*/}
                         {
-                            session ? (
-                                <Link
-                                    href="/profile"
-                                    className=" px-3 py-1 text-black text-2xl rounded-lg hover:text-theme-blue font-bold"
-                                ><CgProfile/>
-                                </Link>
-                            ) : (
+                            session && userData ? (
+                                <>
+
+                                    <ChainSelect/>
+
+                                    <div className="text-sm pr-5 border-r-2 whitespace-nowrap">
+                                        {userData?.rewards ? `Rewards: ${userData.rewards}` : "Rewards: 0"} USD
+                                    </div>
+                                    <div
+                                        className=" flex flex-row gap-2 items-center"
+                                    >
+                                        <Link href="/profile" className="text-xl">
+                                            <CgProfile/>
+                                        </Link>
+
+                                    </div>
+                                </>
+                            ) : <div>
                                 <button
                                     onClick={() => signIn('worldcoin')}
-                                    className=" mx-4 px-3 py-1 text-white bg-theme-blue-light hover:bg-theme-blue rounded-lg "
+                                    className=" px-3 py-1 text-white bg-theme-blue-light hover:bg-theme-blue rounded-lg "
                                 >Login with World ID</button>
-                            )
+                            </div>
                         }
 
                     </div>
@@ -82,7 +95,6 @@ export default function Navbar() {
                         className=" text-center flex flex-col gap-2  border-t border-theme-blue-light py-2  font-bold">
                         <Link className=" py-1 hover:text-black text-gray-500" href="/create">Create</Link>
                         <Link className=" py-1 hover:text-black text-gray-500" href="/vote">Vote</Link>
-                        {/*<Link className=" py-1 hover:text-black text-gray-500" href="/earn">Your Rewards</Link>*/}
                         {/*login with world id*/}
                         {
                             session ? (
