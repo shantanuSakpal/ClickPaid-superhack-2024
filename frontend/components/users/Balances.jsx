@@ -4,6 +4,7 @@ import LoadingSpinner from "@components/LoadingSpinner";
 import Link from "next/link";
 import DepositEth from "@components/DepositEth";
 import WithdrawTokens from "@components/WithdrawTokens";
+import PriceConverter from "@components/PriceConvertor";
 
 
 export default function Balances() {
@@ -44,6 +45,7 @@ export default function Balances() {
     }, []);
     return (
         <div className="p-4">
+             <PriceConverter />
             {
                 loading ? <LoadingSpinner/> : error ? <p>{error}</p> : (
                     <div>
@@ -56,6 +58,7 @@ export default function Balances() {
                         <DepositEth/>
 
                         <WithdrawTokens/>
+                        <PriceConverter />
                     </div>
                 )
             }
