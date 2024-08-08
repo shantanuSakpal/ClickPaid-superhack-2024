@@ -478,7 +478,7 @@ function Page() {
                                 >
                                     {loading ? (
                                         uploadingImages ? "Uploading images..." : "Creating post..."
-                                    ) : 'Publish Post'}
+                                    ) : 'Pay and Publish Post'}
                                 </button>
                             ) : (
                                 <button
