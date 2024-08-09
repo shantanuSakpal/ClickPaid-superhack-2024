@@ -14,15 +14,19 @@ import abi from "@/app/abis/abi";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
 import SwitchChains from "@components/SwitchChains";
-import {useActiveAccount} from "thirdweb/react";
+import {useActiveAccount, useSendTransaction} from "thirdweb/react";
 import ConnectWallet from "@components/ConnectWallet";
 import {client} from "@/app/_lib/client";
-
+import { ethers } from 'ethers'; 
+import { optimismSepolia, sepolia } from "thirdweb/chains";
+import { getContract, prepareContractCall, prepareTransaction } from "thirdweb";
+import { toWei } from "thirdweb/utils"
 require('dotenv').config();
 
 function Page() {
     const {userData, setUserData, selectedChain, setSelectedChain} = useContext(GlobalContext);
     const activeAccount = useActiveAccount();
+    const { mutate: sendTx, data: transactionResult } = useSendTransaction();
 
     const [formState, setFormState] = useState({
         title: '',
@@ -92,10 +96,10 @@ function Page() {
             return false;
         }
 
-        if (Number(bountyReward) < 5) {
-            toast.error("Reward should be at least 5 USD");
-            return false;
-        }
+        // if (Number(bountyReward) < 5) {
+        //     toast.error("Reward should be at least 5 USD");
+        //     return false;
+        // }
         if (Number(numberOfVotes) < 10) {
             toast.error("Votes should be at least 10");
             return false;
@@ -145,16 +149,38 @@ function Page() {
 
 
     const addDataToBlockchain = async (postData, postId) => {
+        const { bountyReward, userId, options, numberOfVotes } = postData;
 
         try {
-            // Connect to Web3
+            const contract = getContract({
+                address: "0x9620e836108aFE5F15c6Fba231DCCDb7853c5480", // Replace with your contract address
+                chain: optimismSepolia,
+                client,
+            });
+
+            const transaction =  prepareContractCall({
+                contract,
+                value: ethers.parseEther(bountyReward.toString()),
+                method: "function createPost(string memory postId, uint256 bounty, uint256 numVoters, string memory userId, string[] memory optionIDs)",
+                params: [
+                    postId,
+                    ethers.parseEther(bountyReward.toString()), // Convert bountyReward to Wei
+                    numberOfVotes,
+                    userId,
+                    options
+                ]
+            });
+
+            // Send the transaction
+            await sendTx(transaction);
+
+            toast.success(`Post created successfully! On Blockchain`);
 
         } catch (error) {
             console.error('Detailed error:', error);
             toast.error(`Contract interaction failed: ${error.message}`);
         }
     };
-
     const handleGenerateImage = async (e) => {
         e.preventDefault();
         try {
@@ -263,11 +289,11 @@ function Page() {
 
             const postId = docRef.id;
 
-            toast.success("Post published successfully!");
-
+            
             // Add data to blockchain
-            // await addDataToBlockchain(postData, postId);
-
+            await addDataToBlockchain(postData, postId, sendTx); 
+            
+            toast.success("Post published successfully!");
             // Reset form state
             setFormState({
                 title: '',
