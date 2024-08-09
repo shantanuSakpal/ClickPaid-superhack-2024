@@ -70,7 +70,7 @@ export default function Home() {
         if (session) {
             fetchPosts();
         }
-    }, [ selectedChain]);
+    }, [selectedChain]);
 
     const handlePostClick = (postId) => {
         router.push(`/post/${postId}`);
@@ -151,13 +151,10 @@ export default function Home() {
                                         className="bg-white p-4 rounded border-1 mb-4 cursor-pointer hover:shadow-lg hover:shadow-gray-200n relative"
                                         onClick={() => handlePostClick(post.id)}
                                     >
-                                        {
-                                            selectedChain && (
-                                                <div className="w-10 absolute right-5 h-auto rounded-full overflow-clip">
-                                                    <img src={post.selectedChain.image} alt=""/>
-                                                </div>
-                                            )
-                                        }
+
+                                        <div className="w-10 absolute right-5 h-auto rounded-full overflow-clip">
+                                            <img src={post.selectedChain.image} alt=""/>
+                                        </div>
                                         <h3 className="font-bold text-xl ">{post.title}</h3>
                                         <div className="mb-2">{post.description}</div>
                                         <div className="flex gap-2 mb-2 mt-5">
@@ -170,15 +167,22 @@ export default function Home() {
                                             ))}
                                         </div>
                                         <div>Bounty
-                                            Reward: {(post.bountyReward / post.numberOfVotes).toFixed(2)} USD</div>
+                                            Reward: {(post.bountyReward / post.numberOfVotes).toFixed(2)} USD
+                                        </div>
                                         <div>Number of
                                             Votes: {post.options.reduce((acc, option) => acc + option.votes, 0)}/{post.numberOfVotes}</div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            session && (
-                                <div className="w-full text-center mt-10 text-lg">No more posts. Come back later!</div>)
+                            session ? (!activeAccount ?
+                                  <div className="w-full">
+                                      <ConnectWallet title="Connect wallet to start voting!"/>
+                                  </div>:
+                                    <div className="w-full text-center mt-10 text-lg">No more posts. Come back
+                                        later!</div>
+                            ) : (<div className="w-full text-center mt-10 text-lg">Login to start voting!</div>
+                            )
                         )
                     )
                 }

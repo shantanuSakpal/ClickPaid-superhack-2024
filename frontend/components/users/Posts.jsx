@@ -77,7 +77,7 @@ function Page() {
                                         ))}
                                     </div>
                                     <div>{post.description}</div>
-                                    <div>Bounty Reward: {(post.bountyReward/post.numberOfVotes).toFixed(2)}</div>
+                                    <div>Bounty Reward: {(post.bountyReward/post.numberOfVotes).toFixed(2)} USD</div>
                                     <div>Number of
                                         Votes: {post.options.reduce((acc, option) => acc + option.votes, 0)}/{post.numberOfVotes}</div>
                                 </div>

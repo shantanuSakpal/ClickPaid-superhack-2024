@@ -82,7 +82,7 @@ function ConnectWallet({title}) {
         }
     }, [activeAccount])
     return (
-        <div>
+        <div className="w-full flex justify-center">
             <ConnectButton
                 chains={[optimismSepolia, baseSepolia, modeTestnet, metalL2Testnet]}
                 wallets={wallets}

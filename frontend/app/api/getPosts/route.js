@@ -28,6 +28,8 @@ export async function POST(request) {
         filteredPosts = filteredPosts.filter(post => post.userId !== userId);
         //remove post which are done
         filteredPosts = filteredPosts.filter(post => !post.done);
+        //sort by bountyReward
+        filteredPosts.sort((a, b) => b.bountyReward - a.bountyReward);
         // //filter posts from selected chain
         // filteredPosts = filteredPosts.filter(post => post.selectedChainId === selectedChainId);
         return new NextResponse(JSON.stringify(filteredPosts), {

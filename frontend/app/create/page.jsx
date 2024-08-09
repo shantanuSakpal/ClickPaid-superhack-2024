@@ -151,10 +151,6 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
             return false;
         }
 
-        // if (Number(bountyReward) < 5) {
-        //     toast.error("Reward should be at least 5 USD");
-        //     return false;
-        // }
         if (Number(numberOfVotes) < 10) {
             toast.error("Votes should be at least 10");
             return false;
@@ -204,7 +200,8 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
 
     const convertUsdToWei = async (usdAmount) => {
         if (!usdAmount || isNaN(usdAmount) || usdAmount <= 0) {
-            throw new Error("Invalid USD amount");
+            console.log("Invalid amount");
+            return;
         }
 
         const connection = new PriceServiceConnection("https://hermes.pyth.network");
@@ -265,6 +262,7 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
                 options: uploadedImages,
                 isDone: false,
                 id: post_id,
+                date: new Date().toISOString(),
             };
             console.log("postData", post_data)
             setPostData(post_data);
@@ -615,6 +613,7 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
 
                                 txnVerified ? (
                                     <button
+                                        type="button"
                                         onClick={handleSubmit}
                                         className={`w-full mt-4  font-semibold py-2 rounded-md  ${loading ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
                                         disabled={loading}
@@ -623,15 +622,16 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
                                     </button>
                                 ) : (
                                     <button
+                                        type="button"
                                         onClick={addDataToBlockchain}
                                         className={`w-full mt-4  font-semibold py-2 rounded-md  ${verfyingTxn || awatingConfirmation ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
                                         disabled={verfyingTxn || awatingConfirmation}
                                     >
                                         {
-                                            verfyingTxn ? "Verifying Transaction..." : ""
+                                            verfyingTxn ? "Initiating transaction..." : ""
                                         }
                                         {
-                                            awatingConfirmation ? "Awaiting Confirmation..." : ""
+                                            awatingConfirmation ? "Awaiting confirmation..." : ""
                                         }
                                         {
                                             !verfyingTxn && !awatingConfirmation ? `Pay ${formState.bountyReward} USD` : ""
