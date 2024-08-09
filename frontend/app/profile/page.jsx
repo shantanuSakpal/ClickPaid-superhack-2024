@@ -10,11 +10,14 @@ import Posts from '@components/users/Posts';
 import DepositEth from "@components/DepositEth";
 import { useDisconnect, useActiveWallet } from "thirdweb/react";
 import {Toaster} from "react-hot-toast";
+import {GlobalContext} from "@/app/contexts/UserContext";
+import {useContext} from "react";
 
 function Page() {
     const { disconnect } = useDisconnect();
     const wallet = useActiveWallet();
     const {data: session} = useSession();
+    const {userData, setUserData, selectedChain, setSelectedChain} = useContext(GlobalContext);
     const userId = session?.user.id;
     const [activeTab, setActiveTab] = useState('Posts');
     const [nameInitials, setNameInitials] = useState('');
@@ -34,11 +37,11 @@ function Page() {
     }
 
     useEffect(() => {
-        if (session?.user.name) {
-            const initials = session.user.name.split(' ').map((n) => n[0]).join('');
+        if (userData) {
+            const initials = userData.name.split(' ').map((n) => n[0]).join('');
             setNameInitials(initials);
         }
-    }, [session]);
+    }, []);
 
     return (
         <div className='px-20 min-h-screen'>

@@ -1,8 +1,7 @@
 "use client";
 import React, {useEffect, useState} from 'react';
 import {toast} from 'react-hot-toast';
-import {uploadImage} from '@/app/_utils/uploadImages'; // Import uploadImage function
-import {db} from '@/app/_lib/fireBaseConfig'; // Import db from firebaseConfig
+import {uploadImage} from '@/app/_utils/uploadImages';
 import {collection, addDoc, doc, getDoc, setDoc} from 'firebase/firestore';
 import Image from "next/image";
 import {FaCloudUploadAlt} from "react-icons/fa";
@@ -14,7 +13,8 @@ import abi from "@/app/abis/abi";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
 import SwitchChains from "@components/SwitchChains";
-import {useActiveWallet, useSendTransaction} from "thirdweb/react";
+import {useActiveWallet, useSendTransaction, useWaitForReceipt} from "thirdweb/react";
+import {db} from '@/app/_lib/fireBaseConfig';
 import ConnectWallet from "@components/ConnectWallet";
 import {client} from "@/app/_lib/client";
 import {ethers} from 'ethers';
@@ -29,9 +29,15 @@ require('dotenv').config();
 function Page() {
     const {userData, setUserData, selectedChain, setSelectedChain} = useContext(GlobalContext);
     const activeWallet = useActiveWallet();
-    const {mutate: sendTx, data: transactionResult} = useSendTransaction();
+    const {mutateAsync: sendTx, data: transactionResult} = useSendTransaction();
     const {data: session} = useSession()
-
+    const [txHash, setTxHash] = useState("");
+    const [currChain, setCurrChain] = useState(optimismSepolia);
+    const {data: receipt, isLoading} = useWaitForReceipt({
+        chain: currChain,
+        client: client,
+        transactionHash: txHash
+    });
     const [formState, setFormState] = useState({
         title: '',
         description: '',
@@ -49,7 +55,11 @@ function Page() {
     const [uploadingImages, setUploadingImages] = useState(false)
     const [userAddress, setUserAddress] = useState('');
     const [amtInEth, setAmtInEth] = useState("");
-    const [transacting, setTransacting] = useState(false);
+    const [verfyingTxn, setVerifyingTxn] = useState(false);
+    const [postId, setPostId] = useState("");
+    const [postData, setPostData] = useState(null);
+
+
 
     const contractAddresses = {
         "base-sepolia": "0x26ed997929235be85c7a2d54ae7c60d91e443ea1",
@@ -91,6 +101,7 @@ function Page() {
         "mode-testnet": modeTestnet,
         "metal-l2": metalL2Testnet,
     }
+
     const handleChange = (e) => {
         const {name, value} = e.target;
         setFormState({
@@ -220,21 +231,50 @@ function Page() {
     };
 
 
-    const addDataToBlockchain = async (postData, postId) => {
-        const {bountyReward, userId, options, numberOfVotes} = postData;
-        const bountyRewardinEther = await convertUsdToWei(bountyReward);
-        console.log("bountyRewardinEther", bountyRewardinEther)
+    const addDataToBlockchain = async () => {
+        // Validate the form inputs
+        if (!validateForm()) {
+            setLoading(false);
+            return;
+        }
 
         try {
-            //get chain using the selected chain name from chains
-            setTransacting(true);
-            const currentChain = chainNameToChain[selectedChain.id];
-            console.log("currentChain", currentChain)
-            const address = contractAddresses[selectedChain.id];
+            setVerifyingTxn(true);
 
+            // Upload images to Firebase and get URLs
+            const uploadedImages = await uploadImages();
+            if (uploadedImages.length === 0) {
+                toast.error("Could not upload images");
+                setLoading(false);
+                return;
+            }
+
+            //post id is random 6 digit string alphanumeric
+            const post_id = Math.random().toString(36).substring(2, 8);
+            setPostId(post_id);
+            // Save post data to Firebase
+            const post_data = {
+                ...formState,
+                selectedChain: selectedChain,
+                selectedChainId: selectedChain.id,
+                userId: session.user.id,
+                options: uploadedImages,
+                isDone: false,
+                id: post_id,
+            };
+            console.log("postData", post_data)
+            setPostData(post_data);
+            // Add data to blockchain
+
+            const {bountyReward, userId, options, numberOfVotes} = post_data;
+            const bountyRewardinEther = await convertUsdToWei(bountyReward);
+            console.log("bountyRewardinEther", bountyRewardinEther)
+            //get chain using the selected chain name from chains
+
+            const address = contractAddresses[selectedChain.id];
             const contract = getContract({
                 address: address, // Replace with your contract address
-                chain: currentChain,
+                chain: currChain,
                 client,
             });
 
@@ -253,10 +293,17 @@ function Page() {
 
             // Send the transaction
             const tx = await sendTx(transaction);
+            console.log("tx---------------------", tx)
+            setTxHash(tx.transactionHash);
+            setCurrChain(tx.chain)
 
         } catch (error) {
             console.error('Detailed error:', error);
             toast.error(`Contract interaction failed: ${error.message}`);
+        }
+        finally {
+            setVerifyingTxn(false);
+
         }
     };
 
@@ -309,25 +356,14 @@ function Page() {
         }
     };
 
-    const handleSubmit = async (e) => {
-        setLoading(true);
-        e.preventDefault();
-
-        // Validate the form inputs
-        if (!validateForm()) {
-            setLoading(false);
+    const handleSubmit = async () => {
+        if(!postData || !postId){
+            toast.error("Could not save post.");
             return;
         }
-
-        if (!session.user.id) {
-            toast.error("Please login to create post");
-            setLoading(false);
-            return;
-        }
-
-
         try {
-            // Check balance before proceeding
+            setLoading(true);
+            // Check user before proceeding
             const userRef = doc(db, "users", session.user.id);
             const userSnap = await getDoc(userRef);
             if (!userSnap.exists()) {
@@ -338,32 +374,7 @@ function Page() {
 
             }
             const userDoc = userSnap.data();
-
-            // Upload images to Firebase and get URLs
-            const uploadedImages = await uploadImages();
-            if (uploadedImages.length === 0) {
-                toast.error("Could not upload images");
-                setLoading(false);
-                return;
-            }
-
-            //post id is random 6 digit string alphanumeric
-            const postId = Math.random().toString(36).substring(2, 8);
-            // Save post data to Firebase
-            const postData = {
-                ...formState,
-                selectedChain: selectedChain,
-                selectedChainId: selectedChain.id,
-                userId: session.user.id,
-                options: uploadedImages,
-                isDone: false,
-                id: postId,
-            };
-            console.log("postData", postData)
-            // Add data to blockchain
-            await addDataToBlockchain(postData, postId, sendTx);
-
-            // Check if the document already exists
+            // // Check if the document already exists
             const docRef = doc(db, 'posts', postId);
             const docSnap = await getDoc(docRef);
 
@@ -374,7 +385,6 @@ function Page() {
             } else {
                 // Document already exists
                 console.log("A post with this ID already exists. Generating a new ID...");
-                // You might want to generate a new ID and try again here
             }
             // Update user document with new post ID and token balances
             await setDoc(userRef, {
@@ -382,15 +392,15 @@ function Page() {
             }, {merge: true});
 
             toast.success("Post published successfully!");
-            // Reset form state
-            setFormState({
-                title: '',
-                description: '',
-                bountyReward: '',
-                numberOfVotes: '',
-                selectedChain: selectedChain,
-            });
-            setImageFiles([]);
+            // // Reset form state
+            // setFormState({
+            //     title: '',
+            //     description: '',
+            //     bountyReward: '',
+            //     numberOfVotes: '',
+            //     selectedChain: selectedChain,
+            // });
+            // setImageFiles([]);
         } catch (error) {
             console.error("Error handling submit:", error);
             toast.error("Could not save post.");
@@ -400,7 +410,6 @@ function Page() {
 
         setLoading(false);
     }
-
 
     const renderDivs = () => {
         const divs = [];
@@ -454,7 +463,16 @@ function Page() {
         return divs;
     };
 
-
+    useEffect(() => {
+        if (selectedChain) {
+            setCurrChain(chainNameToChain[selectedChain.id])
+            console.log("selectedChain", selectedChain)
+        }
+        if (receipt) {
+            console.log("Transaction confirmed:", receipt);
+            // Handle successful transaction confirmation
+        }
+    }, [receipt, selectedChain]);
     return (
         <div className="w-full">
             <div className="py-2 mb-5">
@@ -578,21 +596,27 @@ function Page() {
 
 
                             activeWallet ? (session ? (
-                                <button
-                                    type="submit"
-                                    className={`w-full mt-4  font-semibold py-2 rounded-md  ${loading ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
-                                    disabled={loading}
-                                >
-                                    {loading ? (
-                                        uploadingImages ? (
-                                            "Uploading images..."
-                                        ) : transacting ? (
-                                            "Creating Post on Blockchain..."
-                                        ) : (
-                                            "Creating Post..."
-                                        )
-                                    ) : 'Pay and Publish Post'}
-                                </button>
+
+                                    receipt && receipt?.success ? (
+                                        <button
+                                            onClick={handleSubmit}
+                                            className={`w-full mt-4  font-semibold py-2 rounded-md  ${loading ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
+                                            disabled={loading}
+                                        >
+                                            Publish Post
+                                        </button>
+                                    ): (
+                                        <button
+                                            onClick={addDataToBlockchain}
+                                            className={`w-full mt-4  font-semibold py-2 rounded-md  ${verfyingTxn ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
+                                            disabled={verfyingTxn}
+                                        >
+                                            {
+                                                verfyingTxn ? "Verifying Transaction..." : `Pay ${formState.bountyReward} USD`
+                                            }
+                                        </button>
+                                    )
+
                             ) : (
                                 <button
                                     type="button"

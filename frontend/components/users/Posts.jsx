@@ -44,7 +44,7 @@ function Page() {
         if(session) {
             fetchPosts();
         }
-    }, [session]);
+    }, []);
 
 
     return (

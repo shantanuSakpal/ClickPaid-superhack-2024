@@ -130,7 +130,7 @@ const Layout = () => {
         if(session){
             fetchPost();
         }
-    }, [session]);
+    }, []);
 
     return (
         <div className="min-h-screen text-black">
