@@ -26,7 +26,6 @@ export default function Home() {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     userId: session.user.id,
-                    selectedChainId: selectedChain.id,
                 }), // Send body as JSON
             });
             if (!response.ok) {
@@ -86,22 +85,22 @@ export default function Home() {
                 </p>
             </div>
 
-            {
-                activeAccount ? (<div className="flex flex-row gap-2 items-center mx-10 w-full justify-center">
-                    {
-                        selectedChain && (
-                            <>
-                                <img src={selectedChain.image} alt={selectedChain.name}
-                                     className="w-7 h-7 rounded-full"/>
-                                <span className="whitespace-nowrap font-semibold">{selectedChain.name}</span></>)
-                    }
-                    <SwitchChains/>
-                </div>) : (
-                    <div className="w-full flex justify-center">
-                        <ConnectWallet title="Connect wallet to start voting!"/>
-                    </div>
-                )
-            }
+            {/*{*/}
+            {/*    activeAccount ? (<div className="flex flex-row gap-2 items-center mx-10 w-full justify-center">*/}
+            {/*        {*/}
+            {/*            selectedChain && (*/}
+            {/*                <>*/}
+            {/*                    <img src={selectedChain.image} alt={selectedChain.name}*/}
+            {/*                         className="w-7 h-7 rounded-full"/>*/}
+            {/*                    <span className="whitespace-nowrap font-semibold">{selectedChain.name}</span></>)*/}
+            {/*        }*/}
+            {/*        <SwitchChains/>*/}
+            {/*    </div>) : (*/}
+            {/*        <div className="w-full flex justify-center">*/}
+            {/*            <ConnectWallet title="Connect wallet to start voting!"/>*/}
+            {/*        </div>*/}
+            {/*    )*/}
+            {/*}*/}
 
             <main className="">
                 {/* Left Sidebar for Trending Section */}
@@ -179,8 +178,7 @@ export default function Home() {
                             </div>
                         ) : (
                             session && (
-                                <div className="w-full text-center mt-10 text-lg">No more posts on this chain, try
-                                    switching network!</div>)
+                                <div className="w-full text-center mt-10 text-lg">No more posts. Come back later!</div>)
                         )
                     )
                 }

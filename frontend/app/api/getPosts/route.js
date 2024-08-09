@@ -6,7 +6,7 @@ export async function POST(request) {
     if (!request) {
         return new NextResponse('No request object', {status: 400});
     }
-    const {userId, selectedChainId} = await request.json(); // Receive postId from JSON
+    const {userId} = await request.json(); // Receive postId from JSON
     try {
         const querySnapshot = await getDocs(collection(db, 'posts'));
         const posts = querySnapshot.docs.map(doc => ({
@@ -28,8 +28,8 @@ export async function POST(request) {
         filteredPosts = filteredPosts.filter(post => post.userId !== userId);
         //remove post which are done
         filteredPosts = filteredPosts.filter(post => !post.done);
-        //filter posts from selected chain
-        filteredPosts = filteredPosts.filter(post => post.selectedChainId === selectedChainId);
+        // //filter posts from selected chain
+        // filteredPosts = filteredPosts.filter(post => post.selectedChainId === selectedChainId);
         return new NextResponse(JSON.stringify(filteredPosts), {
             status: 200,
             headers: {'Content-Type': 'application/json'},
