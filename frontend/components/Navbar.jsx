@@ -52,10 +52,10 @@ export default function Navbar() {
                                         {userData?.rewards ? `Rewards: ${userData.rewards}` : "Rewards: 0"} USD
                                     </div>
                                     {
-                                        selectedChain && <div className="flex flex-row gap-2 items-center">
+                                        selectedChain &&
                                             <img src={selectedChain.image} alt={selectedChain.name}
                                                  className="w-7 h-7 rounded-full"/>
-                                        </div>
+
                                     }
                                     <ConnectWallet/>
                                 </div>
