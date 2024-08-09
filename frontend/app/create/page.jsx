@@ -18,9 +18,12 @@ import {useActiveAccount, useSendTransaction} from "thirdweb/react";
 import ConnectWallet from "@components/ConnectWallet";
 import {client} from "@/app/_lib/client";
 import { ethers } from 'ethers'; 
-import { optimismSepolia, sepolia } from "thirdweb/chains";
+import { optimismSepolia, metalL2Testnet, baseSepolia } from "thirdweb/chains";
 import { getContract, prepareContractCall, prepareTransaction } from "thirdweb";
 import { toWei } from "thirdweb/utils"
+import { PriceServiceConnection } from "@pythnetwork/price-service-client";
+
+
 require('dotenv').config();
 
 function Page() {
@@ -147,10 +150,40 @@ function Page() {
         return uploadedImages.filter((image) => image);
     };
 
+    const convertUsdToWei = async (usdAmount) => {
+        if (!usdAmount || isNaN(usdAmount) || usdAmount <= 0) {
+            throw new Error("Invalid USD amount");
+        }
+        
+        const connection = new PriceServiceConnection("https://hermes.pyth.network");
+
+        try {
+            // Fetch the latest ETH price
+            const priceId = "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"; // ETH/USD price id
+            const currentPrices = await connection.getLatestPriceFeeds([priceId]);
+            const ethPriceData = currentPrices[0].price;
+    
+            // Extract the price value and convert to float
+            const ethPrice = parseFloat(ethPriceData.price) / 1e8; // Convert from integer to float
+    
+            // Calculate the equivalent amount in ETH
+            const ethAmount = usdAmount / ethPrice;
+    
+            // Convert ETH to Wei
+            
+    
+            return ethAmount.toString(); // Return Wei as a string
+        } catch (error) {
+            console.error("Error fetching ETH price or converting:", error);
+            throw new Error("Failed to convert USD to Wei");
+        }
+    };
+
 
     const addDataToBlockchain = async (postData, postId) => {
         const { bountyReward, userId, options, numberOfVotes } = postData;
-
+        const bountyRewardinEther = await convertUsdToWei(bountyReward);
+ 
         try {
             const contract = getContract({
                 address: "0x9620e836108aFE5F15c6Fba231DCCDb7853c5480", // Replace with your contract address
@@ -160,11 +193,11 @@ function Page() {
 
             const transaction =  prepareContractCall({
                 contract,
-                value: ethers.parseEther(bountyReward.toString()),
+                value: ethers.parseEther(bountyRewardinEther.toString()),
                 method: "function createPost(string memory postId, uint256 bounty, uint256 numVoters, string memory userId, string[] memory optionIDs)",
                 params: [
                     postId,
-                    ethers.parseEther(bountyReward.toString()), // Convert bountyReward to Wei
+                    ethers.parseEther(bountyRewardinEther.toString()), // Convert bountyReward to Wei
                     numberOfVotes,
                     userId,
                     options
