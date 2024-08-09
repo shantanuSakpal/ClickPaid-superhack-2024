@@ -3,34 +3,22 @@
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "postId",
-				"type": "string"
-			},
-			{
-				"indexed": false,
+				"indexed": true,
 				"internalType": "address",
 				"name": "creator",
 				"type": "address"
 			},
 			{
 				"indexed": false,
+				"internalType": "string",
+				"name": "postID",
+				"type": "string"
+			},
+			{
+				"indexed": false,
 				"internalType": "uint256",
 				"name": "bounty",
 				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "numVoters",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "string[]",
-				"name": "optionIDs",
-				"type": "string[]"
 			}
 		],
 		"name": "PostCreated",
@@ -40,15 +28,15 @@
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "postId",
-				"type": "string"
+				"indexed": true,
+				"internalType": "address",
+				"name": "voter",
+				"type": "address"
 			},
 			{
 				"indexed": false,
 				"internalType": "string",
-				"name": "userId",
+				"name": "postID",
 				"type": "string"
 			},
 			{
@@ -56,12 +44,6 @@
 				"internalType": "string",
 				"name": "optionID",
 				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "reward",
-				"type": "uint256"
 			}
 		],
 		"name": "Voted",
@@ -71,15 +53,15 @@
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "userId",
-				"type": "string"
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
 			},
 			{
 				"indexed": false,
 				"internalType": "uint256",
-				"name": "ethAmount",
+				"name": "amount",
 				"type": "uint256"
 			}
 		],
@@ -87,72 +69,47 @@
 		"type": "event"
 	},
 	{
-		"inputs": [],
-		"name": "conversionRate",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "postId",
+				"name": "_postID",
 				"type": "string"
 			},
 			{
 				"internalType": "uint256",
-				"name": "bounty",
+				"name": "_bounty",
 				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "numVoters",
+				"name": "_numVoters",
 				"type": "uint256"
 			},
 			{
 				"internalType": "string",
-				"name": "userId",
+				"name": "_userID",
 				"type": "string"
 			},
 			{
 				"internalType": "string[]",
-				"name": "optionIDs",
+				"name": "_optionIDs",
 				"type": "string[]"
 			}
 		],
 		"name": "createPost",
 		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "userId",
+				"name": "_userID",
 				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "ethAmount",
-				"type": "uint256"
 			}
 		],
-		"name": "deposit",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "ethToUsdRate",
+		"name": "fetchUserBalance",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -167,12 +124,41 @@
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "postId",
+				"name": "_postID",
+				"type": "string"
+			},
+			{
+				"internalType": "string[]",
+				"name": "_optionIDs",
+				"type": "string[]"
+			}
+		],
+		"name": "getOptionVotes",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_postID",
 				"type": "string"
 			}
 		],
-		"name": "getPost",
+		"name": "getPostDetails",
 		"outputs": [
+			{
+				"internalType": "string",
+				"name": "postID",
+				"type": "string"
+			},
 			{
 				"internalType": "address",
 				"name": "creator",
@@ -197,16 +183,6 @@
 				"internalType": "string[]",
 				"name": "peopleWhoVoted",
 				"type": "string[]"
-			},
-			{
-				"internalType": "string[]",
-				"name": "optionIDs",
-				"type": "string[]"
-			},
-			{
-				"internalType": "uint256[]",
-				"name": "optionVotes",
-				"type": "uint256[]"
 			}
 		],
 		"stateMutability": "view",
@@ -216,16 +192,26 @@
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "userId",
+				"name": "_userID",
 				"type": "string"
 			}
 		],
-		"name": "getTokenBalance",
+		"name": "getUserDetails",
 		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
+			},
 			{
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",
@@ -235,16 +221,16 @@
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "userId",
+				"name": "_userID",
 				"type": "string"
 			}
 		],
-		"name": "getUserAddress",
+		"name": "getUserPosts",
 		"outputs": [
 			{
-				"internalType": "address",
+				"internalType": "string[]",
 				"name": "",
-				"type": "address"
+				"type": "string[]"
 			}
 		],
 		"stateMutability": "view",
@@ -260,6 +246,11 @@
 		],
 		"name": "posts",
 		"outputs": [
+			{
+				"internalType": "string",
+				"name": "postID",
+				"type": "string"
+			},
 			{
 				"internalType": "address",
 				"name": "creator",
@@ -288,19 +279,13 @@
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "",
+				"name": "_userID",
 				"type": "string"
 			}
 		],
-		"name": "tokenBalance",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
+		"name": "setUserID",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -311,11 +296,16 @@
 				"type": "string"
 			}
 		],
-		"name": "userAddresses",
+		"name": "users",
 		"outputs": [
 			{
+				"internalType": "uint256",
+				"name": "balance",
+				"type": "uint256"
+			},
+			{
 				"internalType": "address",
-				"name": "",
+				"name": "userAddress",
 				"type": "address"
 			}
 		],
@@ -326,17 +316,17 @@
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "postId",
+				"name": "_postID",
 				"type": "string"
 			},
 			{
 				"internalType": "string",
-				"name": "userId",
+				"name": "_userID",
 				"type": "string"
 			},
 			{
 				"internalType": "string",
-				"name": "optionID",
+				"name": "_optionID",
 				"type": "string"
 			}
 		],
@@ -349,18 +339,27 @@
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "userId",
+				"name": "_userID",
 				"type": "string"
 			},
 			{
 				"internalType": "uint256",
-				"name": "tokenAmount",
+				"name": "_amount",
 				"type": "uint256"
+			},
+			{
+				"internalType": "address payable",
+				"name": "_to",
+				"type": "address"
 			}
 		],
 		"name": "withdraw",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"stateMutability": "payable",
+		"type": "receive"
 	}
 ]

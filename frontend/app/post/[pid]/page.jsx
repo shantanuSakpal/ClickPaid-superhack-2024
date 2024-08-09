@@ -95,7 +95,8 @@ const Layout = () => {
                 userId: session.user.id,
                 postId: postId,
                 optionId: selectedOptionId,
-                reward: reward
+                reward: reward,
+                chain: post.selectedChainId
             }
             const response = await fetch(`/api/submitVote`, {
                 method: 'POST',

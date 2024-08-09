@@ -1,59 +1,82 @@
-import {NextResponse} from "next/server";
-import {db} from '@/app/_lib/fireBaseConfig';
-import {addDoc, collection, doc, getDoc, setDoc} from 'firebase/firestore';
+import { NextResponse } from "next/server";
+import { db } from '@/app/_lib/fireBaseConfig';
+import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import Web3 from 'web3';
-import abi from "@/app/abis/abi"
+import abi from "@/app/abis/abi.json";
 
-const contractABI = abi; // Replace with your actual contract ABI
-const contractAddress = '0x8C992ba2293dd69dB74bE621F61fF9E14E76F262'; // Replace with your deployed contract address
+// Define contract addresses for different chains
+const contractAddresses = {
+    'op-sepolia': '0x8C992ba2293dd69dB74bE621F61fF9E14E76F262',
+    'base-sepolia': '0x26ed997929235be85c7a2d54ae7c60d91e443ea1',
+    'metal-l2': '0x821ec6aeef9da466eac1f297d29d81251f50c50f',
+    'mode-testnet': '0x821EC6AeEf9DA466eac1f297D29d81251F50C50F',
+};
 
-const web3 = new Web3(new Web3.providers.HttpProvider(`https://optimism-sepolia.infura.io/v3/b725fe7c53164e5da34a10cc350877c4`));
+// Define web3 provider URLs for different chains
+const providerUrls = {
+    'op-sepolia': 'https://optimism-sepolia.infura.io/v3/b725fe7c53164e5da34a10cc350877c4',
+    'base-sepolia': 'https://base-sepolia.g.alchemy.com/v2/5gfYGR46TZqdOnjEY-scgyCAwjWXeorz',
+    'metal-l2': 'https://testnet.rpc.metall2.com',
+    'mode-testnet': 'https://sepolia.mode.network',
+};
 
-// Configure the contract
-const contract = new web3.eth.Contract(contractABI, contractAddress);
+// Function to get the web3 instance based on the chain
+const getWeb3Instance = (chain) => {
+    const providerUrl = providerUrls[chain];
+    return new Web3(new Web3.providers.HttpProvider(providerUrl));
+};
 
-// Middleware to sign transactions
-const signTransaction = async (transactionObject, privateKey) => {
+// Function to get the contract instance based on the chain
+const getContractInstance = (chain) => {
+    const contractAddress = contractAddresses[chain];
+    const web3 = getWeb3Instance(chain);
+    return new web3.eth.Contract(abi, contractAddress);
+};
+
+// Function to sign and send a transaction to the blockchain
+const addVoteToBlockchain = async (chain, postId, userId, optionId, privateKey) => {
+    const web3 = getWeb3Instance(chain); // Get the web3 instance for the specified chain
+    const fromAddress = web3.eth.accounts.privateKeyToAccount(privateKey).address;
+    const contract = getContractInstance(chain);
+
+    const transactionObject = {
+        from: fromAddress,
+        to: contract.options.address,
+        data: contract.methods.vote(postId, userId, optionId).encodeABI(),
+        gas: 2000000,
+        maxFeePerGas: web3.utils.toWei('50', 'gwei'),
+        maxPriorityFeePerGas: web3.utils.toWei('10', 'gwei'),
+    };
+
     const signedTx = await web3.eth.accounts.signTransaction(transactionObject, privateKey);
-    return signedTx.rawTransaction;
+    const txReceipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+    return txReceipt;
 };
 
 export async function POST(request) {
     if (!request) {
-        return new NextResponse('No request object', {status: 400});
+        return new NextResponse('No request object', { status: 400 });
     }
+    
     try {
-        const {userId, optionId, postId, reward} = await request.json(); // Receive postId from JSON
+        const { userId, optionId, postId, reward, chain } = await request.json();
 
-        if (!userId || !optionId || !postId || !reward) {
-            console.error("Missing required parameters:", { userId, optionId, postId, reward });
+        if (!userId || !optionId || !postId || !reward || !chain) {
+            console.error("Missing required parameters:", { userId, optionId, postId, reward, chain });
             return new Response(JSON.stringify({ error: 'Missing required parameters' }), { status: 400 });
         }
-        //vote on blockchain
-        // const privateKey = process.env.NEXT_PRIVATE_KEY;
-        // if (!privateKey) {
-        //     console.error("Private key is missing.");
-        //     return new Response(JSON.stringify({ error: 'Private key is not configured' }), { status: 500 });
-        // }
-        //
-        // // Get the from address from the private key
-        // const fromAddress = web3.eth.accounts.privateKeyToAccount(privateKey).address;
-        //
-        // // Create transaction object
-        // const transactionObject = {
-        //     from: fromAddress, // Add the from address here
-        //     to: contractAddress,
-        //     data: contract.methods.vote(postId, userId, optionId).encodeABI(),
-        //     gas: 2000000, // Specify the gas limit
-        //     maxFeePerGas: web3.utils.toWei('50', 'gwei'), // Maximum total fee per gas
-        //     maxPriorityFeePerGas: web3.utils.toWei('10', 'gwei'), // Priority fee per gas
-        // };
-        //
-        // // Sign and send the transaction
-        // const rawTx = await signTransaction(transactionObject, privateKey);
-        // const txReceipt = await web3.eth.sendSignedTransaction(rawTx);
 
-        //find the post and update the votes
+        const privateKey = process.env.NEXT_PRIVATE_KEY;
+        if (!privateKey) {
+            console.error("Private key is missing.");
+            return new Response(JSON.stringify({ error: 'Private key is not configured' }), { status: 500 });
+        }
+
+        // Call the function to add the vote to the blockchain
+        const txReceipt = await addVoteToBlockchain(chain, postId, userId, optionId, privateKey);
+        console.log('Transaction receipt:', txReceipt);
+
+        // Continue with Firestore operations
         const postDocRef = doc(db, 'posts', postId);
         const postDocSnap = await getDoc(postDocRef);
         if (!postDocSnap.exists()) {
