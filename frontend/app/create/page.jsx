@@ -54,12 +54,13 @@ function Page() {
     const [generatingImage, setGeneratingImage] = useState(false);
     const [uploadingImages, setUploadingImages] = useState(false)
     const [userAddress, setUserAddress] = useState('');
-    const [amtInEth, setAmtInEth] = useState("");
+    const [amtInEth, setAmtInEth] = useState(0);
     const [verfyingTxn, setVerifyingTxn] = useState(false);
     const [postId, setPostId] = useState("");
     const [postData, setPostData] = useState(null);
-
-
+    const [gettingLiveEthPrice, setGettingLiveEthPrice] = useState(false);
+    const [txnVerified, setTxnVerified] = useState(false);
+const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
 
     const contractAddresses = {
         "base-sepolia": "0x26ed997929235be85c7a2d54ae7c60d91e443ea1",
@@ -209,6 +210,7 @@ function Page() {
         const connection = new PriceServiceConnection("https://hermes.pyth.network");
 
         try {
+            setGettingLiveEthPrice(true)
             // Fetch the latest ETH price
             const priceId = "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"; // ETH/USD price id
             const currentPrices = await connection.getLatestPriceFeeds([priceId]);
@@ -218,7 +220,7 @@ function Page() {
             const ethPrice = parseFloat(ethPriceData.price) / 1e8; // Convert from integer to float
 
             // Calculate the equivalent amount in ETH
-            let eth_amt = usdAmount / ethPrice;
+            let eth_amt = Number(usdAmount) / ethPrice;
             eth_amt = eth_amt.toFixed(6); // Round to 6 decimal places
 
             // Convert ETH to Wei
@@ -227,6 +229,8 @@ function Page() {
         } catch (error) {
             console.error("Error fetching ETH price or converting:", error);
             throw new Error("Failed to convert USD to Wei");
+        } finally {
+            setGettingLiveEthPrice(false);
         }
     };
 
@@ -295,13 +299,13 @@ function Page() {
             const tx = await sendTx(transaction);
             console.log("tx---------------------", tx)
             setTxHash(tx.transactionHash);
+            setAwaitingConfirmation(true);
             setCurrChain(tx.chain)
 
         } catch (error) {
             console.error('Detailed error:', error);
             toast.error(`Contract interaction failed: ${error.message}`);
-        }
-        finally {
+        } finally {
             setVerifyingTxn(false);
 
         }
@@ -357,7 +361,7 @@ function Page() {
     };
 
     const handleSubmit = async () => {
-        if(!postData || !postId){
+        if (!postData || !postId) {
             toast.error("Could not save post.");
             return;
         }
@@ -385,6 +389,7 @@ function Page() {
             } else {
                 // Document already exists
                 console.log("A post with this ID already exists. Generating a new ID...");
+                throw new Error("Post ID already exists");
             }
             // Update user document with new post ID and token balances
             await setDoc(userRef, {
@@ -392,15 +397,16 @@ function Page() {
             }, {merge: true});
 
             toast.success("Post published successfully!");
-            // // Reset form state
-            // setFormState({
-            //     title: '',
-            //     description: '',
-            //     bountyReward: '',
-            //     numberOfVotes: '',
-            //     selectedChain: selectedChain,
-            // });
-            // setImageFiles([]);
+            setTxnVerified(false);
+            // Reset form state
+            setFormState({
+                title: '',
+                description: '',
+                bountyReward: '5',
+                numberOfVotes: '',
+                selectedChain: selectedChain,
+            });
+            setImageFiles([]);
         } catch (error) {
             console.error("Error handling submit:", error);
             toast.error("Could not save post.");
@@ -471,6 +477,14 @@ function Page() {
         if (receipt) {
             console.log("Transaction confirmed:", receipt);
             // Handle successful transaction confirmation
+            if (receipt.status === 'success') {
+                setTxnVerified(true);
+                toast.success("Transaction confirmed!");
+            }
+            else {
+                toast.error("Transaction failed");
+            }
+            setAwaitingConfirmation(false);
         }
     }, [receipt, selectedChain]);
     return (
@@ -547,7 +561,9 @@ function Page() {
                                 <div className="flex items-center flex-row mr-5 gap-1 mt-1">
                                     <div
                                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm  sm:text-sm">
-                                        {amtInEth}
+                                        {
+                                            amtInEth ? amtInEth : "0"
+                                        }
                                     </div>
                                     <div className="text-sm font-bold">ETH</div>
                                 </div>
@@ -597,25 +613,31 @@ function Page() {
 
                             activeWallet ? (session ? (
 
-                                    receipt && receipt?.success ? (
-                                        <button
-                                            onClick={handleSubmit}
-                                            className={`w-full mt-4  font-semibold py-2 rounded-md  ${loading ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
-                                            disabled={loading}
-                                        >
-                                            Publish Post
-                                        </button>
-                                    ): (
-                                        <button
-                                            onClick={addDataToBlockchain}
-                                            className={`w-full mt-4  font-semibold py-2 rounded-md  ${verfyingTxn ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
-                                            disabled={verfyingTxn}
-                                        >
-                                            {
-                                                verfyingTxn ? "Verifying Transaction..." : `Pay ${formState.bountyReward} USD`
-                                            }
-                                        </button>
-                                    )
+                                txnVerified ? (
+                                    <button
+                                        onClick={handleSubmit}
+                                        className={`w-full mt-4  font-semibold py-2 rounded-md  ${loading ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
+                                        disabled={loading}
+                                    >
+                                        Publish Post
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={addDataToBlockchain}
+                                        className={`w-full mt-4  font-semibold py-2 rounded-md  ${verfyingTxn || awatingConfirmation ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
+                                        disabled={verfyingTxn || awatingConfirmation}
+                                    >
+                                        {
+                                            verfyingTxn ? "Verifying Transaction..." : ""
+                                        }
+                                        {
+                                            awatingConfirmation ? "Awaiting Confirmation..." : ""
+                                        }
+                                        {
+                                            !verfyingTxn && !awatingConfirmation ? `Pay ${formState.bountyReward} USD` : ""
+                                        }
+                                    </button>
+                                )
 
                             ) : (
                                 <button
