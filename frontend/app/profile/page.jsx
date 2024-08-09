@@ -9,12 +9,13 @@ import Votes from '@components/users/Votes'; // New component for Votes
 import Posts from '@components/users/Posts';
 import DepositEth from "@components/DepositEth";
 import { useDisconnect, useActiveWallet } from "thirdweb/react";
-
+import {Toaster} from "react-hot-toast";
 
 function Page() {
     const { disconnect } = useDisconnect();
     const wallet = useActiveWallet();
     const {data: session} = useSession();
+    const userId = session?.user.id;
     const [activeTab, setActiveTab] = useState('Posts');
     const [nameInitials, setNameInitials] = useState('');
     const handleTabChange = (key) => {
@@ -41,6 +42,7 @@ function Page() {
 
     return (
         <div className='px-20 min-h-screen'>
+            <Toaster position="center"/>
             {/* User Component */}
             <div className='flex items-center gap-10 mb-10'>
                 <div className='flex items-center space-x-4'>
@@ -71,7 +73,7 @@ function Page() {
                         <Posts/>
                     </Tab>
                     <Tab key="Balances" className='min-w-[15vh]' title="Balances">
-                        <Balances/>
+                        <Balances userId={userId}/>
                     </Tab>
                     <Tab key="Transactions" className='min-w-[15vh]' title="Transactions">
                         <Transactions/>
