@@ -21,12 +21,7 @@ import {ethers} from 'ethers';
 import {base, ethereum, sepolia, baseSepolia, optimismSepolia} from "thirdweb/chains";
 import {defineChain, getContract, prepareContractCall, prepareTransaction} from "thirdweb";
 import {toWei} from "thirdweb/utils"
-
-import { ethers } from 'ethers';
-import { optimismSepolia, metalL2Testnet, baseSepolia } from "thirdweb/chains";
-import { getContract, prepareContractCall, prepareTransaction } from "thirdweb";
-import { toWei } from "thirdweb/utils"
-import { PriceServiceConnection } from "@pythnetwork/price-service-client";
+import {PriceServiceConnection} from "@pythnetwork/price-service-client";
 
 
 require('dotenv').config();
@@ -53,12 +48,14 @@ function Page() {
     const [generatingImage, setGeneratingImage] = useState(false);
     const [uploadingImages, setUploadingImages] = useState(false)
     const [userAddress, setUserAddress] = useState('');
+    const [amtInEth, setAmtInEth] = useState("");
+    const [transacting, setTransacting] = useState(false);
 
     const contractAddresses = {
         "base-sepolia": "0x26ed997929235be85c7a2d54ae7c60d91e443ea1",
         "op-sepolia": "0x9620e836108aFE5F15c6Fba231DCCDb7853c5480",
         "mode-testnet": "0x821EC6AeEf9DA466eac1f297D29d81251F50C50F",
-        "metal-l2":     "0x821EC6AeEf9DA466eac1f297D29d81251F50C50F",
+        "metal-l2": "0x821EC6AeEf9DA466eac1f297D29d81251F50C50F",
     }
 
     //custom chains
@@ -210,12 +207,12 @@ function Page() {
             const ethPrice = parseFloat(ethPriceData.price) / 1e8; // Convert from integer to float
 
             // Calculate the equivalent amount in ETH
-            const ethAmount = usdAmount / ethPrice;
+            let eth_amt = usdAmount / ethPrice;
+            eth_amt = eth_amt.toFixed(6); // Round to 6 decimal places
 
             // Convert ETH to Wei
-
-
-            return ethAmount.toString(); // Return Wei as a string
+            setAmtInEth(eth_amt);
+            return eth_amt.toString(); // Return Wei as a string
         } catch (error) {
             console.error("Error fetching ETH price or converting:", error);
             throw new Error("Failed to convert USD to Wei");
@@ -224,12 +221,13 @@ function Page() {
 
 
     const addDataToBlockchain = async (postData, postId) => {
-        const { bountyReward, userId, options, numberOfVotes } = postData;
+        const {bountyReward, userId, options, numberOfVotes} = postData;
         const bountyRewardinEther = await convertUsdToWei(bountyReward);
+        console.log("bountyRewardinEther", bountyRewardinEther)
 
         try {
             //get chain using the selected chain name from chains
-
+            setTransacting(true);
             const currentChain = chainNameToChain[selectedChain.id];
             console.log("currentChain", currentChain)
             const address = contractAddresses[selectedChain.id];
@@ -254,15 +252,14 @@ function Page() {
             });
 
             // Send the transaction
-            await sendTx(transaction);
-
-            toast.success(`Post created successfully! On Blockchain`);
+            const tx = await sendTx(transaction);
 
         } catch (error) {
             console.error('Detailed error:', error);
             toast.error(`Contract interaction failed: ${error.message}`);
         }
     };
+
     const handleGenerateImage = async (e) => {
         e.preventDefault();
         try {
@@ -360,28 +357,40 @@ function Page() {
                 userId: session.user.id,
                 options: uploadedImages,
                 isDone: false,
+                id: postId,
             };
             console.log("postData", postData)
             // Add data to blockchain
             await addDataToBlockchain(postData, postId, sendTx);
 
-            const docRef = await addDoc(collection(db, 'posts'), postData);
+            // Check if the document already exists
+            const docRef = doc(db, 'posts', postId);
+            const docSnap = await getDoc(docRef);
+
+            if (!docSnap.exists()) {
+                // Document doesn't exist, so create it
+                await setDoc(docRef, postData, {merge: false});
+                console.log("New post created with ID: ", postId);
+            } else {
+                // Document already exists
+                console.log("A post with this ID already exists. Generating a new ID...");
+                // You might want to generate a new ID and try again here
+            }
             // Update user document with new post ID and token balances
             await setDoc(userRef, {
-                posts: [...userDoc.posts, docRef.id],
-
+                posts: [...userDoc.posts, postId],
             }, {merge: true});
 
             toast.success("Post published successfully!");
             // Reset form state
-            // setFormState({
-            //     title: '',
-            //     description: '',
-            //     bountyReward: '',
-            //     numberOfVotes: '',
-            //     selectedChain: selectedChain,
-            // });
-            // setImageFiles([]);
+            setFormState({
+                title: '',
+                description: '',
+                bountyReward: '',
+                numberOfVotes: '',
+                selectedChain: selectedChain,
+            });
+            setImageFiles([]);
         } catch (error) {
             console.error("Error handling submit:", error);
             toast.error("Could not save post.");
@@ -496,20 +505,40 @@ function Page() {
                             ></textarea>
                         </div>
                         <div className='flex space-x-2'>
-                            <div className='w-1/2'>
+                            <div className='w-1/2 '>
                                 <label htmlFor="bountyReward"
                                        className="block text-sm font-medium text-gray-700">Reward</label>
-                                <input
-                                    type="number"
-                                    id="bountyReward"
-                                    name="bountyReward"
-                                    value={formState.bountyReward}
-                                    onChange={handleChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
-                                    placeholder="Enter reward in USD"
-                                />
+                                <div className="flex items-center flex-row mr-5 gap-1 mt-1">
+                                    <input
+                                        type="number"
+                                        id="bountyReward"
+                                        name="bountyReward"
+                                        value={formState.bountyReward}
+                                        onChange={handleChange}
+                                        onBlur={() => convertUsdToWei(formState.bountyReward)}
+                                        className=" block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                                        placeholder="Enter reward in USD"
+                                    />
+                                    <div className="text-sm font-bold">USD</div>
+                                </div>
                             </div>
                             <div className='w-1/2'>
+                                <label htmlFor="numberOfVotes" className="block text-sm font-medium text-gray-700">Equivalent
+                                    ETH Amount</label>
+
+                                <div className="flex items-center flex-row mr-5 gap-1 mt-1">
+                                    <div
+                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm  sm:text-sm">
+                                        {amtInEth}
+                                    </div>
+                                    <div className="text-sm font-bold">ETH</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className='flex space-x-2'>
+
+                            <div className='w-full'>
                                 <label htmlFor="numberOfVotes" className="block text-sm font-medium text-gray-700">Number
                                     of
                                     Votes</label>
@@ -555,7 +584,13 @@ function Page() {
                                     disabled={loading}
                                 >
                                     {loading ? (
-                                        uploadingImages ? "Uploading images..." : "Creating post..."
+                                        uploadingImages ? (
+                                            "Uploading images..."
+                                        ) : transacting ? (
+                                            "Creating Post on Blockchain..."
+                                        ) : (
+                                            "Creating Post..."
+                                        )
                                     ) : 'Pay and Publish Post'}
                                 </button>
                             ) : (

@@ -26,7 +26,8 @@ function Page() {
     const handleSignOut = async () => {
         setLoading(true);
         localStorage.removeItem('user');
-        await  disconnect(wallet);
+        if(wallet)
+            await  disconnect(wallet);
         await signOut({callbackUrl: 'http://localhost:3000/'})
         setLoading(false)
     }

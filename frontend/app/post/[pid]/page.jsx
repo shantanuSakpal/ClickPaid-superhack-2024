@@ -21,6 +21,7 @@ const Layout = () => {
     const [isOwner, setIsOwner] = useState(false)
     const navigate = useRouter();
     const { userData, setUserData, selectedChain, setSelectedChain } = useContext(GlobalContext);
+    const [reward, setReward] = useState("");
 
     /*
     post = {
@@ -59,10 +60,12 @@ const Layout = () => {
             const data = await response.json();
             //check if curr user is post owner
                 console.log(data.userId, session?.user.id)
-            if (data.userId == session?.user.id) {
+            if (data.userId === session?.user.id) {
                 setIsOwner(true);
             }
             setPost(data);
+            let share = (Number(data.bountyReward) /Number(data.numberOfVotes)).toFixed(2);
+            setReward(share);
             console.log("data", data);
         } catch (error) {
             console.error('Error fetching post:', error);
@@ -92,7 +95,7 @@ const Layout = () => {
                 userId: session.user.id,
                 postId: postId,
                 optionId: selectedOptionId,
-                reward: post.bountyReward / post.numberOfVotes
+                reward: reward
             }
             const response = await fetch(`/api/submitVote`, {
                 method: 'POST',
@@ -104,7 +107,9 @@ const Layout = () => {
                 console.error('Error submitting vote:', errorMessage);
                 toast.error(errorMessage); // Display the error message to the user
             } else {
-                setUserData({...userData, rewards: userData.rewards + post.bountyReward / post.numberOfVotes})
+                let newReward = Number(userData.rewards) + Number(reward)
+                newReward = newReward.toFixed(2);
+                setUserData({...userData, rewards: newReward})
                 toast.success("Vote submitted");
                 navigate.push('/vote')
             }
@@ -138,7 +143,7 @@ const Layout = () => {
                             <span className="font-bold">On {post.selectedChain.name}</span>
                         </div>
                         <h2 className="text-3xl  font-bold">{post.title}</h2>
-                        <div className="">Reward: {post.bountyReward / post.numberOfVotes} USD</div>
+                        <div className="">Reward: {reward} USD</div>
                     </div>
                     <p className="text-lg">{post.description}</p>
                     <div className="grid grid-cols-2 gap-8 my-5">
