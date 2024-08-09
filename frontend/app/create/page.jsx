@@ -14,10 +14,15 @@ import abi from "@/app/abis/abi";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
 import SwitchChains from "@components/SwitchChains";
-import {useActiveAccount, useSendTransaction} from "thirdweb/react";
+import {useActiveWallet, useSendTransaction} from "thirdweb/react";
 import ConnectWallet from "@components/ConnectWallet";
 import {client} from "@/app/_lib/client";
-import { ethers } from 'ethers'; 
+import {ethers} from 'ethers';
+import {base, ethereum, sepolia, baseSepolia, optimismSepolia} from "thirdweb/chains";
+import {defineChain, getContract, prepareContractCall, prepareTransaction} from "thirdweb";
+import {toWei} from "thirdweb/utils"
+
+import { ethers } from 'ethers';
 import { optimismSepolia, metalL2Testnet, baseSepolia } from "thirdweb/chains";
 import { getContract, prepareContractCall, prepareTransaction } from "thirdweb";
 import { toWei } from "thirdweb/utils"
@@ -28,8 +33,9 @@ require('dotenv').config();
 
 function Page() {
     const {userData, setUserData, selectedChain, setSelectedChain} = useContext(GlobalContext);
-    const activeAccount = useActiveAccount();
-    const { mutate: sendTx, data: transactionResult } = useSendTransaction();
+    const activeWallet = useActiveWallet();
+    const {mutate: sendTx, data: transactionResult} = useSendTransaction();
+    const {data: session} = useSession()
 
     const [formState, setFormState] = useState({
         title: '',
@@ -41,16 +47,53 @@ function Page() {
     const [web3, setWeb3] = useState(null);
     const [contract, setContract] = useState(null);
 
-    // const activeAccount = useActiveAccount();
     const [images, setImages] = useState([]);
     const [imageFiles, setImageFiles] = useState([]); // Store file references
     const [aiGeneratedImages, setAiGeneratedImages] = useState([]);
     const [generatingImage, setGeneratingImage] = useState(false);
     const [uploadingImages, setUploadingImages] = useState(false)
-    const {data: session} = useSession()
     const [userAddress, setUserAddress] = useState('');
 
+    const contractAddresses = {
+        "base-sepolia": "0x26ed997929235be85c7a2d54ae7c60d91e443ea1",
+        "op-sepolia": "0x9620e836108aFE5F15c6Fba231DCCDb7853c5480",
+        "mode-testnet": "0x821EC6AeEf9DA466eac1f297D29d81251F50C50F",
+        "metal-l2":     "0x821EC6AeEf9DA466eac1f297D29d81251F50C50F",
+    }
 
+    //custom chains
+    const metalL2Testnet = defineChain({
+        id: 1740,
+        name: "Metal L2 Testnet",
+        nativeCurrency: {name: "ETH", symbol: "ETH", decimals: 18},
+        blockExplorers: [
+            {
+                name: "Blockscout",
+                url: "https://testnet.explorer.metall2.com"
+            }
+        ],
+        testnet: true
+    });
+
+    const modeTestnet = defineChain({
+        id: 919,
+        name: "Mode Testnet",
+        nativeCurrency: {name: "ETH", symbol: "ETH", decimals: 18},
+        blockExplorers: [
+            {
+                name: "Blockscout",
+                url: "https://sepolia.explorer.mode.network/"
+            }
+        ],
+        testnet: true
+    });
+
+    const chainNameToChain = {
+        "base-sepolia": baseSepolia,
+        "op-sepolia": optimismSepolia,
+        "mode-testnet": modeTestnet,
+        "metal-l2": metalL2Testnet,
+    }
     const handleChange = (e) => {
         const {name, value} = e.target;
         setFormState({
@@ -154,7 +197,7 @@ function Page() {
         if (!usdAmount || isNaN(usdAmount) || usdAmount <= 0) {
             throw new Error("Invalid USD amount");
         }
-        
+
         const connection = new PriceServiceConnection("https://hermes.pyth.network");
 
         try {
@@ -162,16 +205,16 @@ function Page() {
             const priceId = "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace"; // ETH/USD price id
             const currentPrices = await connection.getLatestPriceFeeds([priceId]);
             const ethPriceData = currentPrices[0].price;
-    
+
             // Extract the price value and convert to float
             const ethPrice = parseFloat(ethPriceData.price) / 1e8; // Convert from integer to float
-    
+
             // Calculate the equivalent amount in ETH
             const ethAmount = usdAmount / ethPrice;
-    
+
             // Convert ETH to Wei
-            
-    
+
+
             return ethAmount.toString(); // Return Wei as a string
         } catch (error) {
             console.error("Error fetching ETH price or converting:", error);
@@ -183,15 +226,21 @@ function Page() {
     const addDataToBlockchain = async (postData, postId) => {
         const { bountyReward, userId, options, numberOfVotes } = postData;
         const bountyRewardinEther = await convertUsdToWei(bountyReward);
- 
+
         try {
+            //get chain using the selected chain name from chains
+
+            const currentChain = chainNameToChain[selectedChain.id];
+            console.log("currentChain", currentChain)
+            const address = contractAddresses[selectedChain.id];
+
             const contract = getContract({
-                address: "0x9620e836108aFE5F15c6Fba231DCCDb7853c5480", // Replace with your contract address
-                chain: optimismSepolia,
+                address: address, // Replace with your contract address
+                chain: currentChain,
                 client,
             });
 
-            const transaction =  prepareContractCall({
+            const transaction = prepareContractCall({
                 contract,
                 value: ethers.parseEther(bountyRewardinEther.toString()),
                 method: "function createPost(string memory postId, uint256 bounty, uint256 numVoters, string memory userId, string[] memory optionIDs)",
@@ -293,7 +342,6 @@ function Page() {
             }
             const userDoc = userSnap.data();
 
-
             // Upload images to Firebase and get URLs
             const uploadedImages = await uploadImages();
             if (uploadedImages.length === 0) {
@@ -302,6 +350,8 @@ function Page() {
                 return;
             }
 
+            //post id is random 6 digit string alphanumeric
+            const postId = Math.random().toString(36).substring(2, 8);
             // Save post data to Firebase
             const postData = {
                 ...formState,
@@ -312,30 +362,26 @@ function Page() {
                 isDone: false,
             };
             console.log("postData", postData)
-            const docRef = await addDoc(collection(db, 'posts'), postData);
+            // Add data to blockchain
+            await addDataToBlockchain(postData, postId, sendTx);
 
+            const docRef = await addDoc(collection(db, 'posts'), postData);
             // Update user document with new post ID and token balances
             await setDoc(userRef, {
                 posts: [...userDoc.posts, docRef.id],
 
             }, {merge: true});
 
-            const postId = docRef.id;
-
-            
-            // Add data to blockchain
-            await addDataToBlockchain(postData, postId, sendTx); 
-            
             toast.success("Post published successfully!");
             // Reset form state
-            setFormState({
-                title: '',
-                description: '',
-                bountyReward: '',
-                numberOfVotes: '',
-                selectedChain: selectedChain,
-            });
-            setImageFiles([]);
+            // setFormState({
+            //     title: '',
+            //     description: '',
+            //     bountyReward: '',
+            //     numberOfVotes: '',
+            //     selectedChain: selectedChain,
+            // });
+            // setImageFiles([]);
         } catch (error) {
             console.error("Error handling submit:", error);
             toast.error("Could not save post.");
@@ -480,7 +526,7 @@ function Page() {
                         </div>
                         {/*removing nft and chain selection for now*/}
                         {
-                            activeAccount && (
+                            activeWallet && (
                                 <div className="flex flex-col">
                                     <label className="block text-sm font-medium text-gray-700">Posting on</label>
                                     <div className="flex flex-row gap-5 justify-between items-center mt-2">
@@ -502,29 +548,29 @@ function Page() {
                         {
 
 
-                          activeAccount ? (  session ? (
-                              <button
-                                  type="submit"
-                                  className={`w-full mt-4  font-semibold py-2 rounded-md  ${loading ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
-                                  disabled={loading}
-                              >
-                                  {loading ? (
-                                      uploadingImages ? "Uploading images..." : "Creating post..."
-                                  ) : 'Pay and Publish Post'}
-                              </button>
-                          ) : (
-                              <button
-                                  type="button"
-                                  className="w-full mt-4 bg-theme-blue-light text-white font-semibold py-2 rounded-md hover:bg-theme-blue"
-                                  onClick={() => {
-                                      signIn("worldcoin")
-                                  }}
-                              >
-                                  Login to Publish Post
-                              </button>
-                          )):(
-                                    <ConnectWallet title="Connect Wallet to Publish Post"/>
-                          )
+                            activeWallet ? (session ? (
+                                <button
+                                    type="submit"
+                                    className={`w-full mt-4  font-semibold py-2 rounded-md  ${loading ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        uploadingImages ? "Uploading images..." : "Creating post..."
+                                    ) : 'Pay and Publish Post'}
+                                </button>
+                            ) : (
+                                <button
+                                    type="button"
+                                    className="w-full mt-4 bg-theme-blue-light text-white font-semibold py-2 rounded-md hover:bg-theme-blue"
+                                    onClick={() => {
+                                        signIn("worldcoin")
+                                    }}
+                                >
+                                    Login to Publish Post
+                                </button>
+                            )) : (
+                                <ConnectWallet title="Connect Wallet to Publish Post"/>
+                            )
                         }
 
                     </form>
@@ -610,7 +656,9 @@ function Page() {
                                 >
                                     {generatingImage ? "Generating Image..." : "Generate New Thumbnail"}
                                 </button>
-                                <div className="font-bold text-center ">Click on generated thumbnails to add them to uploads</div>
+                                <div className="font-bold text-center ">Click on generated thumbnails to add them to
+                                    uploads
+                                </div>
 
                             </form>
 

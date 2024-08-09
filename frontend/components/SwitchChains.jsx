@@ -66,7 +66,7 @@ export default function SwitchChains() {
   function handleClick() {
     networkSwitcher.open({
       client,
-      theme: "light",
+      theme: "dark",
       sections: [
         { label: "Currently supported", chains: [baseSepolia, optimismSepolia,modeTestnet, metalL2Testnet] },
         { label: "Test networks", chains: [baseSepolia, optimismSepolia, modeTestnet, metalL2Testnet] }
