@@ -12,13 +12,9 @@ const chains = [
 
 const AllChainBalances = ({userId}) => {
     const [balances, setBalances] = useState({});
-    const [ethPrice, setEthPrice] = useState(0); // Assuming you have a way to fetch ETH price
+    const [ethPrice, setEthPrice] = useState(0);
     const [loading, setLoading] = useState(false);
-        const [withDrawing, setWithDrawing] = useState(false);
-    const [withDrawingOp, setWithDrawingOp] = useState(false);
-    const [withDrawingBase, setWithDrawingBase] = useState(false);
-    const [withDrawingMode, setWithDrawingMode] = useState(false);
-    const [withDrawingMetal, setWithDrawingMetal] = useState(false);
+    const [withdrawingChains, setWithdrawingChains] = useState({});
 
     useEffect(() => {
         fetchBalances();
@@ -53,7 +49,6 @@ const AllChainBalances = ({userId}) => {
         }
     };
 
-
     const handleWithdraw = async (chainKey) => {
         console.log("Withdraw amount in chain:", chainKey);
         const amountToWithdraw = balances[chainKey].wei;
@@ -61,17 +56,7 @@ const AllChainBalances = ({userId}) => {
         const userAddress = wallet?.getAccount().address;
         console.log("user address:", userAddress);
         try {
-            withDrawing(true);
-            if(chainKey === 'op-sepolia'){
-                setWithDrawingOp(true);
-            }else if(chainKey === 'base-sepolia'){
-                setWithDrawingBase(true);
-            } else if(chainKey === 'mode-testnet'){
-                setWithDrawingMode(true);
-            }
-            else if(chainKey === 'metal-l2'){
-                setWithDrawingMetal(true);
-            }
+            setWithdrawingChains(prev => ({...prev, [chainKey]: true}));
             const response = await fetch('/api/withdrawUserBalance', {
                 method: 'POST',
                 headers: {
@@ -88,25 +73,16 @@ const AllChainBalances = ({userId}) => {
 
             if (response.ok) {
                 console.log("Withdrawal successful:", data);
-                // Optionally, you can refresh the balances after withdrawal
                 toast.success("Withdrawal successful");
                 fetchBalances();
-
-            }
-
-            if (!response.ok) {
+            } else {
                 toast.error("Failed to withdraw balance");
             }
-
         } catch (error) {
             console.error("Error during withdrawal:", error);
-        }
-        finally {
-            setWithDrawing(false);
-            setWithDrawingBase(false);
-            setWithDrawingOp(false);
-            setWithDrawingMode(false);
-            setWithDrawingMetal(false);
+            toast.error("Error during withdrawal");
+        } finally {
+            setWithdrawingChains(prev => ({...prev, [chainKey]: false}));
         }
     };
 
@@ -127,18 +103,19 @@ const AllChainBalances = ({userId}) => {
 
                                     {
                                         wallet && (
-                                                <Button color={ withDrawing ? "default":"primary"} className={
-                                                    `text-sm font-semibold rounded-xl ${withDrawing ? "cursor-not-allowed" : ""}`
-                                                } disabled={withDrawing}
-                                                        onClick={() => handleWithdraw(chain.key)}>{
-                                                    withDrawing ? "Withdrawing..." : `Withdraw`
-                                                }</Button>
+                                            <Button
+                                                color={withdrawingChains[chain.key] ? "default" : "primary"}
+                                                className={`text-sm font-semibold rounded-xl ${withdrawingChains[chain.key] ? "cursor-not-allowed" : ""}`}
+                                                disabled={withdrawingChains[chain.key]}
+                                                onClick={() => handleWithdraw(chain.key)}
+                                            >
+                                                {withdrawingChains[chain.key] ? "Withdrawing..." : "Withdraw"}
+                                            </Button>
                                         )
                                     }
-                                </>)
+                                </>
+                            )
                         }
-
-
                     </div>
                 </div>
             ))}
