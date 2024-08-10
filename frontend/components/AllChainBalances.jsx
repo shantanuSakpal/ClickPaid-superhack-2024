@@ -64,6 +64,7 @@ const AllChainBalances = ({userId}) => {
                     userId,
                     amount: amountToWithdraw.toString(),
                     chain: chainKey,
+                    userAddress: userAddress,
                 }),
             });
 

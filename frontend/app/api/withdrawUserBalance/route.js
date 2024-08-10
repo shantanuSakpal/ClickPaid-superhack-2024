@@ -19,32 +19,38 @@ const providerUrls = {
 
 export async function POST(request) {
     try {
-        const { userId, amount, chain } = await request.json();
+        const { userId, amount, chain, userAddress } = await request.json();
 
-        if (!userId || !amount || !chain) {
-            return new NextResponse('User ID, amount, and chain are required', { status: 400 });
+        if (!userId || !amount || !chain || !userAddress) {
+            return new NextResponse('User ID, amount, chain, and user address are required', { status: 400 });
         }
-
+        
+        console.log("Amount", amount)
         // Initialize Web3 and contract
         const web3 = new Web3(new Web3.providers.HttpProvider(providerUrls[chain]));
         const contract = new web3.eth.Contract(abi, contractAddresses[chain]);
-
-        // Fetch the user's address from the contract
-        const userAddress = await contract.methods.getUserDetails(userId).call().then(details => details[2]);
 
         // Create the transaction for withdrawal
         const tx = {
             from: userAddress,
             to: contractAddresses[chain],
-            data: contract.methods.withdraw(userId, web3.utils.toWei(amount.toString(), 'ether'), userAddress).encodeABI(),
-            gas: 2000000,
+            data: contract.methods.withdraw(userId, amount.toString(16), userAddress).encodeABI(),
+        };
+
+        // Estimate gas limit
+        const estimatedGas = await web3.eth.estimateGas(tx);
+
+        // Create the transaction with estimated gas limit
+        const txWithGas = {
+            ...tx,
+            gas: estimatedGas,
             maxFeePerGas: web3.utils.toWei('50', 'gwei'),
             maxPriorityFeePerGas: web3.utils.toWei('10', 'gwei'),
         };
 
         // Sign and send the transaction
         const privateKey = process.env.NEXT_PRIVATE_KEY; // Ensure your private key is securely stored
-        const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey);
+        const signedTx = await web3.eth.accounts.signTransaction(txWithGas, privateKey);
         const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
         return NextResponse.json({ success: true, receipt });
