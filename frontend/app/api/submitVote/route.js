@@ -9,8 +9,8 @@ import abi from "@/app/abis/abi";
 const contractAddresses = {
     "base-sepolia": "0x26ed997929235be85c7a2d54ae7c60d91e443ea1",
     "op-sepolia": "0x9620e836108aFE5F15c6Fba231DCCDb7853c5480",
-    "mode-testnet": "0x821EC6AeEf9DA466eac1f297D29d81251F50C50F",
-    "metal-l2": "0x821EC6AeEf9DA466eac1f297D29d81251F50C50F",
+    "mode-testnet": "0x9B8B3AC576cDF17F9076be43Ae665Ed3864eFF0d",
+    "metal-l2": "0x996A200B7cEa5a00EAB75072Ddf172F3C38b21a7",
 }
 
 // Define web3 provider URLs for different chains
