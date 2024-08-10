@@ -4,11 +4,11 @@ import abi from "@/app/abis/abi.json";
 
 // Define contract addresses and provider URLs for different chains
 const contractAddresses = {
-    'op-sepolia': '0x8C992ba2293dd69dB74bE621F61fF9E14E76F262',
-    'base-sepolia': '0x26ed997929235be85c7a2d54ae7c60d91e443ea1',
-    'metal-l2': '0x821ec6aeef9da466eac1f297d29d81251f50c50f',
-    'mode-testnet': '0x821EC6AeEf9DA466eac1f297D29d81251F50C50F',
-};
+    "base-sepolia": "0x26ed997929235be85c7a2d54ae7c60d91e443ea1",
+    "op-sepolia": "0x9620e836108aFE5F15c6Fba231DCCDb7853c5480",
+    "mode-testnet": "0x821EC6AeEf9DA466eac1f297D29d81251F50C50F",
+    "metal-l2": "0x821EC6AeEf9DA466eac1f297D29d81251F50C50F",
+}
 
 const providerUrls = {
     'op-sepolia': 'https://optimism-sepolia.infura.io/v3/b725fe7c53164e5da34a10cc350877c4',
@@ -47,8 +47,9 @@ export async function POST(request) {
                 const balanceUsd = (parseFloat(balanceEth) * ethPrice).toFixed(2); // Convert to USD
 
                 balances[chain] = {
-                    eth: balanceEth,
-                    usd: balanceUsd,
+                    wei: balanceWei.toString(),
+                    eth: balanceEth.toString(),
+                    usd: balanceUsd.toString(),
                 };
             } catch (error) {
                 console.error(`Error fetching balance for ${chain}:`, error);

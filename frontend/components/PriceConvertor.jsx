@@ -55,7 +55,7 @@ const PriceConverter = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold">Price Converter</h1>
+      <h1 className="text-2xl font-bold">Withdraw balance</h1>
       <div className="mt-4">
         <label className="block mb-2">USD:</label>
         <input

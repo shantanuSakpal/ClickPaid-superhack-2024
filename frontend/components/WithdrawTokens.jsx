@@ -10,7 +10,7 @@ const WithdrawTokens = () => {
     const [status, setStatus] = useState('');
     const [userId, setUserId] = useState("")
     const {data: session} = useSession();
-    const contractAddress = "0x8C992ba2293dd69dB74bE621F61fF9E14E76F262"
+    const contractAddress = "0x9620e836108aFE5F15c6Fba231DCCDb7853c5480"
     const {userData} = useContext(
         GlobalContext
     )

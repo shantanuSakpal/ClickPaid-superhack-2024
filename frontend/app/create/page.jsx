@@ -285,7 +285,7 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
                 value: ethers.parseEther(bountyRewardinEther.toString()),
                 method: "function createPost(string memory postId, uint256 bounty, uint256 numVoters, string memory userId, string[] memory optionIDs)",
                 params: [
-                    postId,
+                    post_id,
                     ethers.parseEther(bountyRewardinEther.toString()), // Convert bountyReward to Wei
                     numberOfVotes,
                     userId,

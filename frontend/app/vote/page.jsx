@@ -68,10 +68,10 @@ export default function Home() {
      */
 
     useEffect(() => {
-        if (session) {
+        if (userData) {
             fetchPosts();
         }
-    }, [selectedChain]);
+    }, [userData]);
 
     const handlePostClick = (postId) => {
         router.push(`/post/${postId}`);

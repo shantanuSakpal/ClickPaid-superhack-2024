@@ -1,146 +1,147 @@
+/**
+ *Submitted for verification at sepolia-optimm.etherscan.io on 2024-08-06
+*/
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 contract ThumbnailVoting {
 
     struct Post {
-        string postID; // Unique identifier for the post
-        address creator; // Address of the post creator
-        uint256 bounty; // Bounty amount in Wei
-        uint256 numVoters; // Number of unique voters
-        mapping(string => uint256) optionVotes; // Track votes per optionID
-        uint256 totalVotesCast; // Total votes cast
-        string[] peopleWhoVoted; // UserIDs of voters
+        address creator;
+        uint256 bounty;
+        uint256 numVoters;
+        mapping(string => uint256) optionVotes;  // Track votes per optionID
+        uint256 totalVotesCast;  // Total votes cast
+        string[] peopleWhoVoted;  // UserIDs of voters
     }
 
-    struct User {
-        string[] posts; // Array of post IDs
-        uint256 balance; // Balance in Wei
-        address userAddress; // User's address
+    mapping(string => Post) public posts;  // PostID => Post
+    mapping(string => uint256) public tokenBalance;  // UserID => TokenBalance
+    mapping(string => address) public userAddresses;  // UserID => UserAddress
+
+    uint256 public conversionRate = 100;
+    uint256 public ethToUsdRate = 2000;
+
+    event PostCreated(string postId, address creator, uint256 bounty, uint256 numVoters, string[] optionIDs);
+    event Voted(string postId, string userId, string optionID, uint256 reward);
+    event Withdrawn(string userId, uint256 ethAmount);
+
+    // Deposit ETH and convert to tokens for a user
+    function deposit(string memory userId, uint256 ethAmount) external payable {
+        require(msg.value == ethAmount, "ETH amount mismatch");
+
+        uint256 usdAmount = (ethAmount * ethToUsdRate) / 1 ether; // Convert Wei to USD
+        uint256 tokenAmount = usdAmount * conversionRate; // Convert USD to Tokens
+
+        // Update token balance for the user
+        tokenBalance[userId] += tokenAmount;
     }
 
-    mapping(string => User) public users; // Mapping from UserID to User object
-    mapping(string => Post) public posts; // Mapping from PostID to Post object
+    // Create a post with options and initialize vote counts
+    function createPost(string memory postId, uint256 bounty, uint256 numVoters, string memory userId, string[] memory optionIDs) external {
+        require(bounty > 0, "Bounty must be greater than zero");
+        require(numVoters > 0, "Number of voters must be greater than zero");
+        require(tokenBalance[userId] >= bounty, "Insufficient balance to create post");
 
-    event Withdrawn(address indexed user, uint256 amount);
-    event PostCreated(address indexed creator, string postID, uint256 bounty);
-    event Voted(address indexed voter, string postID, string optionID);
+        Post storage newPost = posts[postId];
+        newPost.creator = userAddresses[userId];
+        newPost.bounty = bounty;
+        newPost.numVoters = numVoters;
 
-    // Withdraw Wei from user account
-    function withdraw(string memory _userID, uint256 _amount, address payable _to) public {
-        require(_amount > 0, "Must withdraw a positive amount");
-        require(users[_userID].balance >= _amount, "Insufficient balance");
-
-        // Transfer the amount to the specified address
-        users[_userID].balance -= _amount; // Subtract the amount from the user's balance
-        _to.transfer(_amount); // Transfer the amount to the specified address
-        emit Withdrawn(_to, _amount);
-    }
-
-    // Create a new post
-    function createPost(
-        string memory _postID,
-        uint256 _bounty, // Amount in Wei
-        uint256 _numVoters,
-        string memory _userID,
-        string[] memory _optionIDs
-    ) public payable {
-        require(_bounty > 0, "Bounty must be greater than 0");
-        require(msg.value == _bounty, "Bounty amount must match the sent value");
-
-        Post storage newPost = posts[_postID];
-        newPost.postID = _postID;
-        newPost.creator = msg.sender; // Use msg.sender directly
-        newPost.bounty = _bounty;
-        newPost.numVoters = _numVoters;
-        newPost.totalVotesCast = 0;
-
-        // Add the post to the user's posts
-        users[_userID].posts.push(_postID);
-
-        // Add the options to the post
-        for (uint256 i = 0; i < _optionIDs.length; i++) {
-            newPost.optionVotes[_optionIDs[i]] = 0; // Initialize option votes to 0
+        // Initialize optionVotes
+        for (uint i = 0; i < optionIDs.length; i++) {
+            newPost.optionVotes[optionIDs[i]] = 0;
         }
 
-        emit PostCreated(newPost.creator, _postID, _bounty);
+        // Update user balance
+        tokenBalance[userId] -= bounty;
+
+        emit PostCreated(postId, userAddresses[userId], bounty, numVoters, optionIDs);
     }
 
+    // Record a vote for an option and update user's token balance
+    function vote(string memory postId, string memory userId, string memory optionID) external {
+        Post storage post = posts[postId];
 
-    function vote(string memory _postID, string memory _userID, string memory _optionID) public {
-        Post storage post = posts[_postID];
-        User storage voter = users[_userID];
+        // Add userID to the list of people who voted
+        post.peopleWhoVoted.push(userId);
 
-        // Check if the user has already voted
-        for (uint256 i = 0; i < post.peopleWhoVoted.length; i++) {
-            require(keccak256(abi.encodePacked(post.peopleWhoVoted[i])) != keccak256(abi.encodePacked(_userID)), "User has already voted");
+        // Add userID and address if not already present
+        if (userAddresses[userId] == address(0)) {
+            userAddresses[userId] = msg.sender;
         }
 
-        // Check if the total votes cast has reached the maximum number of voters
-        require(post.totalVotesCast < post.numVoters, "Maximum number of voters reached");
+        // Update vote count for the selected optionID
+        post.optionVotes[optionID]++;
+        post.totalVotesCast++;
 
-        // Record the vote
-        post.optionVotes[_optionID]++;
-        post.totalVotesCast++; // Increment the total votes cast
-        post.peopleWhoVoted.push(_userID); // Add UserID to the list of voters
-
-        // Calculate reward for the voter
+        // Update user's token balance
         uint256 reward = post.bounty / post.numVoters;
+        tokenBalance[userId] += reward;
 
-        // Update voter's balance
-        voter.balance += reward; // Increase voter's balance
-
-        emit Voted(voter.userAddress, _postID, _optionID);
+        emit Voted(postId, userId, optionID, reward);
     }
 
-    // Set the UserID for the user
-    function setUserID(string memory _userID) public {
-        users[_userID].userAddress = msg.sender; // Set the user's address
+    // Withdraw tokens and convert them to ETH
+    function withdraw(string memory userId, uint256 tokenAmount) external {
+        require(userAddresses[userId] == msg.sender, "Only the user can withdraw");
+        uint256 userTokenBalance = tokenBalance[userId];
+        require(userTokenBalance >= tokenAmount, "Insufficient token balance");
+
+        // Convert tokens to USD
+        uint256 usdAmount = tokenAmount / conversionRate;
+        // Convert USD to Wei
+        uint256 ethAmount = (usdAmount * 1 ether) / ethToUsdRate;
+
+        require(address(this).balance >= ethAmount, "Insufficient contract balance");
+
+        // Deduct tokens from the user's balance
+        tokenBalance[userId] -= tokenAmount;
+
+        // Transfer ETH to the user's address
+        payable(userAddresses[userId]).transfer(ethAmount);
+
+        emit Withdrawn(userId, ethAmount);
     }
 
-    // Fetch user balance in Wei
-    function fetchUserBalance(string memory _userID) public view returns (uint256) {
-        return users[_userID].balance; // Return balance in Wei
-    }
+    // Getter function to retrieve post details
+    function getPost(string memory postId) external view returns (address creator, uint256 bounty, uint256 numVoters, uint256 totalVotesCast, string[] memory peopleWhoVoted, string[] memory optionIDs, uint256[] memory optionVotes) {
+        Post storage post = posts[postId];
+        uint256 optionCount = 0;
 
-    // Get user details
-    function getUserDetails(string memory _userID) public view returns (string[] memory, uint256, address) {
-        User storage user = users[_userID];
-        return (user.posts, user.balance, user.userAddress); // Return user posts, balance in Wei, and address
-    }
-
-    // Get user posts
-    function getUserPosts(string memory _userID) public view returns (string[] memory) {
-        return users[_userID].posts; // Return user posts
-    }
-
-    // Get post details
-    function getPostDetails(string memory _postID) public view returns (
-        string memory postID,
-        address creator,
-        uint256 bounty,
-        uint256 numVoters,
-        uint256 totalVotesCast,
-        string[] memory peopleWhoVoted
-    ) {
-        Post storage post = posts[_postID];
-        postID = post.postID;
-        creator = post.creator;
-        bounty = post.bounty;
-        numVoters = post.numVoters;
-        totalVotesCast = post.totalVotesCast;
-        peopleWhoVoted = post.peopleWhoVoted; // Return the list of voters
-    }
-
-    // Get option votes for a post
-    function getOptionVotes(string memory _postID, string[] memory _optionIDs) public view returns (uint256[] memory) {
-        uint256[] memory votes = new uint256[](_optionIDs.length);
-        for (uint256 i = 0; i < _optionIDs.length; i++) {
-            votes[i] = posts[_postID].optionVotes[_optionIDs[i]]; // Get the votes for each option
+        // Calculate the number of options
+        for (uint i = 0; i < post.peopleWhoVoted.length; i++) {
+            string memory optionID = post.peopleWhoVoted[i];
+            if (post.optionVotes[optionID] > 0) {
+                optionCount++;
+            }
         }
-        return votes; // Return the array of votes
+
+        // Create arrays for options and votes
+        string[] memory options = new string[](optionCount);
+        uint256[] memory votes = new uint256[](optionCount);
+        uint256 index = 0;
+
+        for (uint i = 0; i < post.peopleWhoVoted.length; i++) {
+            string memory optionID = post.peopleWhoVoted[i];
+            if (post.optionVotes[optionID] > 0) {
+                options[index] = optionID;
+                votes[index] = post.optionVotes[optionID];
+                index++;
+            }
+        }
+
+        return (post.creator, post.bounty, post.numVoters, post.totalVotesCast, post.peopleWhoVoted, options, votes);
     }
 
-    // Fallback function to receive Ether
-    receive() external payable {}
+    // Getter function to retrieve user's token balance
+    function getTokenBalance(string memory userId) external view returns (uint256) {
+        return tokenBalance[userId];
+    }
+
+    // Getter function to retrieve user's address
+    function getUserAddress(string memory userId) external view returns (address) {
+        return userAddresses[userId];
+    }
 }

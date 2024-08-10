@@ -8,17 +8,16 @@ import Transactions from '@components/users/Transactions'; // Renamed to Transac
 import Votes from '@components/users/Votes'; // New component for Votes
 import Posts from '@components/users/Posts';
 import DepositEth from "@components/DepositEth";
-import { useDisconnect, useActiveWallet } from "thirdweb/react";
+import {useDisconnect, useActiveWallet} from "thirdweb/react";
 import {Toaster} from "react-hot-toast";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
 
 function Page() {
-    const { disconnect } = useDisconnect();
+    const {disconnect} = useDisconnect();
     const wallet = useActiveWallet();
     const {data: session} = useSession();
     const {userData, setUserData, selectedChain, setSelectedChain} = useContext(GlobalContext);
-    const userId = userData.id;
     const [activeTab, setActiveTab] = useState('Posts');
     const [nameInitials, setNameInitials] = useState('');
     const handleTabChange = (key) => {
@@ -30,8 +29,8 @@ function Page() {
     const handleSignOut = async () => {
         setLoading(true);
         localStorage.removeItem('user');
-        if(wallet)
-            await  disconnect(wallet);
+        if (wallet)
+            await disconnect(wallet);
         await signOut({callbackUrl: 'http://localhost:3000/'})
         setLoading(false)
     }
@@ -41,7 +40,7 @@ function Page() {
             const initials = userData.name.split(' ').map((n) => n[0]).join('');
             setNameInitials(initials);
         }
-    }, []);
+    }, [userData]);
 
     return (
         <div className='px-20 min-h-screen'>
@@ -70,23 +69,26 @@ function Page() {
                 </button>
             </div>
             {/* Tabs Component */}
-            <div className="flex w-full  flex-col justify-center">
-                <Tabs aria-label="Options" onChange={handleTabChange}>
-                    <Tab key="Posts" className='min-w-[15vh]' title="Posts">
-                        <Posts/>
-                    </Tab>
-                    <Tab key="Balances" className='min-w-[15vh]' title="Balances">
-                        <Balances userId={userId}/>
-                    </Tab>
-                    <Tab key="Transactions" className='min-w-[15vh]' title="Transactions">
-                        <Transactions/>
-                    </Tab>
-                    {/*<Tab key="Votes" className='min-w-[15vh]' title="Votes">*/}
-                    {/*    <Votes />*/}
-                    {/*</Tab>*/}
+            {
+                userData &&
+                <div className="flex w-full  flex-col justify-center">
+                    <Tabs aria-label="Options" onChange={handleTabChange}>
+                        <Tab key="Posts" className='min-w-[15vh]' title="Posts">
+                            <Posts/>
+                        </Tab>
+                        <Tab key="Balances" className='min-w-[15vh]' title="Balances">
+                            <Balances userId={userData.id}/>
+                        </Tab>
+                        <Tab key="Transactions" className='min-w-[15vh]' title="Transactions">
+                            <Transactions/>
+                        </Tab>
+                        {/*<Tab key="Votes" className='min-w-[15vh]' title="Votes">*/}
+                        {/*    <Votes />*/}
+                        {/*</Tab>*/}
 
-                </Tabs>
-            </div>
+                    </Tabs>
+                </div>
+            }
         </div>
     );
 }

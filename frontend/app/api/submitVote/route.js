@@ -6,11 +6,11 @@ import abi from "@/app/abis/abi.json";
 
 // Define contract addresses for different chains
 const contractAddresses = {
-    'op-sepolia': '0x8C992ba2293dd69dB74bE621F61fF9E14E76F262',
-    'base-sepolia': '0x26ed997929235be85c7a2d54ae7c60d91e443ea1',
-    'metal-l2': '0x821ec6aeef9da466eac1f297d29d81251f50c50f',
-    'mode-testnet': '0x821EC6AeEf9DA466eac1f297D29d81251F50C50F',
-};
+    "base-sepolia": "0x26ed997929235be85c7a2d54ae7c60d91e443ea1",
+    "op-sepolia": "0x9620e836108aFE5F15c6Fba231DCCDb7853c5480",
+    "mode-testnet": "0x821EC6AeEf9DA466eac1f297D29d81251F50C50F",
+    "metal-l2": "0x821EC6AeEf9DA466eac1f297D29d81251F50C50F",
+}
 
 // Define web3 provider URLs for different chains
 const providerUrls = {
@@ -57,7 +57,7 @@ export async function POST(request) {
     if (!request) {
         return new NextResponse('No request object', { status: 400 });
     }
-    
+
     try {
         const { userId, optionId, postId, reward, chain } = await request.json();
 

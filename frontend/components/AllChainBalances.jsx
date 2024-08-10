@@ -12,8 +12,6 @@ const chains = [
 
 const AllChainBalances = ({ userId }) => {
     const [balances, setBalances] = useState({});
-    const [withdrawButtonClicked, setWithdrawButtonClicked] = useState({});
-    const [withdrawAmount, setWithdrawAmount] = useState({});
     const [ethPrice, setEthPrice] = useState(0); // Assuming you have a way to fetch ETH price
 
     useEffect(() => {
@@ -24,6 +22,7 @@ const AllChainBalances = ({ userId }) => {
         if (!userId) return;
 
         try {
+            console.log("Fetching balances for user:", userId);
             const response = await fetch('/api/fetchUserChainBalances', {
                 method: 'POST',
                 headers: {
@@ -45,20 +44,11 @@ const AllChainBalances = ({ userId }) => {
     };
 
 
-    const handleWithdrawClick = (chainKey) => {
-        setWithdrawButtonClicked((prev) => ({ ...prev, [chainKey]: !prev[chainKey] }));
-        setWithdrawAmount((prev) => ({ ...prev, [chainKey]: '' })); // Reset amount
-    };
 
     const handleWithdraw = async (chainKey) => {
-        const amountInUSD = parseFloat(withdrawAmount[chainKey]);
-        if (isNaN(amountInUSD) || amountInUSD <= 0) {
-            toast.error("Please enter a valid amount.");
-            return;
-        }
-
-        // Convert USD to Wei
-        const amountInWei = (amountInUSD / ethPrice) * 1e18; // Assuming ethPrice is in USD
+        console.log("Withdraw amount in chain:", chainKey);
+        const amountToWithdraw = balances[chainKey].wei;
+        console.log("Amount to withdraw:", amountToWithdraw);
 
         try {
             const response = await fetch('/api/withdrawUserBalance', {
@@ -68,7 +58,7 @@ const AllChainBalances = ({ userId }) => {
                 },
                 body: JSON.stringify({
                     userId,
-                    amount: amountInWei.toString(),
+                    amount: amountToWithdraw.toString(),
                     chain: chainKey,
                 }),
             });
@@ -99,27 +89,14 @@ const AllChainBalances = ({ userId }) => {
                         <p className="font-semibold">{chain.name}</p>
                     </div>
                     <div className="flex items-center space-x-4">
-                        {withdrawButtonClicked[chain.key] ? (
                             <>
-                                <Input
-                                    type="number"
-                                    placeholder="0.00"
-                                    labelPlacement="outside"
-                                    value={withdrawAmount[chain.key] || ''}
-                                    onChange={(e) => setWithdrawAmount((prev) => ({ ...prev, [chain.key]: e.target.value }))}
-                                />
+
                                 <ButtonGroup>
                                     <Button color="default" className="rounded-xl" onClick={() => handleWithdraw(chain.key)}>Withdraw</Button>
                                 </ButtonGroup>
                             </>
-                        ) : (
-                            <>
-                                <p className="font-medium">{balances[chain.key]?.usd ? `$${balances[chain.key].usd}` : '$0.00'}</p>
-                                <ButtonGroup>
-                                    <Button color="default" className="rounded-xl" onClick={() => handleWithdrawClick(chain.key)}>Withdraw</Button>
-                                </ButtonGroup>
-                            </>
-                        )}
+
+
                     </div>
                 </div>
             ))}
