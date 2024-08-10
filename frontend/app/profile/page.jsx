@@ -77,7 +77,7 @@ function Page() {
                             <Posts/>
                         </Tab>
                         <Tab key="Balances" className='min-w-[15vh]' title="Balances">
-                            <Balances userId={userData.id}/>
+                            <Balances userId={userData.id} />
                         </Tab>
                         <Tab key="Transactions" className='min-w-[15vh]' title="Transactions">
                             <Transactions/>
