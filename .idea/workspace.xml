@@ -5,22 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitmodules" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/contracts_foundry/.github/workflows/test.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/contracts_foundry/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/contracts_foundry/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/contracts_foundry/foundry.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/contracts_foundry/lib/forge-std" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/contracts_foundry/src/ThumbnailVoting.sol" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/contracts_foundry/test/ThumbnailVoting.t.sol" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/abis/abi.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/abis/abi.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/api/fetchUserChainBalances/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/fetchUserChainBalances/route.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/app/api/submitVote/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/submitVote/route.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/app/api/withdrawUserBalance/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/withdrawUserBalance/route.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/app/create/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/create/page.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/vote/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/vote/page.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/AllChainBalances.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/AllChainBalances.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,7 +112,8 @@
       <workItem from="1723262085760" duration="18482000" />
       <workItem from="1723289960219" duration="19000" />
       <workItem from="1723300264857" duration="2756000" />
-      <workItem from="1723304352823" duration="2198000" />
+      <workItem from="1723304352823" duration="4733000" />
+      <workItem from="1723310292526" duration="1968000" />
     </task>
     <servers />
   </component>

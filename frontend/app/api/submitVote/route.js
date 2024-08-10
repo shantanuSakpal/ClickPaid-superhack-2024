@@ -40,16 +40,26 @@ const addVoteToBlockchain = async (chain, postId, userId, optionId, privateKey) 
     const fromAddress = web3.eth.accounts.privateKeyToAccount(privateKey).address;
     const contract = getContractInstance(chain);
 
+
     const transactionObject = {
         from: fromAddress,
         to: contract.options.address,
         data: contract.methods.vote(postId, userId, optionId).encodeABI(),
-        gas: 2000000,
+
+    };
+    // Estimate gas limit
+    const estimatedGas = await web3.eth.estimateGas(transactionObject);
+
+    // Create the transaction with estimated gas limit
+    const txWithGas = {
+        ...transactionObject,
+        gas: estimatedGas,
         maxFeePerGas: web3.utils.toWei('50', 'gwei'),
         maxPriorityFeePerGas: web3.utils.toWei('10', 'gwei'),
     };
 
-    const signedTx = await web3.eth.accounts.signTransaction(transactionObject, privateKey);
+
+    const signedTx = await web3.eth.accounts.signTransaction(txWithGas, privateKey);
     const txReceipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
     return txReceipt;
 };

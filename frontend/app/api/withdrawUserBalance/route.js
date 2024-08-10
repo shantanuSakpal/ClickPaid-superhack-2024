@@ -25,15 +25,24 @@ export async function POST(request) {
         if (!userId || !amount || !chain || !userAddress) {
             return new NextResponse('User ID, amount, chain, and user address are required', { status: 400 });
         }
-        
+        // Get the contract account
+        const privateKey = process.env.NEXT_PRIVATE_KEY;
+        if (!privateKey) {
+            console.error("Private key is missing.");
+            return;
+        }
+
+
+
         console.log("Amount", amount)
         // Initialize Web3 and contract
         const web3 = new Web3(new Web3.providers.HttpProvider(providerUrls[chain]));
         const contract = new web3.eth.Contract(abi, contractAddresses[chain]);
-
+        const contractAccount = web3.eth.accounts.privateKeyToAccount(privateKey);
+        const fromAddress = contractAccount.address;
         // Create the transaction for withdrawal
         const tx = {
-            from: userAddress,
+            from: fromAddress,
             to: contractAddresses[chain],
             data: contract.methods.withdraw(userId, amount.toString(16), userAddress).encodeABI(),
         };
@@ -49,12 +58,12 @@ export async function POST(request) {
             maxPriorityFeePerGas: web3.utils.toWei('10', 'gwei'),
         };
 
-        // Sign and send the transaction
-        const privateKey = process.env.NEXT_PRIVATE_KEY; // Ensure your private key is securely stored
+        console.log("txWithGas", txWithGas)
+
         const signedTx = await web3.eth.accounts.signTransaction(txWithGas, privateKey);
         const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
-        return NextResponse.json({ success: true, receipt });
+        return NextResponse.json({ success: true });
     } catch (error) {
         console.error("Error processing withdrawal:", error);
         return new NextResponse('Failed to process withdrawal', { status: 500 });

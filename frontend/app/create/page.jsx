@@ -478,6 +478,7 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
             if (receipt.status === 'success') {
                 setTxnVerified(true);
                 toast.success("Transaction confirmed!");
+                handleSubmit();
             }
             else {
                 toast.error("Transaction failed");
