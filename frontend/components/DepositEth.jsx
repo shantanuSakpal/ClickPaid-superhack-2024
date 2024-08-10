@@ -1,15 +1,16 @@
-import {useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import Web3 from 'web3';
 import abi from "@/app/abis/abi";
 import {useSession} from "next-auth/react";
 import {toast} from "react-hot-toast";
+import {GlobalContext} from "@/app/contexts/UserContext";
 
 const DepositForm = () => {
     const [ethAmount, setEthAmount] = useState('');
     const [status, setStatus] = useState('');
     const [userId, setUserId] = useState("")
     const {data: session} = useSession();
-
+    const {userData} = useContext(GlobalContext);
     const handleDeposit = async (e) => {
         e.preventDefault();
         setStatus('Processing...');
@@ -55,10 +56,10 @@ const DepositForm = () => {
     };
 
     useEffect(() => {
-        if (session) {
-            setUserId(session?.user.id)
+        if (userData) {
+            setUserId(userData.id)
         }
-    }, [session]);
+    }, [userData]);
     return (
         <div className="p-5 mt-5 flex flex-col gap-3 border-2 rounded ">
             <h2 className="text-lg font-bold">Deposit ETH</h2>
@@ -76,7 +77,9 @@ const DepositForm = () => {
                         required
                     />
                 </div>
-                <button className="px-4 py-2 rounded bg-theme-blue-light hover:bg-theme-blue text-white" type="submit">Deposit</button>
+                <button className="px-4 py-2 rounded bg-theme-blue-light hover:bg-theme-blue text-white"
+                        type="submit">Deposit
+                </button>
             </form>
             {status && <p>{status}</p>}
         </div>

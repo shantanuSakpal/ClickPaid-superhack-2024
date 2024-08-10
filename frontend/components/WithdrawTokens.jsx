@@ -1,8 +1,9 @@
-import {useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import Web3 from 'web3';
 import abi from "@/app/abis/abi";
 import {useSession} from "next-auth/react";
 import {toast} from "react-hot-toast";
+import {GlobalContext} from "@/app/contexts/UserContext";
 
 const WithdrawTokens = () => {
     const [tokenAmt, setTokenAmt] = useState('');
@@ -10,7 +11,9 @@ const WithdrawTokens = () => {
     const [userId, setUserId] = useState("")
     const {data: session} = useSession();
     const contractAddress = "0x8C992ba2293dd69dB74bE621F61fF9E14E76F262"
-
+    const {userData} = useContext(
+        GlobalContext
+    )
     const handleWithdrawTokens = async (e) => {
         e.preventDefault();
         setStatus('Processing...');
@@ -19,10 +22,7 @@ const WithdrawTokens = () => {
             toast.error("No user or user address");
             return;
         }
-        if (tokenAmt > session.user.tokens.realTokenBalance) {
-            toast.error("Not enough tokens!");
-            return;
-        }
+
         try {
             // Connect to Web3
             const web3 = new Web3(new Web3.providers.HttpProvider('https://optimism-sepolia.infura.io/v3/b725fe7c53164e5da34a10cc350877c4'));
@@ -61,10 +61,10 @@ const WithdrawTokens = () => {
     };
 
     useEffect(() => {
-        if (session) {
-            setUserId(session?.user.id)
+        if (userData) {
+            setUserId(userData.id)
         }
-    }, [session]);
+    }, [userData]);
     return (
         <div className="p-5 mt-5 flex flex-col gap-3 border-2 rounded ">
             <h2 className="text-lg font-bold">Withdraw tokens ETH</h2>

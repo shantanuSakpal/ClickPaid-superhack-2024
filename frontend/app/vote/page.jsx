@@ -8,7 +8,7 @@ import {ChevronDownIcon} from "@heroicons/react/20/solid";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
 import SwitchChains from "@components/SwitchChains";
-import {useActiveAccount} from "thirdweb/react";
+import {useActiveAccount, useActiveWallet} from "thirdweb/react";
 import ConnectWallet from "@components/ConnectWallet";
 
 export default function Home() {
@@ -16,8 +16,9 @@ export default function Home() {
     const [posts, setPosts] = useState([]);
     const {data: session} = useSession();
     const [loading, setLoading] = useState(false);
-    const {selectedChain, setSelectedChain} = useContext(GlobalContext);
+    const {userData, selectedChain, setSelectedChain} = useContext(GlobalContext);
     const activeAccount = useActiveAccount();
+    const activeWallet = useActiveWallet()
     const fetchPosts = async () => {
         try {
             setLoading(true);
@@ -25,7 +26,7 @@ export default function Home() {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    userId: session.user.id,
+                    userId: userData.id,
                 }), // Send body as JSON
             });
             if (!response.ok) {
@@ -175,7 +176,7 @@ export default function Home() {
                                 ))}
                             </div>
                         ) : (
-                            session ? (!activeAccount ?
+                            session ? (!activeWallet ?
                                   <div className="w-full">
                                       <ConnectWallet title="Connect wallet to start voting!"/>
                                   </div>:

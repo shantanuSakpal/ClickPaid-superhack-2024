@@ -258,7 +258,7 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
                 ...formState,
                 selectedChain: selectedChain,
                 selectedChainId: selectedChain.id,
-                userId: session.user.id,
+                userId: userData.id,
                 options: uploadedImages,
                 isDone: false,
                 id: post_id,
@@ -337,7 +337,7 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
             if (!imageRef) {
                 throw new Error('Failed to save image');
             }
-            const userRef = doc(db, 'users', session.user.id);
+            const userRef = doc(db, 'users', userData.id);
             const userSnap = await getDoc(userRef);
             if (!userSnap.exists()) {
                 toast.error("User not found")
@@ -366,7 +366,7 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
         try {
             setLoading(true);
             // Check user before proceeding
-            const userRef = doc(db, "users", session.user.id);
+            const userRef = doc(db, "users", userData.id);
             const userSnap = await getDoc(userRef);
             if (!userSnap.exists()) {
 

@@ -84,5 +84,5 @@ export default function SwitchChains() {
 
   // console.log("activeChain", activeChain);
 
-  return <div className="hover:cursor-pointer bg-black hover:bg-theme-gray-dark text-white font-bold rounded-lg px-3 py-2" onClick={handleClick}> Switch Network </div>;
+  return <div className="hover:cursor-pointer border hover:bg-gray-300 bg-gray-200 text-black font-bold rounded-lg px-3 py-2" onClick={handleClick}> Switch Network </div>;
 }

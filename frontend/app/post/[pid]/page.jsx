@@ -59,8 +59,8 @@ const Layout = () => {
             });
             const data = await response.json();
             //check if curr user is post owner
-                console.log(data.userId, session?.user.id)
-            if (data.userId === session?.user.id) {
+                console.log(data.userId, userData.id)
+            if (data.userId === userData.id) {
                 setIsOwner(true);
             }
             setPost(data);
@@ -92,7 +92,7 @@ const Layout = () => {
         try {
             setSubmitting(true);
             const body = {
-                userId: session.user.id,
+                userId: userData.id,
                 postId: postId,
                 optionId: selectedOptionId,
                 reward: reward,
@@ -127,10 +127,10 @@ const Layout = () => {
     }
 
     useEffect(() => {
-        if(session){
+        if(userData){
             fetchPost();
         }
-    }, []);
+    }, [userData]);
 
     return (
         <div className="min-h-screen text-black">

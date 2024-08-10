@@ -86,7 +86,7 @@ function ConnectWallet({title}) {
             <ConnectButton
                 chains={[optimismSepolia, baseSepolia, modeTestnet, metalL2Testnet]}
                 wallets={wallets}
-                client={client} theme="dark"
+                client={client} theme="light"
                 onConnect={(wallet) => {
                     console.log("Connected to wallet", wallet.getChain());
                     //set the selected chain by matching name

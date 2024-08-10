@@ -1,15 +1,5 @@
 import NextAuth from "next-auth";
-import {db} from '@/app/_lib/fireBaseConfig';
-import {doc, getDoc, setDoc} from 'firebase/firestore';
-import {adjectives, animals, uniqueNamesGenerator} from 'unique-names-generator';
 
-// Configuration for name generation
-const nameConfig = {
-    dictionaries: [adjectives, animals],
-    separator: ' ',
-    length: 2,
-    style: 'capital'
-};
 
 export const authOptions = {
     providers: [
@@ -40,43 +30,7 @@ export const authOptions = {
             token.userRole = "admin";
             return token;
         },
-        async session({ session, token }) {
-            const userRef = doc(db, "users", token.sub);
-            const userSnap = await getDoc(userRef);
 
-            if (!userSnap.exists()) {
-                // Generate a random name
-                const randomName = uniqueNamesGenerator(nameConfig);
-
-                // Create a new user document in Firestore
-                await setDoc(userRef, {
-                    id: token.sub,
-                    name: randomName,
-                    walletAddress: "",
-                    posts: [],
-                    votes: [],
-                    payouts: [],
-                    aiGeneratedImages: [],
-                    rewards:0,
-                    // Add any other fields you want to store
-                });
-
-                // Update the session with the generated name
-                session.user.name = randomName;
-                session.user.id = token.sub;
-                session.rewards = 0;
-
-            } else {
-                // Retrieve user data from Firestore
-                const userData = userSnap.data();
-                session.user.name = userData.name;
-                session.user.id = userData.id;
-                session.user.rewards = userData.rewards;
-
-            }
-
-            return session;
-        },
 
     },
     debug: true,

@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "@components/LoadingSpinner";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
+import {GlobalContext} from "@/app/contexts/UserContext";
 
 function Page() {
     const { data: session } = useSession();
@@ -11,6 +12,7 @@ function Page() {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const {userData, setUserData, selectedChain, setSelectedChain} = useContext(GlobalContext);
 
     const fetchPosts = async () => {
         try {
@@ -19,7 +21,7 @@ function Page() {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    userId: session.user.id
+                    userId: userData.id
                 }), // Send body as JSON
             });
             if (!response.ok) {
