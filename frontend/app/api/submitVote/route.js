@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from '@/app/_lib/fireBaseConfig';
 import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import Web3 from 'web3';
-import abi from "@/app/abis/abi.json";
+import abi from "@/app/abis/abi";
+;
 
 // Define contract addresses for different chains
 const contractAddresses = {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Web3 from 'web3';
-import abi from "@/app/abis/abi.json"; // Ensure this path is correct
+import abi from "@/app/abis/abi";
+; // Ensure this path is correct
 
 // Define contract addresses and provider URLs for different chains
 const contractAddresses = {
