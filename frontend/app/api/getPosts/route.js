@@ -30,6 +30,8 @@ export async function POST(request) {
         filteredPosts = filteredPosts.filter(post => !post.done);
         //sort by bountyReward
         filteredPosts.sort((a, b) => b.bountyReward - a.bountyReward);
+        //sort by time of creation, date is like 2024-08-11T10:43:11.039Z
+        filteredPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
         // //filter posts from selected chain
         // filteredPosts = filteredPosts.filter(post => post.selectedChainId === selectedChainId);
         return new NextResponse(JSON.stringify(filteredPosts), {
