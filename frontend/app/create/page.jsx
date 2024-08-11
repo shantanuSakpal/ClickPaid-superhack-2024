@@ -2,14 +2,10 @@
 import React, {useEffect, useState} from 'react';
 import {toast} from 'react-hot-toast';
 import {uploadImage} from '@/app/_utils/uploadImages';
-import {collection, addDoc, doc, getDoc, setDoc} from 'firebase/firestore';
+import {updateDoc, arrayUnion, doc, getDoc, setDoc} from 'firebase/firestore';
 import Image from "next/image";
 import {FaCloudUploadAlt} from "react-icons/fa";
-import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
-import {ChevronDownIcon} from "@heroicons/react/20/solid";
 import {useSession, signIn} from "next-auth/react"
-import Web3 from 'web3';
-import abi from "@/app/abis/abi";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
 import SwitchChains from "@components/SwitchChains";
@@ -50,7 +46,7 @@ function Page() {
 
     const [images, setImages] = useState([]);
     const [imageFiles, setImageFiles] = useState([]); // Store file references
-    const [aiGeneratedImages, setAiGeneratedImages] = useState([]);
+    const [aiGeneratedImage, setAiGeneratedImage] = useState(null);
     const [generatingImage, setGeneratingImage] = useState(false);
     const [uploadingImages, setUploadingImages] = useState(false)
     const [userAddress, setUserAddress] = useState('');
@@ -60,7 +56,10 @@ function Page() {
     const [postData, setPostData] = useState(null);
     const [gettingLiveEthPrice, setGettingLiveEthPrice] = useState(false);
     const [txnVerified, setTxnVerified] = useState(false);
-const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
+    const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
+    const [gettingAiImages, setGettingAiImages] = useState(false)
+    const [prevAiGenImgs, setPrevAiGenImgs] = useState([])
+    const [idsArray, setIdsArray] = useState([])
 
     const contractAddresses = {
         "base-sepolia": "0x26ed997929235be85c7a2d54ae7c60d91e443ea1",
@@ -121,14 +120,6 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
         setImageFiles(prevFiles => [...prevFiles, ...files].slice(0, 4)); // Append new files and ensure the total count doesn't exceed 4
     };
 
-    const addAIgeneratedImageToImageArray = (base64string) => {
-        const blob = base64ToBlob(base64string);
-        const file = new File([blob], 'image.png', {type: 'image/png'});
-        setImageFiles((prevFiles) => [...prevFiles, file]);
-        //scroll to top smoothly
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    };
-
     const base64ToBlob = (base64string) => {
         const bytes = atob(base64string.split(',')[1]);
         const array = [];
@@ -136,6 +127,15 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
             array.push(bytes.charCodeAt(i));
         }
         return new Blob([new Uint8Array(array)], {type: 'image/png'});
+    };
+
+    const addAIgeneratedImageToImageArray = (base64string) => {
+        console.log("base 64 string", base64string)
+        const blob = base64ToBlob(base64string);
+        const file = new File([blob], 'image.png', {type: 'image/png'});
+        setImageFiles((prevFiles) => [...prevFiles, file]);
+        //scroll to top smoothly
+        window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
     const handleImageRemove = (index) => {
@@ -175,32 +175,58 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
         return true;
     };
 
-    const uploadImages = async () => {
-        setUploadingImages(true)
-        const uploadedImages = await Promise.all(
-            imageFiles.map(async (file) => {
-                const url = await uploadImage(file);
-                if (!url) return null;
-
-                return {
-                    id: Math.random().toString(36).substring(2, 9),
-                    imageUrl: url,
-                    votes: 0,
-                };
-            })
-        );
-        if (uploadedImages.some((image) => !image)) {
-            setUploadingImages(false)
-            return [];
+    const generateUniqueIds = (length) => {
+        let ids_array = [];
+        for (let i = 0; i < length; i++) {
+            let id = Math.random().toString(36).substring(2, 9);
+            // Ensure the ID is unique within the array
+            while (ids_array.includes(id)) {
+                id = Math.random().toString(36).substring(2, 9);
+            }
+            ids_array.push(id);
         }
-        // toast.success("Images Uploaded Successfully");
-        setUploadingImages(false);
-        return uploadedImages.filter((image) => image);
+        return ids_array;
     };
+
+    const uploadImages = async (idsArray) => {
+        // idsArray is like = ["id1", "id2", ...]
+        setUploadingImages(true);
+        const uploadedImages = [];
+
+        for (let i = 0; i < idsArray.length; i++) {
+            const id = idsArray[i];
+            const file = imageFiles[i]; // Assuming imageFiles is an array of files
+
+            let url;
+
+            // Check if the file is already a Firebase URL
+            if (typeof file === 'string') {
+                url = file;
+            } else {
+                // If not a Firebase URL, upload the file
+                url = await uploadImage(file);
+                if (!url) {
+                    uploadedImages.push(null); // Push null if upload fails
+                    continue;
+                }
+            }
+
+            uploadedImages.push({
+                id,
+                imageUrl: url,
+                votes: 0,
+            });
+        }
+
+        // Don't forget to set uploadingImages to false when done
+        setUploadingImages(false);
+
+        return uploadedImages;
+    }
 
     const convertUsdToWei = async (usdAmount) => {
         if (!usdAmount || isNaN(usdAmount) || usdAmount <= 0) {
-            // console.log("Invalid amount");
+            console.log("Invalid amount");
             return;
         }
 
@@ -231,7 +257,6 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
         }
     };
 
-
     const addDataToBlockchain = async () => {
         // Validate the form inputs
         if (!validateForm()) {
@@ -242,13 +267,10 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
         try {
             setVerifyingTxn(true);
 
-            // Upload images to Firebase and get URLs
-            const uploadedImages = await uploadImages();
-            if (uploadedImages.length === 0) {
-                toast.error("Could not upload images");
-                setLoading(false);
-                return;
-            }
+            //make optionId array using the length of imageFiles to be uploaded
+            const optionIds = generateUniqueIds(imageFiles.length);
+            setIdsArray(optionIds)
+
 
             //post id is random 6 digit string alphanumeric
             const post_id = Math.random().toString(36).substring(2, 8);
@@ -259,18 +281,18 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
                 selectedChain: selectedChain,
                 selectedChainId: selectedChain.id,
                 userId: userData.id,
-                options: uploadedImages,
+                options: optionIds,
                 isDone: false,
                 id: post_id,
                 date: new Date().toISOString(),
             };
-            // console.log("postData", post_data)
+            console.log("postData", post_data)
             setPostData(post_data);
             // Add data to blockchain
 
             const {bountyReward, userId, options, numberOfVotes} = post_data;
             const bountyRewardinEther = await convertUsdToWei(bountyReward);
-            // console.log("bountyRewardinEther", bountyRewardinEther)
+            console.log("bountyRewardinEther", bountyRewardinEther)
             //get chain using the selected chain name from chains
 
             const address = contractAddresses[selectedChain.id];
@@ -295,7 +317,7 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
 
             // Send the transaction
             const tx = await sendTx(transaction);
-            // console.log("tx---------------------", tx)
+            console.log("tx---------------------", tx)
             setTxHash(tx.transactionHash);
             setAwaitingConfirmation(true);
             setCurrChain(tx.chain)
@@ -327,16 +349,21 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
                 throw new Error('Failed to generate image');
             }
             const data = await response.json();
-            const newImage = `data:image/png;base64,${data.imageData}`;
+            const newImageBase64String = `data:image/png;base64,${data.imageData}`;
 
+            console.log("generated image base64 string", newImageBase64String)
+            const blob = base64ToBlob(newImageBase64String);
+            const file = new File([blob], 'image.png', {type: 'image/png'});
             // Update state with the new image
-            setAiGeneratedImages(prevImages => [...prevImages, newImage]);
+            setAiGeneratedImage(newImageBase64String);
 
             // Save the image to Firebase
-            const imageRef = await uploadImage(newImage);
+            const imageRef = await uploadImage(file);
             if (!imageRef) {
                 throw new Error('Failed to save image');
             }
+            console.log("image ref", imageRef)
+
             const userRef = doc(db, 'users', userData.id);
             const userSnap = await getDoc(userRef);
             if (!userSnap.exists()) {
@@ -344,11 +371,13 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
                 return;
             }
             const userDoc = userSnap.data();
-            // Update user document with generated image url
-            await setDoc(userRef, {
-                aiGeneratedImages: [...userDoc.aiGeneratedImages, imageRef],
-            }, {merge: true});
 
+            // Update user document with generated image url
+            await updateDoc(userRef, {
+                aiGeneratedImages: arrayUnion(imageRef)
+            });
+
+            setPrevAiGenImgs((prev) => [...prev, imageRef]);
 
         } catch (error) {
             console.error('Error generating image:', error);
@@ -358,12 +387,52 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
         }
     };
 
+    const fetchPreviousAIimages = async (userId) => {
+        console.log("fetching ai images...")
+        try {
+            setGettingAiImages(true);
+            const userRef = doc(db, 'users', userData.id);
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) {
+                toast.error("User not found")
+                return;
+            }
+            const userDoc = userSnap.data();
+            const imgArr = userDoc.aiGeneratedImages;
+            setPrevAiGenImgs(imgArr);
+            console.log("prev images", imgArr)
+        } catch (error) {
+            console.error('Error getting image:', error);
+            toast.error('Failed to get previous images');
+        } finally {
+            setGettingAiImages(false);
+        }
+    }
+
+    const handleAddImageToUploads = (imgUrl) => {
+        console.log("images added", imgUrl)
+        setImageFiles((prev) => [...prev, imgUrl])
+        //scroll to top smoothly
+        window.scrollTo({top: 0, behavior: 'smooth'});
+
+    }
+
     const handleSubmit = async () => {
-        if (!postData || !postId) {
+        if (!postData || !postId || !idsArray) {
             toast.error("Could not save post.");
             return;
         }
         try {
+
+            // Upload images to Firebase and get URLs
+            const uploadedImages = await uploadImages(idsArray);
+
+            if (uploadedImages.length === 0) {
+                toast.error("Could not upload images");
+                setLoading(false);
+                return;
+            }
+
             setLoading(true);
             // Check user before proceeding
             const userRef = doc(db, "users", userData.id);
@@ -380,13 +449,18 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
             const docRef = doc(db, 'posts', postId);
             const docSnap = await getDoc(docRef);
 
+            const updatedPostData = {
+                ...postData,
+                options: uploadedImages,
+            };
+
             if (!docSnap.exists()) {
                 // Document doesn't exist, so create it
-                await setDoc(docRef, postData, {merge: false});
-                // console.log("New post created with ID: ", postId);
+                await setDoc(docRef, updatedPostData, {merge: false});
+                console.log("New post created with ID: ", postId);
             } else {
                 // Document already exists
-                // console.log("A post with this ID already exists. Generating a new ID...");
+                console.log("A post with this ID already exists. Generating a new ID...");
                 throw new Error("Post ID already exists");
             }
             // Update user document with new post ID and token balances
@@ -396,6 +470,7 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
 
             toast.success("Post published successfully!");
             setTxnVerified(false);
+            setTxHash(null)
             // Reset form state
             setFormState({
                 title: '',
@@ -405,6 +480,7 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
                 selectedChain: selectedChain,
             });
             setImageFiles([]);
+            setIdsArray([])
         } catch (error) {
             console.error("Error handling submit:", error);
             toast.error("Could not save post.");
@@ -422,10 +498,17 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
         for (let i = 0; i < imageFiles.length; i++) {
             divs.push(
                 <div key={i} className="relative w-full pt-[56.25%] bg-gray-300 border border-gray-300 rounded">
-                    <Image src={URL.createObjectURL(imageFiles[i])} alt={`uploaded-${i}`}
-                           className="absolute inset-0 w-full h-full object-cover rounded"
-                           width={300} height={300}
-                    />
+                    {
+                        typeof imageFiles[i] === 'string' ? (
+                            <Image src={imageFiles[i]} alt={`uploaded-${i}`}
+                                   className="absolute inset-0 w-full h-full object-cover rounded"
+                                   width={300} height={300}
+                            />
+                        ) : (<Image src={URL.createObjectURL(imageFiles[i])} alt={`uploaded-${i}`}
+                                    className="absolute inset-0 w-full h-full object-cover rounded"
+                                    width={300} height={300}
+                        />)
+                    }
                     <button
                         onClick={() => handleImageRemove(i)}
                         className="absolute top-2 right-2 bg-white bg-opacity-50 rounded-full p-1"
@@ -470,21 +553,32 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
     useEffect(() => {
         if (selectedChain) {
             setCurrChain(chainNameToChain[selectedChain.id])
-            // console.log("selectedChain", selectedChain)
+            console.log("selectedChain", selectedChain)
         }
-        if (receipt) {
-            // console.log("Transaction confirmed:", receipt);
+
+    }, [selectedChain]);
+
+    useEffect(() => {
+        if (receipt && txHash) {
+            console.log("Transaction confirmed:", receipt);
             // Handle successful transaction confirmation
             if (receipt.status === 'success') {
                 setTxnVerified(true);
                 toast.success("Transaction confirmed!");
-            }
-            else {
+                handleSubmit();
+            } else {
                 toast.error("Transaction failed");
             }
             setAwaitingConfirmation(false);
-        }``
-    }, [receipt, selectedChain]);
+        }
+    }, [receipt])
+
+    useEffect(() => {
+        if (userData) {
+            fetchPreviousAIimages(userData.id);
+        }
+    }, [userData]);
+
     return (
         <div className="w-full">
             <div className="py-2 mb-5">
@@ -615,10 +709,18 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
                                     <button
                                         type="button"
                                         onClick={handleSubmit}
-                                        className={`w-full mt-4  font-semibold py-2 rounded-md  ${loading ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
+                                        className={`w-full mt-4  font-semibold py-2 rounded-md  ${loading || uploadingImages ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light text-white hover:bg-theme-blue"}`}
                                         disabled={loading}
                                     >
-                                        Publish Post
+                                        {
+                                            uploadingImages && "Uploading images..."
+                                        }
+                                        {
+                                            loading && "Publishing post..."
+                                        }
+                                        {
+                                            !uploadingImages && !loading && "Publish post"
+                                        }
                                     </button>
                                 ) : (
                                     <button
@@ -668,23 +770,21 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
                     <div className="flex  px-10 ">
                         {/* images container */}
                         <div className="w-7/12 p-4 ">
-                            {aiGeneratedImages.length > 0 ? (
+                            {aiGeneratedImage ? (
                                 <div className="grid grid-cols-1 gap-4">
-                                    {aiGeneratedImages.map((image, index) => (
-                                        <div key={index}
-                                             className="relative w-full pt-[56.25%] bg-gray-300  rounded hover:cursor-pointer border-4 border-transparent hover:border-theme-blue-light"
-                                             onClick={() => addAIgeneratedImageToImageArray(image)}
-                                        >
+                                    <div
+                                        className="relative w-full pt-[56.25%] bg-gray-300  rounded hover:cursor-pointer border-4 border-transparent hover:border-theme-blue-light"
+                                        onClick={() => addAIgeneratedImageToImageArray(aiGeneratedImage)}
+                                    >
 
-                                            <Image
-                                                src={image}
-                                                alt={`AI Generated Thumbnail ${index + 1}`}
-                                                className="absolute inset-0 w-full h-full object-cover rounded"
-                                                width={1024}
-                                                height={576}
-                                            />
-                                        </div>
-                                    ))}
+                                        <Image
+                                            src={aiGeneratedImage}
+                                            alt={`AI Generated Thumbnail`}
+                                            className="absolute inset-0 w-full h-full object-cover rounded"
+                                            width={1024}
+                                            height={576}
+                                        />
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="w-full flex justify-center items-center h-full bg-gray-300 rounded-lg">
@@ -732,7 +832,7 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
 
                                 <button
                                     type="submit"
-                                    className={`w-full mt-4 bg-theme-blue-light text-white font-semibold py-2 rounded-md  ${generatingImage ? "bg-gray-300 text-black cursor-not-allowed" : "hover:bg-theme-blue"}`}
+                                    className={`w-full mt-4 text-white font-semibold py-2 rounded-md  ${generatingImage ? "bg-gray-300 text-black cursor-not-allowed" : "bg-theme-blue-light"}`}
                                     disabled={generatingImage}
                                 >
                                     {generatingImage ? "Generating Image..." : "Generate New Thumbnail"}
@@ -744,7 +844,35 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
                             </form>
 
                         </div>
+
+
                     </div>
+                    {
+                        userData && (<div className="p-10 my-3">
+                            <h3 className="text-xl font-bold">{
+                                gettingAiImages ? "Fetching previous images..." : "Previously created images (click on any image to add to uploads)"
+                            }</h3>
+                            <div className="flex gap-3 w-full flex-wrap my-5">
+                                {
+                                    prevAiGenImgs && prevAiGenImgs.length > 0 ? (
+                                        prevAiGenImgs.map((imgUrl, ind) => {
+                                            return (
+                                                <div key={ind} className="rounded overflow-clip"
+                                                     onClick={() => {
+                                                         handleAddImageToUploads(imgUrl)
+                                                     }}>
+                                                    <Image src={imgUrl} alt="ai image" width={1024} height={720}
+                                                           className=" h-48 w-auto"/>
+                                                </div>)
+
+                                        })
+                                    ) : (
+                                        <div className="text-center">No images found!</div>
+                                    )
+                                }
+                            </div>
+                        </div>)
+                    }
                 </div>
             </div>
 

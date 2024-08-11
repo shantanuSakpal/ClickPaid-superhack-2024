@@ -1,67 +1,61 @@
-import {NextResponse} from "next/server";
-import axios from "axios";
-import FormData from "form-data";
+import { NextResponse } from "next/server";
+import fetch from 'node-fetch';
 
 export async function POST(request) {
-    const engineId = 'stable-diffusion-v1-6'
-    const apiHost = process.env.API_HOST ?? 'https://api.stability.ai'
-    const apiKey = process.env.NEXT_PUBLIC_STABILITY_API_KEY
-
     if (!request) {
-        return new NextResponse('No request object', {status: 400});
+        return new NextResponse('No request object', { status: 400 });
     }
-    if (!apiKey) throw new Error('Missing Stability API key.')
+
+    const apiKey = process.env.NEXT_PUBLIC_GETIMG_API_KEY;
+    if(!apiKey)
+        return new NextResponse('Api key not found', { status: 403 });
 
     try {
-        const {body} = await request.json(); // Receive body from JSON
-        console.log("body", body)
-
+        const { body } = await request.json(); // Receive body from JSON
+//userId = body.userId
         const basePrompt = `Create a visually striking and professional thumbnail image for a topic titled "${body.topic}". 
     The image should prominently feature the text "${body.text}" in an eye-catching, easy-to-read font. 
     ${body.description ? `Incorporate elements that represent: ${body.description}. ` : ''}
     The overall style should be modern, vibrant, and attention-grabbing, suitable for social media and online content. 
     Use a balanced color scheme that complements the topic and text. 
     Ensure the composition is clean and uncluttered, with a clear focal point.`;
+        console.log("prompt", basePrompt);
 
-        const payload = {
-            prompt: basePrompt,
-            output_format: "jpeg",
-            aspect_ratio: "16:9",
+        const url = 'https://api.getimg.ai/v1/flux-schnell/text-to-image';
+        const options = {
+            method: 'POST',
+            headers: {
+                accept: 'application/json',
+                'content-type': 'application/json',
+                authorization: `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                response_format: 'b64',
+                output_format: 'jpeg',
+                prompt: basePrompt,
+                width: 1024,
+                height: 720,
+                steps: 5
+            })
         };
 
-        const form = new FormData();
-        Object.keys(payload).forEach(key => form.append(key, payload[key]));
+        const response = await fetch(url, options);
+        const json = await response.json();
 
-        const response = await axios.post(
-            `https://api.stability.ai/v2beta/stable-image/generate/sd3`,
-            form,
-            {
-                validateStatus: undefined,
-                responseType: "arraybuffer",
-                headers: {
-                    Authorization: `Bearer ${apiKey}`,
-                    Accept: "image/*",
-                    ...form.getHeaders()
-                },
-            },
-        );
-
-        if(response.status === 200) {
-            const imageData = Buffer.from(response.data).toString('base64');
+        if (response.ok) {
             const frontendResponse = {
-                imageData: imageData,
-                width: 1024, // default width
-                height: 576, // default height
+                imageData: json.image, // Assuming the API returns the base64 image in the 'image' field
+
             };
             return new NextResponse(JSON.stringify(frontendResponse), {
                 status: 200,
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
             });
         } else {
-            throw new Error(`${response.status}: ${response.data.toString()}`);
+            throw new Error(`${response.status}: ${JSON.stringify(json)}`);
         }
     } catch (error) {
         console.error("Error generating image:", error.message);
-        return new NextResponse('Failed to generate image', {status: 500});
+        return new NextResponse('Failed to generate image', { status: 500 });
     }
 }

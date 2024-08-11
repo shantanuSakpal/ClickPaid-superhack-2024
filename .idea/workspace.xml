@@ -5,8 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/_utils/uploadImages.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/_utils/uploadImages.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/api/generateImageUsingAi/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/generateImageUsingAi/route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/create/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/create/page.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/components/BrandLogo.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/BrandLogo.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tailwind.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/next.config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/next.config.mjs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -111,7 +115,7 @@
       <workItem from="1723300264857" duration="2756000" />
       <workItem from="1723304352823" duration="4733000" />
       <workItem from="1723310292526" duration="3196000" />
-      <workItem from="1723345074353" duration="3209000" />
+      <workItem from="1723345074353" duration="15246000" />
     </task>
     <servers />
   </component>
