@@ -130,8 +130,11 @@ export default function Home() {
                                         onClick={() => handlePostClick(post.id)}
                                     >
 
-                                        <div className="w-10 absolute right-5 h-auto rounded-full overflow-clip">
-                                            <img src={post.selectedChain.image} alt=""/>
+                                        <div className=" flex flex-row gap-3 items-center  absolute right-5  rounded-full overflow-clip">
+                                            <img className="w-10 h-auto" src={post.selectedChain.image} alt=""/>
+                                            <div className="text-sm">
+                                                Created on {new Date(post.date).toLocaleDateString()} at {new Date(post.date).toLocaleTimeString()}
+                                            </div>
                                         </div>
                                         <h3 className="font-bold text-xl ">{post.title}</h3>
                                         <div className="mb-2">{post.description}</div>

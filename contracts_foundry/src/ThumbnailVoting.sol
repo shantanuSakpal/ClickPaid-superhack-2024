@@ -1,7 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract ThumbnailVoting {
+// Import the entropy SDK in order to interact with the entropy contracts
+import { IEntropyConsumer } from "@pythnetwork/entropy-sdk-solidity/IEntropyConsumer.sol";
+import { IEntropy } from "@pythnetwork/entropy-sdk-solidity/IEntropy.sol";
+
+
+library RandomNumberError {
+    error InsufficientBalance();
+}
+
+contract ThumbnailVoting is IEntropyConsumer {
+
+    IEntropy private entropy;
+    address private entropyProvider;
+
     struct Post {
         string postID; // Unique identifier for the post
         address creator; // Address of the post creator
@@ -24,13 +37,47 @@ contract ThumbnailVoting {
     event Withdrawn(address indexed user, uint256 amount);
     event PostCreated(address indexed creator, string postID, uint256 bounty);
     event Voted(address indexed voter, string postID, string optionID);
+    // Event emitted when the result of the coin flip is known.
+    event RandomNumberResult(uint64 sequenceNumber, bool isHeads);
+
+    constructor(address _entropy, address _entropyProvider) {
+        entropy = IEntropy(_entropy);
+        entropyProvider = _entropyProvider;
+    }
+
+    // Function to get a random number and flip a coin.
+    function getRandomNumber(bytes32 userRandomNumber) external {
+        uint256 fee = entropy.getFee(entropyProvider);
+        if (address(this).balance < fee) {
+            revert RandomNumberError.InsufficientBalance();
+        }
+
+        // Request the random number from the Entropy protocol.
+        uint64 sequenceNumber = entropy.requestWithCallback{value: fee}(
+            entropyProvider,
+            userRandomNumber
+        );
+
+        // The callback will emit the result.
+        emit RandomNumberResult(sequenceNumber, false); // Placeholder until the callback is executed.
+    }
+
+    // This method is required by the IEntropyConsumer interface.
+    function entropyCallback(
+        uint64 sequenceNumber,
+        address, // Not used in this implementation
+        bytes32 randomNumber
+    ) internal override {
+        emit RandomNumberResult(sequenceNumber, uint256(randomNumber) % 2 == 0);
+    }
+
+    // This method is required by the IEntropyConsumer interface.
+    function getEntropy() internal view override returns (address) {
+        return address(entropy);
+    }
 
     // Withdraw Wei from user account
-    function withdraw(
-        string memory _userID,
-        uint256 _amount,
-        address payable _to
-    ) public {
+    function withdraw(string memory _userID, uint256 _amount, address payable _to) public {
         require(_amount > 0, "Must withdraw a positive amount");
         require(users[_userID].balance >= _amount, "Insufficient balance");
 
@@ -49,10 +96,7 @@ contract ThumbnailVoting {
         string[] memory _optionIDs
     ) public payable {
         require(_bounty > 0, "Bounty must be greater than 0");
-        require(
-            msg.value == _bounty,
-            "Bounty amount must match the sent value"
-        );
+        require(msg.value == _bounty, "Bounty amount must match the sent value");
 
         Post storage newPost = posts[_postID];
         newPost.postID = _postID;
@@ -73,28 +117,18 @@ contract ThumbnailVoting {
         emit PostCreated(newPost.creator, _postID, _bounty);
     }
 
-    function vote(
-        string memory _postID,
-        string memory _userID,
-        string memory _optionID
-    ) public {
+
+    function vote(string memory _postID, string memory _userID, string memory _optionID) public {
         Post storage post = posts[_postID];
         User storage voter = users[_userID];
 
         // Check if the user has already voted
         for (uint256 i = 0; i < post.peopleWhoVoted.length; i++) {
-            require(
-                keccak256(abi.encodePacked(post.peopleWhoVoted[i])) !=
-                    keccak256(abi.encodePacked(_userID)),
-                "User has already voted"
-            );
+            require(keccak256(abi.encodePacked(post.peopleWhoVoted[i])) != keccak256(abi.encodePacked(_userID)), "User has already voted");
         }
 
         // Check if the total votes cast has reached the maximum number of voters
-        require(
-            post.totalVotesCast < post.numVoters,
-            "Maximum number of voters reached"
-        );
+        require(post.totalVotesCast < post.numVoters, "Maximum number of voters reached");
 
         // Record the vote
         post.optionVotes[_optionID]++;
@@ -116,42 +150,30 @@ contract ThumbnailVoting {
     }
 
     // Fetch user balance in Wei
-    function fetchUserBalance(
-        string memory _userID
-    ) public view returns (uint256) {
+    function fetchUserBalance(string memory _userID) public view returns (uint256) {
         return users[_userID].balance; // Return balance in Wei
     }
 
     // Get user details
-    function getUserDetails(
-        string memory _userID
-    ) public view returns (string[] memory, uint256, address) {
+    function getUserDetails(string memory _userID) public view returns (string[] memory, uint256, address) {
         User storage user = users[_userID];
         return (user.posts, user.balance, user.userAddress); // Return user posts, balance in Wei, and address
     }
 
     // Get user posts
-    function getUserPosts(
-        string memory _userID
-    ) public view returns (string[] memory) {
+    function getUserPosts(string memory _userID) public view returns (string[] memory) {
         return users[_userID].posts; // Return user posts
     }
 
     // Get post details
-    function getPostDetails(
-        string memory _postID
-    )
-        public
-        view
-        returns (
-            string memory postID,
-            address creator,
-            uint256 bounty,
-            uint256 numVoters,
-            uint256 totalVotesCast,
-            string[] memory peopleWhoVoted
-        )
-    {
+    function getPostDetails(string memory _postID) public view returns (
+        string memory postID,
+        address creator,
+        uint256 bounty,
+        uint256 numVoters,
+        uint256 totalVotesCast,
+        string[] memory peopleWhoVoted
+    ) {
         Post storage post = posts[_postID];
         postID = post.postID;
         creator = post.creator;
@@ -162,10 +184,7 @@ contract ThumbnailVoting {
     }
 
     // Get option votes for a post
-    function getOptionVotes(
-        string memory _postID,
-        string[] memory _optionIDs
-    ) public view returns (uint256[] memory) {
+    function getOptionVotes(string memory _postID, string[] memory _optionIDs) public view returns (uint256[] memory) {
         uint256[] memory votes = new uint256[](_optionIDs.length);
         for (uint256 i = 0; i < _optionIDs.length; i++) {
             votes[i] = posts[_postID].optionVotes[_optionIDs[i]]; // Get the votes for each option

@@ -25,6 +25,7 @@ contract ThumbnailVotingTest is Test {
         string[] memory optionIDs = new string[](2);
         optionIDs[0] = "option1";
         optionIDs[1] = "option2";
+        uint256 timeStamp = block.timestamp;
 
         vm.prank(user1);
         vm.deal(user1, 1 ether);
@@ -33,7 +34,8 @@ contract ThumbnailVotingTest is Test {
             bounty,
             numVoters,
             userID,
-            optionIDs
+            optionIDs,
+            timeStamp
         );
 
         (
@@ -60,6 +62,7 @@ contract ThumbnailVotingTest is Test {
         string[] memory optionIDs = new string[](2);
         optionIDs[0] = "option1";
         optionIDs[1] = "option2";
+        uint256 timeStamp = block.timestamp;
 
         vm.prank(user1);
         vm.deal(user1, 0.5 ether);
@@ -69,7 +72,8 @@ contract ThumbnailVotingTest is Test {
             bounty,
             numVoters,
             userID,
-            optionIDs
+            optionIDs,
+            timeStamp
         );
     }
 
@@ -81,6 +85,7 @@ contract ThumbnailVotingTest is Test {
         string[] memory optionIDs = new string[](2);
         optionIDs[0] = "option1";
         optionIDs[1] = "option2";
+        uint256 timeStamp = block.timestamp;
 
         vm.prank(user1);
         vm.deal(user1, 1 ether);
@@ -89,7 +94,8 @@ contract ThumbnailVotingTest is Test {
             bounty,
             numVoters,
             userID,
-            optionIDs
+            optionIDs,
+            timeStamp
         );
 
         string memory voterID = "voter1";
@@ -112,6 +118,7 @@ contract ThumbnailVotingTest is Test {
         string[] memory optionIDs = new string[](2);
         optionIDs[0] = "option1";
         optionIDs[1] = "option2";
+        uint256 timeStamp = block.timestamp;
 
         vm.prank(user1);
         vm.deal(user1, 1 ether);
@@ -120,7 +127,8 @@ contract ThumbnailVotingTest is Test {
             bounty,
             numVoters,
             userID,
-            optionIDs
+            optionIDs,
+            timeStamp
         );
 
         string memory voterID = "voter1";
@@ -139,6 +147,7 @@ contract ThumbnailVotingTest is Test {
         string[] memory optionIDs = new string[](2);
         optionIDs[0] = "option1";
         optionIDs[1] = "option2";
+        uint256 timeStamp = block.timestamp;
 
         vm.prank(user1);
         vm.deal(user1, 1 ether);
@@ -147,7 +156,8 @@ contract ThumbnailVotingTest is Test {
             bounty,
             numVoters,
             userID,
-            optionIDs
+            optionIDs,
+            timeStamp
         );
 
         thumbnailVoting.vote(postID, "voter1", "option1");
@@ -165,6 +175,7 @@ contract ThumbnailVotingTest is Test {
         string[] memory optionIDs = new string[](2);
         optionIDs[0] = "option1";
         optionIDs[1] = "option2";
+        uint256 timeStamp = block.timestamp;
 
         vm.prank(user1);
         vm.deal(user1, 1 ether);
@@ -173,7 +184,8 @@ contract ThumbnailVotingTest is Test {
             bounty,
             numVoters,
             userID,
-            optionIDs
+            optionIDs,
+            timeStamp
         );
 
         vm.prank(user1);
@@ -214,6 +226,7 @@ contract ThumbnailVotingTest is Test {
         string[] memory optionIDs = new string[](2);
         optionIDs[0] = "option1";
         optionIDs[1] = "option2";
+        uint256 timeStamp = block.timestamp;
 
         vm.prank(user1);
         vm.deal(user1, 1 ether);
@@ -222,7 +235,8 @@ contract ThumbnailVotingTest is Test {
             bounty,
             numVoters,
             userID,
-            optionIDs
+            optionIDs,
+            timeStamp
         );
 
         thumbnailVoting.setUserID(userID);
@@ -240,6 +254,7 @@ contract ThumbnailVotingTest is Test {
         string[] memory optionIDs = new string[](2);
         optionIDs[0] = "option1";
         optionIDs[1] = "option2";
+        uint256 timeStamp = block.timestamp;
 
         vm.prank(user1);
         vm.deal(user1, 1 ether);
@@ -248,7 +263,8 @@ contract ThumbnailVotingTest is Test {
             bounty,
             numVoters,
             userID,
-            optionIDs
+            optionIDs,
+            timeStamp
         );
 
         thumbnailVoting.setUserID(userID);
@@ -272,6 +288,7 @@ contract ThumbnailVotingTest is Test {
         string[] memory optionIDs = new string[](2);
         optionIDs[0] = "option1";
         optionIDs[1] = "option2";
+        uint256 timeStamp = block.timestamp;
 
         vm.prank(user1);
         vm.deal(user1, 1 ether);
@@ -280,12 +297,113 @@ contract ThumbnailVotingTest is Test {
             bounty,
             numVoters,
             userID,
-            optionIDs
+            optionIDs,
+            timeStamp
         );
 
         string[] memory posts = thumbnailVoting.getUserPosts(userID);
         assertEq(posts.length, 1);
         assertEq(posts[0], postID);
+    }
+
+    // New test for sorting and selecting posts
+    function testSortAndSelectPosts() public {
+        // Create multiple posts with different bounties and timestamps
+        createTestPost("post1", 1 ether, 5, "user1", block.timestamp);
+        vm.warp(block.timestamp + 1 days);
+        createTestPost("post2", 2 ether, 5, "user2", block.timestamp);
+        vm.warp(block.timestamp + 1 days);
+        createTestPost("post3", 0.5 ether, 5, "user3", block.timestamp);
+        vm.warp(block.timestamp + 1 days);
+        createTestPost("post4", 3 ether, 5, "user4", block.timestamp);
+
+        // Get sorted post IDs
+        string[] memory sortedPostIds = thumbnailVoting.getSortedPostIds();
+
+        // Check if we got the correct number of posts (should be 4 in this case)
+        assertEq(sortedPostIds.length, 4);
+
+        // The first post should be "post4" as it has the highest bounty and is relatively recent
+        assertEq(sortedPostIds[0], "post4");
+
+        // The second post should be "post2" as it has the second highest bounty
+        assertEq(sortedPostIds[1], "post2");
+    }
+
+    function testSortAndSelectPostsWithMoreThan20Posts() public {
+        // Create 25 posts
+        for (uint i = 0; i < 25; i++) {
+            string memory postId = string(
+                abi.encodePacked("post", uint2str(i))
+            );
+            uint256 bounty = (i + 1) * 0.1 ether;
+            createTestPost(
+                postId,
+                bounty,
+                5,
+                string(abi.encodePacked("user", uint2str(i))),
+                block.timestamp
+            );
+            vm.warp(block.timestamp + 1 hours);
+        }
+
+        // Get sorted post IDs
+        string[] memory sortedPostIds = thumbnailVoting.getSortedPostIds();
+
+        // Check if we got exactly 20 posts
+        assertEq(sortedPostIds.length, 20);
+
+        // The first post should be "post24" as it has the highest bounty and is the most recent
+        assertEq(sortedPostIds[0], "post24");
+    }
+
+    // Helper function to create a test post
+    function createTestPost(
+        string memory postId,
+        uint256 bounty,
+        uint256 numVoters,
+        string memory userId,
+        uint256 timestamp
+    ) private {
+        string[] memory optionIDs = new string[](2);
+        optionIDs[0] = "option1";
+        optionIDs[1] = "option2";
+
+        vm.prank(user1);
+        vm.deal(user1, bounty);
+        thumbnailVoting.createPost{value: bounty}(
+            postId,
+            bounty,
+            numVoters,
+            userId,
+            optionIDs,
+            timestamp
+        );
+    }
+
+    // Helper function to convert uint to string
+    function uint2str(
+        uint _i
+    ) internal pure returns (string memory _uintAsString) {
+        if (_i == 0) {
+            return "0";
+        }
+        uint j = _i;
+        uint len;
+        while (j != 0) {
+            len++;
+            j /= 10;
+        }
+        bytes memory bstr = new bytes(len);
+        uint k = len;
+        while (_i != 0) {
+            k = k - 1;
+            uint8 temp = (48 + uint8(_i - (_i / 10) * 10));
+            bytes1 b1 = bytes1(temp);
+            bstr[k] = b1;
+            _i /= 10;
+        }
+        return string(bstr);
     }
 
     receive() external payable {}

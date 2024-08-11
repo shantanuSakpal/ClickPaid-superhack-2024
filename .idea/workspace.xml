@@ -5,7 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/contracts_foundry/package-lock.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/contracts_foundry/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/contracts_foundry/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/contracts_foundry/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/contracts_foundry/src/ThumbnailVoting.sol" beforeDir="false" afterPath="$PROJECT_DIR$/contracts_foundry/src/ThumbnailVoting.sol" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/contracts_foundry/test/ThumbnailVoting.t.sol" beforeDir="false" afterPath="$PROJECT_DIR$/contracts_foundry/test/ThumbnailVoting.t.sol" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/api/getPosts/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/getPosts/route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/api/submitVote/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/submitVote/route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/vote/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/vote/page.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,7 +120,7 @@
       <workItem from="1723304352823" duration="4733000" />
       <workItem from="1723310292526" duration="3196000" />
       <workItem from="1723345074353" duration="15480000" />
-      <workItem from="1723368228392" duration="5940000" />
+      <workItem from="1723368228392" duration="13902000" />
     </task>
     <servers />
   </component>
