@@ -6,37 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/contract.sol" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/dist/db.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/dist/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/dist/middleware.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/dist/routers/contract.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/dist/routers/user.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/dist/routers/worker.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/dist/types.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/dist/utils/verifyWorldIDProof.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/contracts/ClickPaid.sol" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/contracts/pyth.sol" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/db.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/middleware.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/routers/user.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/routers/user.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/types.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/utils/verifyWorldIDProof.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.env.example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/api/auth/[...nextauth]/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/auth/[...nextauth]/route.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/api/generateImageUsingAi/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/generateImageUsingAi/route.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/api/submitVote/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/submitVote/route.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Navbar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/SwitchChains.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/SwitchChains.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/WithdrawTokens.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/AllChainBalances.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/AllChainBalances.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/components/PriceConvertor.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/PriceConvertor.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/components/users/Balances.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/users/Balances.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -140,7 +111,7 @@
       <workItem from="1723304352823" duration="4733000" />
       <workItem from="1723310292526" duration="3196000" />
       <workItem from="1723345074353" duration="15480000" />
-      <workItem from="1723368228392" duration="1048000" />
+      <workItem from="1723368228392" duration="2339000" />
     </task>
     <servers />
   </component>

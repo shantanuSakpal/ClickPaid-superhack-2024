@@ -92,11 +92,12 @@ const AllChainBalances = ({userId}) => {
     };
 
     return (
-        <div className="p-4 ml-[30vh]">
+        <div className="px-5">
+            <h2 className="text-xl font-bold my-5">Withdraw Balance</h2>
             {chains.map((chain, index) => (
                 <div key={index}
-                     className="flex items-center justify-between p-4 mb-2 w-[80%] h-[15vh] border border-gray-250 rounded-xl">
-                    <div className="flex items-center space-x-4">
+                     className="flex items-center  p-4 mb-2 w-fit  border border-gray-250 rounded-xl">
+                    <div className="flex items-center space-x-4 w-56">
                         <img src={chain.image} alt={chain.name} className="w-12 h-12 rounded-full"/>
                         <p className="font-semibold">{chain.name}</p>
                     </div>

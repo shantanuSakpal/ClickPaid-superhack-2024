@@ -10,8 +10,8 @@ export default function Balances({userId}) {
 
     return (
         <div className="p-4">
-             <PriceConverter />
              <AllChainBalances userId={userId}/>
+             <PriceConverter />
         </div>
     );
 }
