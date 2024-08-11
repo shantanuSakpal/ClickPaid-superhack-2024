@@ -25,7 +25,7 @@ module.exports = {
                 "theme-purple-dark": "#5530b8",
                 "theme-purple": "#7a49ff",
                 "theme-purple-light": "#a87dff",
-                "theme-blue-dark": "#17219D",
+                "theme-blue-dark": "#12355D",
                 "theme-blue": "#3948EE",
                 "theme-blue-light": "#017BFE",
                 "theme-pink-dark": "#e2558c",

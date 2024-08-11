@@ -10,10 +10,10 @@ function BrandLogo(props) {
                 alt="logo"
                 width={200}
                 height={50}
-                className="w-auto h-12"
+                className="w-auto h-12 rounded-xl overflow-clip"
             />
             <div
-                className="font-extrabold bg-clip-text text-transparent bg-gradient-to-l from-theme-blue to-theme-blue text-2xl">ClickPaid
+                className="font-extrabold text-theme-blue-dark text-3xl">ClickPaid
             </div>
         </Link>
 
