@@ -130,7 +130,7 @@ function Page() {
     };
 
     const addAIgeneratedImageToImageArray = (base64string) => {
-        console.log("base 64 string", base64string)
+        // console.log("base 64 string", base64string)
         const blob = base64ToBlob(base64string);
         const file = new File([blob], 'image.png', {type: 'image/png'});
         setImageFiles((prevFiles) => [...prevFiles, file]);
@@ -286,13 +286,13 @@ function Page() {
                 id: post_id,
                 date: new Date().toISOString(),
             };
-            console.log("postData", post_data)
+            // console.log("postData", post_data)
             setPostData(post_data);
             // Add data to blockchain
 
             const {bountyReward, userId, options, numberOfVotes} = post_data;
             const bountyRewardinEther = await convertUsdToWei(bountyReward);
-            console.log("bountyRewardinEther", bountyRewardinEther)
+            // console.log("bountyRewardinEther", bountyRewardinEther)
             //get chain using the selected chain name from chains
 
             const address = contractAddresses[selectedChain.id];
@@ -317,7 +317,7 @@ function Page() {
 
             // Send the transaction
             const tx = await sendTx(transaction);
-            console.log("tx---------------------", tx)
+            // console.log("tx---------------------", tx)
             setTxHash(tx.transactionHash);
             setAwaitingConfirmation(true);
             setCurrChain(tx.chain)
@@ -351,7 +351,7 @@ function Page() {
             const data = await response.json();
             const newImageBase64String = `data:image/png;base64,${data.imageData}`;
 
-            console.log("generated image base64 string", newImageBase64String)
+            // console.log("generated image base64 string", newImageBase64String)
             const blob = base64ToBlob(newImageBase64String);
             const file = new File([blob], 'image.png', {type: 'image/png'});
             // Update state with the new image
@@ -362,7 +362,7 @@ function Page() {
             if (!imageRef) {
                 throw new Error('Failed to save image');
             }
-            console.log("image ref", imageRef)
+            // console.log("image ref", imageRef)
 
             const userRef = doc(db, 'users', userData.id);
             const userSnap = await getDoc(userRef);
@@ -400,7 +400,7 @@ function Page() {
             const userDoc = userSnap.data();
             const imgArr = userDoc.aiGeneratedImages;
             setPrevAiGenImgs(imgArr);
-            console.log("prev images", imgArr)
+            // console.log("prev images", imgArr)
         } catch (error) {
             console.error('Error getting image:', error);
             toast.error('Failed to get previous images');
@@ -410,7 +410,7 @@ function Page() {
     }
 
     const handleAddImageToUploads = (imgUrl) => {
-        console.log("images added", imgUrl)
+        // console.log("images added", imgUrl)
         setImageFiles((prev) => [...prev, imgUrl])
         //scroll to top smoothly
         window.scrollTo({top: 0, behavior: 'smooth'});
@@ -560,7 +560,7 @@ function Page() {
 
     useEffect(() => {
         if (receipt && txHash) {
-            console.log("Transaction confirmed:", receipt);
+            console.log("Transaction confirmed");
             // Handle successful transaction confirmation
             if (receipt.status === 'success') {
                 setTxnVerified(true);
