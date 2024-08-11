@@ -115,7 +115,7 @@ export default function Home() {
                 <div className="flex justify-center items-center w-full my-5 p-10">
                     <div className="w-1/2 rounded-lg overflow-clip shadow-lg shadow-gray-500">
                         <iframe width="100%" height="315"
-                                src="https://www.youtube.com/embed/kYnA8AotiU0">
+                                src="https://www.youtube.com/embed/wbX9cpiDH70?si=g4YpuJrt10mBF9LI">
                         </iframe>
                     </div>
                     <div className="w-1/2 p-10">
