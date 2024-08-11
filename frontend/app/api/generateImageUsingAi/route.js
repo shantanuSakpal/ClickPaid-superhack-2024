@@ -6,7 +6,7 @@ export async function POST(request) {
         return new NextResponse('No request object', { status: 400 });
     }
 
-    const apiKey = process.env.NEXT_PUBLIC_GETIMG_API_KEY;
+    const apiKey = process.env.GETIMG_API_KEY;
     if(!apiKey)
         return new NextResponse('Api key not found', { status: 403 });
 

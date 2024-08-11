@@ -4,10 +4,7 @@ import { useActiveWalletChain } from "thirdweb/react";
 import { base, ethereum, sepolia, baseSepolia, optimismSepolia } from "thirdweb/chains";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
-
-const client = createThirdwebClient({
-  clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID
-});
+import {client} from "@/app/_lib/client"
 
 
 export default function SwitchChains() {

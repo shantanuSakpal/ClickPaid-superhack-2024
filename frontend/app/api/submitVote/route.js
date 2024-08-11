@@ -125,9 +125,6 @@ export async function POST(request) {
         }
         const user = userDocSnap.data();
         //add the post id to votes array in user
-        user.rewards = Number(user.rewards) + Number(reward);
-        console.log(user.rewards)
-
         user.votes.push(postId);
         await setDoc(userDocRef, user);
 

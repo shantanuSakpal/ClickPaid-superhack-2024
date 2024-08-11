@@ -43,7 +43,6 @@ export default function Navbar() {
                 votes: [],
                 payouts: [],
                 aiGeneratedImages: [],
-                rewards: 0,
                 // Add any other fields you want to store
             });
 
