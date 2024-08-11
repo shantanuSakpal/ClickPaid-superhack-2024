@@ -77,7 +77,7 @@ export async function POST(request) {
             return new Response(JSON.stringify({ error: 'Missing required parameters' }), { status: 400 });
         }
 
-        const privateKey = process.env.NEXT_PRIVATE_KEY;
+        const privateKey = process.env.PRIVATE_KEY;
         if (!privateKey) {
             console.error("Private key is missing.");
             return new Response(JSON.stringify({ error: 'Private key is not configured' }), { status: 500 });

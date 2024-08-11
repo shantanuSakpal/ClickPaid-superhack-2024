@@ -26,7 +26,7 @@ export async function POST(request) {
             return new NextResponse('User ID, amount, chain, and user address are required', { status: 400 });
         }
         // Get the contract account
-        const privateKey = process.env.NEXT_PRIVATE_KEY;
+        const privateKey = process.env.PRIVATE_KEY;
         if (!privateKey) {
             console.error("Private key is missing.");
             return;

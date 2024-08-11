@@ -29,7 +29,7 @@ const WithdrawTokens = () => {
             const contract = new web3.eth.Contract(abi, contractAddress);
 
             // Get the contract account
-            const privateKey = process.env.NEXT_PRIVATE_KEY;
+            const privateKey = process.env.PRIVATE_KEY;
             if (!privateKey) {
                 console.error("Private key is missing.");
                 return;
