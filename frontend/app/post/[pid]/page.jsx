@@ -51,7 +51,7 @@ const Layout = () => {
         }
 
         try {
-            console.log("post id", postId)
+            // console.log("post id", postId)
             const response = await fetch(`/api/getPost`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -59,14 +59,14 @@ const Layout = () => {
             });
             const data = await response.json();
             //check if curr user is post owner
-                console.log(data.userId, userData.id)
+                // console.log(data.userId, userData.id)
             if (data.userId === userData.id) {
                 setIsOwner(true);
             }
             setPost(data);
             let share = (Number(data.bountyReward) /Number(data.numberOfVotes)).toFixed(2);
             setReward(share);
-            console.log("data", data);
+            // console.log("data", data);
         } catch (error) {
             console.error('Error fetching post:', error);
         } finally {
@@ -88,7 +88,7 @@ const Layout = () => {
             toast.error("Please login to submit vote")
             return;
         }
-        console.log("selectedOptionId", selectedOptionId);
+        // console.log("selectedOptionId", selectedOptionId);
         try {
             setSubmitting(true);
             const body = {

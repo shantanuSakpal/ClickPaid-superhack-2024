@@ -11,7 +11,7 @@ export async function getTokenBalance(userId) {
             realTokenBalance : userDoc.data().realTokenBalance,
             trialTokenBalance: userDoc.data().trialTokenBalance
         };
-        console.log("token balance", tokenBalance)
+        // console.log("token balance", tokenBalance)
         return tokenBalance;
     } else {
         return null;

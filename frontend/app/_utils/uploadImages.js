@@ -24,7 +24,7 @@ export const saveSettings = async (formState, images) => {
       ...formState,
       images,
     });
-    console.log("Post saved successfully with ID:", docRef.id);
+    // console.log("Post saved successfully with ID:", docRef.id);
     return docRef.id; // Return the document ID if needed
   } catch (error) {
     console.error("Error saving post:", error);

@@ -77,7 +77,7 @@ function ConnectWallet({title}) {
 
     useEffect(() => {
         if (activeWallet) {
-            console.log("Active Account", activeWallet.getChain().name);
+            // console.log("Active Account", activeWallet.getChain().name);
             setSelectedChain(chains.find(chain => chain.name === activeWallet.getChain().name));
         }
     }, [activeAccount])
@@ -88,7 +88,7 @@ function ConnectWallet({title}) {
                 wallets={wallets}
                 client={client} theme="light"
                 onConnect={(wallet) => {
-                    console.log("Connected to wallet", wallet.getChain());
+                    // console.log("Connected to wallet", wallet.getChain());
                     //set the selected chain by matching name
                     setSelectedChain(chains.find(chain => chain.name === wallet.getChain().name));
                 }}

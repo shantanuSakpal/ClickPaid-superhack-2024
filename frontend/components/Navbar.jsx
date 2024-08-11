@@ -68,7 +68,7 @@ export default function Navbar() {
         if (session && !userData) {
             getUserFromDb(session.user.name)
         }
-        console.log("userData", userData)
+        // console.log("userData", userData)
     }, [session, setUserData])
 
     return (

@@ -200,7 +200,7 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
 
     const convertUsdToWei = async (usdAmount) => {
         if (!usdAmount || isNaN(usdAmount) || usdAmount <= 0) {
-            console.log("Invalid amount");
+            // console.log("Invalid amount");
             return;
         }
 
@@ -264,13 +264,13 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
                 id: post_id,
                 date: new Date().toISOString(),
             };
-            console.log("postData", post_data)
+            // console.log("postData", post_data)
             setPostData(post_data);
             // Add data to blockchain
 
             const {bountyReward, userId, options, numberOfVotes} = post_data;
             const bountyRewardinEther = await convertUsdToWei(bountyReward);
-            console.log("bountyRewardinEther", bountyRewardinEther)
+            // console.log("bountyRewardinEther", bountyRewardinEther)
             //get chain using the selected chain name from chains
 
             const address = contractAddresses[selectedChain.id];
@@ -295,7 +295,7 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
 
             // Send the transaction
             const tx = await sendTx(transaction);
-            console.log("tx---------------------", tx)
+            // console.log("tx---------------------", tx)
             setTxHash(tx.transactionHash);
             setAwaitingConfirmation(true);
             setCurrChain(tx.chain)
@@ -383,10 +383,10 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
             if (!docSnap.exists()) {
                 // Document doesn't exist, so create it
                 await setDoc(docRef, postData, {merge: false});
-                console.log("New post created with ID: ", postId);
+                // console.log("New post created with ID: ", postId);
             } else {
                 // Document already exists
-                console.log("A post with this ID already exists. Generating a new ID...");
+                // console.log("A post with this ID already exists. Generating a new ID...");
                 throw new Error("Post ID already exists");
             }
             // Update user document with new post ID and token balances
@@ -470,10 +470,10 @@ const [awatingConfirmation, setAwaitingConfirmation] = useState(false);
     useEffect(() => {
         if (selectedChain) {
             setCurrChain(chainNameToChain[selectedChain.id])
-            console.log("selectedChain", selectedChain)
+            // console.log("selectedChain", selectedChain)
         }
         if (receipt) {
-            console.log("Transaction confirmed:", receipt);
+            // console.log("Transaction confirmed:", receipt);
             // Handle successful transaction confirmation
             if (receipt.status === 'success') {
                 setTxnVerified(true);

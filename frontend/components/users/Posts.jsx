@@ -28,7 +28,7 @@ function Page() {
                 throw new Error('Failed to fetch getPosts');
             }
             const data = await response.json();
-            console.log('Fetched getPosts:', data);
+            // console.log('Fetched getPosts:', data);
             setPosts(data);
         } catch (error) {
             console.error('Error fetching getPosts:', error);

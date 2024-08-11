@@ -73,7 +73,7 @@ export default function SwitchChains() {
 
       ],
       onSwitch: (chain) => {
-        console.log("Switched to chain", chain);
+        // console.log("Switched to chain", chain);
         const selectedChainConfig = chains.find((c) => c.name === chain.name);
         if (selectedChainConfig) {
           setSelectedChain(selectedChainConfig);

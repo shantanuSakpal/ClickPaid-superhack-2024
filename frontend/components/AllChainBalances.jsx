@@ -26,7 +26,7 @@ const AllChainBalances = ({userId}) => {
 
         try {
             setLoading(true);
-            console.log("Fetching balances for user:", userId);
+            // console.log("Fetching balances for user:", userId);
             const response = await fetch('/api/fetchUserChainBalances', {
                 method: 'POST',
                 headers: {
@@ -41,7 +41,7 @@ const AllChainBalances = ({userId}) => {
 
             const data = await response.json();
             setBalances(data);
-            console.log(data);
+            // console.log(data);
         } catch (error) {
             console.error("Error fetching balances:", error);
         } finally {
@@ -50,11 +50,11 @@ const AllChainBalances = ({userId}) => {
     };
 
     const handleWithdraw = async (chainKey) => {
-        console.log("Withdraw amount in chain:", chainKey);
+        // console.log("Withdraw amount in chain:", chainKey);
         const amountToWithdraw = balances[chainKey].wei;
-        console.log("Amount to withdraw:", amountToWithdraw);
+        // console.log("Amount to withdraw:", amountToWithdraw);
         const userAddress = wallet?.getAccount().address;
-        console.log("user address:", userAddress);
+        // console.log("user address:", userAddress);
         try {
             setWithdrawingChains(prev => ({...prev, [chainKey]: true}));
             const response = await fetch('/api/withdrawUserBalance', {
@@ -69,15 +69,20 @@ const AllChainBalances = ({userId}) => {
                     userAddress: userAddress,
                 }),
             });
-            const data = await response.json();
+            // const data = await response.json();
 
             if (response.ok) {
-                console.log("Withdrawal successful:", data);
+                // console.log("Withdrawal successful:", data);
                 toast.success("Withdrawal successful");
                 fetchBalances();
             } else {
                 toast.error("Failed to withdraw balance");
             }
+
+            // const data = await response.json();
+            // console.log("Withdrawal successful:", data);
+            // Optionally, you can refresh the balances after withdrawal
+            fetchBalances();
         } catch (error) {
             console.error("Error during withdrawal:", error);
             toast.error("Error during withdrawal");
