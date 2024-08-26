@@ -2,22 +2,16 @@
 import React, {useEffect, useState} from 'react';
 import {useSession, signOut} from "next-auth/react";
 import {Tabs, Tab, Card, CardBody} from "@nextui-org/react";
-import {Button} from "@nextui-org/react";
-import Balances from '@components/users/Balances'; // Adjust paths if needed
+import Balances from '@components/users/Balances';
 import Transactions from '@components/users/Transactions'; // Renamed to Transactions
-import Votes from '@components/users/Votes'; // New component for Votes
 import Posts from '@components/users/Posts';
-import DepositEth from "@components/DepositEth";
-import {useDisconnect, useActiveWallet} from "thirdweb/react";
 import {Toaster} from "react-hot-toast";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
 
 function Page() {
-    const {disconnect} = useDisconnect();
-    const wallet = useActiveWallet();
     const {data: session} = useSession();
-    const {userData, setUserData, selectedChain, setSelectedChain} = useContext(GlobalContext);
+    const {userData, setUserData,} = useContext(GlobalContext);
     const [activeTab, setActiveTab] = useState('Posts');
     const [nameInitials, setNameInitials] = useState('');
     const handleTabChange = (key) => {
@@ -29,8 +23,6 @@ function Page() {
     const handleSignOut = async () => {
         setLoading(true);
         localStorage.removeItem('user');
-        if (wallet)
-            await disconnect(wallet);
         await signOut({callbackUrl: 'http://localhost:3000/'})
         setLoading(false)
     }

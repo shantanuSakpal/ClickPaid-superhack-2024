@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useSession} from "next-auth/react";
-import PriceConverter from "@components/PriceConvertor";
-import AllChainBalances from "@components/AllChainBalances";
+import UserBalance from "@components/UserBalance";
 
 export default function Balances({userId}) {
     const [loading, setLoading] = useState(false);
@@ -10,8 +9,7 @@ export default function Balances({userId}) {
 
     return (
         <div className="p-4">
-             <AllChainBalances userId={userId}/>
-             <PriceConverter />
+             <UserBalance userId={userId}/>
         </div>
     );
 }

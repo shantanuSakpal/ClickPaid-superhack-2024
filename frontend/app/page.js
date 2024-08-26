@@ -4,7 +4,6 @@ import Link from "next/link";
 import {useSession, signIn, signOut} from "next-auth/react"
 import React from "react";
 import {FaArrowRightLong} from "react-icons/fa6";
-import LogoCloud from "../components/LogoCloud";
 
 export default function Home() {
     const {data: session} = useSession()

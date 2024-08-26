@@ -4,14 +4,13 @@ import Link from "next/link";
 import {FaBars, FaTimes} from "react-icons/fa";
 import BrandLogo from "@/components/BrandLogo";
 import {useSession, signIn} from "next-auth/react"
-import {CgProfile} from "react-icons/cg";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
-import ConnectWallet from "@components/ConnectWallet";
 import {doc, getDoc, setDoc} from "firebase/firestore";
 import {db} from "@/app/_lib/fireBaseConfig";
 import {adjectives, animals, uniqueNamesGenerator} from 'unique-names-generator';
 import { RiCoinsLine } from "react-icons/ri";
+import { usePathname } from 'next/navigation'
 
 
 export default function Navbar() {
@@ -19,7 +18,8 @@ export default function Navbar() {
     const {data: session} = useSession()
     const {userData, setUserData, selectedChain, setSelectedChain} = useContext(GlobalContext);
     const [nameInitials, setNameInitials] = useState('');
-
+    const [currentPage, setCurrentPage] = useState('/');
+    const pathname = usePathname();
     // Configuration for name generation
     const nameConfig = {
         dictionaries: [adjectives, animals],
@@ -73,12 +73,28 @@ export default function Navbar() {
             getUserFromDb(session.user.name)
 
         }
+
+    }, [session])
+
+    useEffect(() => {
+
         if (userData) {
             const initials = userData.name.split(' ').map((n) => n[0]).join('');
             setNameInitials(initials);
         }
+
         console.log("userData", userData)
-    }, [session, userData])
+    }, [ userData])
+
+    useEffect(() => {
+
+        //get current page url
+        if(pathname){
+            setCurrentPage(pathname);
+            console.log(pathname)
+        }
+        console.log("userData", userData)
+    }, [pathname])
 
     return (
         <nav className="fixed top-0 py-1 left-0 w-full z-10 border-b bg-white">
@@ -89,16 +105,19 @@ export default function Navbar() {
                         <BrandLogo/>
                     </div>
                     <div className="hidden md:flex gap-2 items-center justify-center font-bold">
-                        <Link href="/create" className=" px-3 py-1 rounded-lg text-lg hover:text-black text-gray-500">
+                        <Link href="/create" className={`px-3 py-1 rounded-lg text-sm  ${
+                            currentPage === "/create" ? 'bg-theme-blue text-white ' : 'text-gray-500 hover:text-black'
+                        }`}>
                             Create
                         </Link>
-                        <Link href="/vote" className=" px-3 py-1 rounded-lg text-lg hover:text-black text-gray-500">
+                        <Link href="/vote" className={`px-3 py-1 rounded-lg text-sm  ${
+                            currentPage === "/vote" ? 'bg-theme-blue text-white ' : 'text-gray-500 hover:text-black'
+                        }`}>
                             Vote
                         </Link>
-                        <Link
-                            href="/profile"
-                            className=" px-3 py-1 rounded-lg text-lg hover:text-black text-gray-500 "
-                        >Profile
+                        <Link href="/profile" className={`px-3 py-1 rounded-lg text-sm  ${
+                            currentPage === "/profile" ? 'bg-theme-blue text-white ' : 'text-gray-500 hover:text-black'
+                        }`}>Profile
                         </Link>
 
                     </div>

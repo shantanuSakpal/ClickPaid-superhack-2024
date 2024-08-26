@@ -5,8 +5,6 @@ import Image from "next/image";
 import LoadingSpinner from "@components/LoadingSpinner";
 import {useSession, signIn} from "next-auth/react";
 import {useRouter} from "next/navigation";
-import Web3 from 'web3';
-import abi from "@/app/abis/abi";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
 
