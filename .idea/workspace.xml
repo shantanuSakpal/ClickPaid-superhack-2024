@@ -5,18 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/contracts_foundry/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/contracts_foundry/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/contracts_foundry/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/contracts_foundry/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/contracts_foundry/foundry.toml" beforeDir="false" afterPath="$PROJECT_DIR$/contracts_foundry/foundry.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/contracts_foundry/src/ThumbnailVoting.sol" beforeDir="false" afterPath="$PROJECT_DIR$/contracts_foundry/src/ThumbnailVoting.sol" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/contracts_foundry/test/ThumbnailVoting.t.sol" beforeDir="false" afterPath="$PROJECT_DIR$/contracts_foundry/test/ThumbnailVoting.t.sol" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/api/getPosts/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/getPosts/route.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/api/submitVote/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/submitVote/route.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/vote/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/vote/page.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/layout.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/layout.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -43,8 +36,8 @@
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/home/shantanu/web_projects/web3/superhack/clickpaid-superhack-24/frontend",
+    "git-widget-placeholder": "dscvr-canvas",
+    "last_opened_file_path": "/home/shantanu/web_projects/web3/protokit/starter-kit",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.standard": "true",
     "node.js.detected.package.tslint": "true",
@@ -53,7 +46,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.lookFeel",
-    "ts.external.directory.path": "/snap/webstorm/387/plugins/javascript-plugin/jsLanguageServicesImpl/external",
+    "ts.external.directory.path": "/snap/webstorm/396/plugins/javascript-plugin/jsLanguageServicesImpl/external",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -74,7 +67,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-WS-241.18034.50" />
+        <option value="bundled-js-predefined-d6986cc7102b-410509235cf1-JavaScript-WS-242.20224.342" />
       </set>
     </attachedChunks>
   </component>
@@ -120,7 +113,12 @@
       <workItem from="1723304352823" duration="4733000" />
       <workItem from="1723310292526" duration="3196000" />
       <workItem from="1723345074353" duration="15480000" />
-      <workItem from="1723368228392" duration="13902000" />
+      <workItem from="1723368228392" duration="14248000" />
+      <workItem from="1723391379956" duration="2746000" />
+      <workItem from="1723532321188" duration="51000" />
+      <workItem from="1723719787540" duration="4786000" />
+      <workItem from="1724165242117" duration="4932000" />
+      <workItem from="1724248077470" duration="1286000" />
     </task>
     <servers />
   </component>

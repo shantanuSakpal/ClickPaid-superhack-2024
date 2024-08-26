@@ -4,6 +4,7 @@ import {Toaster} from "react-hot-toast";
 import React from "react";
 import Footer from "@/components/Footer";
 import Providers from "@/components/Providers";
+import Head from "next/head";
 
 export const metadata = {
     title: 'ClickPaid', description: 'Create, vote, earn', charSet: 'UTF-8', icons: {
@@ -17,6 +18,9 @@ export const viewport = {
 
 export default function RootLayout({children}) {
     return (<html lang="en">
+    <Head>
+        <meta property="dscvr:canvas:version" content="vNext"/>
+    </Head>
         <body className="pt-24">
         <Providers>
             <Navbar/>
