@@ -20,7 +20,7 @@ const Layout = () => {
     const [submitting, setSubmitting] = useState(false);
     const [isOwner, setIsOwner] = useState(false)
     const navigate = useRouter();
-    const { userData, setUserData, selectedChain, setSelectedChain } = useContext(GlobalContext);
+    const { userData, setUserData } = useContext(GlobalContext);
     const [reward, setReward] = useState("");
 
     /*
@@ -96,23 +96,23 @@ const Layout = () => {
                 postId: postId,
                 optionId: selectedOptionId,
                 reward: reward,
-                chain: post.selectedChainId
             }
             const response = await fetch(`/api/submitVote`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(body), // Send body as JSON
             });
+
             if (!response.ok) {
                 const errorMessage = await response.text();
                 console.error('Error submitting vote:', errorMessage);
                 toast.error(errorMessage); // Display the error message to the user
             } else {
-                let newReward = Number(userData.rewards) + Number(reward)
-                newReward = newReward.toFixed(2);
-                setUserData({...userData, rewards: newReward})
+                const responseData = await response.json(); // Parse JSON response
+                let newReward = responseData.balance; // Extract balance
+                setUserData({...userData, balance: newReward}); // Update userData state
                 toast.success("Vote submitted");
-                navigate.push('/vote')
+                navigate.push('/vote');
             }
 
         } catch (error) {
@@ -139,12 +139,8 @@ const Layout = () => {
             ) : (post && (
                 <div className="p-5">
                     <div className="relative">
-                        <div className=" absolute right-5 items-center justify-center  flex gap-4">
-                            <img src={post.selectedChain.image} className="w-10 h-auto rounded-full overflow-clip" alt=""/>
-                            <span className="font-bold">On {post.selectedChain.name}</span>
-                        </div>
                         <h2 className="text-3xl  font-bold">{post.title}</h2>
-                        <div className="">Reward: {reward} USD</div>
+                        <div className="">Reward: {reward} tokens</div>
                     </div>
                     <p className="text-lg">{post.description}</p>
                     <div className="grid grid-cols-2 gap-8 my-5">

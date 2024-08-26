@@ -3,22 +3,15 @@ import {useRouter} from 'next/navigation';
 import React, {useEffect, useState} from 'react';
 import LoadingSpinner from "@components/LoadingSpinner";
 import {signIn, useSession} from "next-auth/react";
-import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
-import {ChevronDownIcon} from "@heroicons/react/20/solid";
 import {GlobalContext} from "@/app/contexts/UserContext";
 import {useContext} from "react";
-import SwitchChains from "@components/SwitchChains";
-import {useActiveAccount, useActiveWallet} from "thirdweb/react";
-import ConnectWallet from "@components/ConnectWallet";
 
 export default function Home() {
     const router = useRouter();
     const [posts, setPosts] = useState([]);
     const {data: session} = useSession();
     const [loading, setLoading] = useState(false);
-    const {userData, selectedChain, setSelectedChain} = useContext(GlobalContext);
-    const activeAccount = useActiveAccount();
-    const activeWallet = useActiveWallet()
+    const {userData} = useContext(GlobalContext);
     const fetchPosts = async () => {
         try {
             setLoading(true);
@@ -63,22 +56,6 @@ export default function Home() {
                 </p>
             </div>
 
-            {/*{*/}
-            {/*    activeAccount ? (<div className="flex flex-row gap-2 items-center mx-10 w-full justify-center">*/}
-            {/*        {*/}
-            {/*            selectedChain && (*/}
-            {/*                <>*/}
-            {/*                    <img src={selectedChain.image} alt={selectedChain.name}*/}
-            {/*                         className="w-7 h-7 rounded-full"/>*/}
-            {/*                    <span className="whitespace-nowrap font-semibold">{selectedChain.name}</span></>)*/}
-            {/*        }*/}
-            {/*        <SwitchChains/>*/}
-            {/*    </div>) : (*/}
-            {/*        <div className="w-full flex justify-center">*/}
-            {/*            <ConnectWallet title="Connect wallet to start voting!"/>*/}
-            {/*        </div>*/}
-            {/*    )*/}
-            {/*}*/}
 
             <main className="">
                 {/* Left Sidebar for Trending Section */}
@@ -130,12 +107,7 @@ export default function Home() {
                                         onClick={() => handlePostClick(post.id)}
                                     >
 
-                                        <div className=" flex flex-row gap-3 items-center  absolute right-5  rounded-full overflow-clip">
-                                            <img className="w-10 h-auto" src={post.selectedChain.image} alt=""/>
-                                            <div className="text-sm">
-                                                Created on {new Date(post.date).toLocaleDateString()} at {new Date(post.date).toLocaleTimeString()}
-                                            </div>
-                                        </div>
+
                                         <h3 className="font-bold text-xl ">{post.title}</h3>
                                         <div className="mb-2">{post.description}</div>
                                         <div className="flex gap-2 mb-2 mt-5">
@@ -148,7 +120,7 @@ export default function Home() {
                                             ))}
                                         </div>
                                         <div>Bounty
-                                            Reward: {(post.bountyReward / post.numberOfVotes).toFixed(2)} USD
+                                            Reward: {(post.bountyReward / post.numberOfVotes).toFixed(2)} tokens
                                         </div>
                                         <div>Number of
                                             Votes: {post.options.reduce((acc, option) => acc + option.votes, 0)}/{post.numberOfVotes}</div>
@@ -156,12 +128,9 @@ export default function Home() {
                                 ))}
                             </div>
                         ) : (
-                            session ? (!activeWallet ?
-                                  <div className="w-full">
-                                      <ConnectWallet title="Connect wallet to start voting!"/>
-                                  </div>:
-                                    <div className="w-full text-center mt-10 text-lg">No more posts. Come back
-                                        later!</div>
+                            session ? (
+                                <div className="w-full text-center mt-10 text-lg">No more posts. Come back
+                                    later!</div>
                             ) : (<div className="w-full text-center mt-10 text-lg">Login to start voting!</div>
                             )
                         )

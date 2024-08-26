@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
-import { db } from '@/app/_lib/fireBaseConfig';
-import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import {NextResponse} from "next/server";
+import {db} from '@/app/_lib/fireBaseConfig';
+import {addDoc, collection, doc, getDoc, setDoc} from 'firebase/firestore';
 import Web3 from 'web3';
 import abi from "@/app/abis/abi";
+
 ;
 
 // Define contract addresses for different chains
@@ -66,26 +67,16 @@ const addVoteToBlockchain = async (chain, postId, userId, optionId, privateKey) 
 
 export async function POST(request) {
     if (!request) {
-        return new NextResponse('No request object', { status: 400 });
+        return new NextResponse('No request object', {status: 400});
     }
 
     try {
-        const { userId, optionId, postId, reward, chain } = await request.json();
+        const {userId, optionId, postId, reward, chain} = await request.json();
 
-        if (!userId || !optionId || !postId || !reward || !chain) {
-            console.error("Missing required parameters:", { userId, optionId, postId, reward, chain });
-            return new Response(JSON.stringify({ error: 'Missing required parameters' }), { status: 400 });
+        if (!userId || !optionId || !postId || !reward) {
+            console.error("Missing required parameters:", {userId, optionId, postId, reward});
+            return new Response(JSON.stringify({error: 'Missing required parameters'}), {status: 400});
         }
-
-        const privateKey = process.env.PRIVATE_KEY;
-        if (!privateKey) {
-            console.error("Private key is missing.");
-            return new Response(JSON.stringify({ error: 'Private key is not configured' }), { status: 500 });
-        }
-
-        // Call the function to add the vote to the blockchain
-        const txReceipt = await addVoteToBlockchain(chain, postId, userId, optionId, privateKey);
-        console.log('Transaction receipt:', txReceipt);
 
         // Continue with Firestore operations
         const postDocRef = doc(db, 'posts', postId);
@@ -126,11 +117,11 @@ export async function POST(request) {
         const user = userDocSnap.data();
         //add the post id to votes array in user
         user.votes.push(postId);
+        user.balance = Number(user.balance) + Number(reward);
         await setDoc(userDocRef, user);
 
-        return new NextResponse('Vote submitted', {
-            status: 200
-        });
+       //return new balance
+        return new NextResponse(JSON.stringify({balance: user.balance}), {status: 200});
 
 
     } catch (error) {

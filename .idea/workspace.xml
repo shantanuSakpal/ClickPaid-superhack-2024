@@ -6,9 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/create/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/create/page.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/page.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/page.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Navbar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/api/submitVote/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/submitVote/route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/vote/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/vote/page.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,7 +119,7 @@
       <workItem from="1723719787540" duration="4786000" />
       <workItem from="1724165242117" duration="4932000" />
       <workItem from="1724248077470" duration="1286000" />
-      <workItem from="1724644609901" duration="5543000" />
+      <workItem from="1724644609901" duration="7072000" />
     </task>
     <servers />
   </component>
