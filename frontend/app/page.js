@@ -115,7 +115,7 @@ export default function Home() {
                 <div className="flex justify-center items-center w-full my-5 p-10">
                     <div className="w-1/2 rounded-lg overflow-clip shadow-lg shadow-gray-500">
                         <iframe width="100%" height="315"
-                                src="https://www.youtube.com/embed/kYnA8AotiU0">
+                                src="https://www.youtube.com/embed/IHq2Y1JXrt4">
                         </iframe>
                     </div>
                     <div className="w-1/2 p-10">
@@ -129,7 +129,7 @@ export default function Home() {
                 </div>
 
                 <div className="my-5 w-full">
-                    <LogoCloud/>
+                    {/*<LogoCloud/>*/}
                 </div>
             </main>
 

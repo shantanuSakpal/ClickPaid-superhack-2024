@@ -11,12 +11,14 @@ import ConnectWallet from "@components/ConnectWallet";
 import {doc, getDoc, setDoc} from "firebase/firestore";
 import {db} from "@/app/_lib/fireBaseConfig";
 import {adjectives, animals, uniqueNamesGenerator} from 'unique-names-generator';
+import { RiCoinsLine } from "react-icons/ri";
 
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const {data: session} = useSession()
     const {userData, setUserData, selectedChain, setSelectedChain} = useContext(GlobalContext);
+    const [nameInitials, setNameInitials] = useState('');
 
     // Configuration for name generation
     const nameConfig = {
@@ -43,13 +45,15 @@ export default function Navbar() {
                 votes: [],
                 payouts: [],
                 aiGeneratedImages: [],
+                balance: 0,
                 // Add any other fields you want to store
             });
 
             //update the user data
             setUserData({
                 id: userId,
-                name: randomName
+                name: randomName,
+                balance: 0,
             });
         } else {
             // Retrieve user data from Firestore
@@ -57,6 +61,7 @@ export default function Navbar() {
             setUserData({
                 id: user_data.id,
                 name: user_data.name,
+                balance: user_data.balance
             });
 
         }
@@ -66,9 +71,14 @@ export default function Navbar() {
     useEffect(() => {
         if (session && !userData) {
             getUserFromDb(session.user.name)
+
         }
-        // console.log("userData", userData)
-    }, [session, setUserData])
+        if (userData) {
+            const initials = userData.name.split(' ').map((n) => n[0]).join('');
+            setNameInitials(initials);
+        }
+        console.log("userData", userData)
+    }, [session, userData])
 
     return (
         <nav className="fixed top-0 py-1 left-0 w-full z-10 border-b bg-white">
@@ -97,15 +107,18 @@ export default function Navbar() {
                         {/*login with world id*/}
                         {
                             session && userData ? (
-                                <div className="flex flex-row gap-3 items-center">
+                                <div className='flex items-center space-x-2'>
+                                    <div className="flex flex-row gap-2 items-center border-r-2 px-2">
+                                        <RiCoinsLine className="text-xl "/>
+                                        <div className="font-bold">{userData?.balance}</div>
+                                    </div>
+                                    <Link href="/profile">
+                                        <div
+                                            className='w-8 h-8 bg-theme-blue-light font-bold rounded-full flex items-center justify-center'>
+                                            {nameInitials}
+                                        </div>
+                                    </Link>
 
-                                    {
-                                        selectedChain &&
-                                        <img src={selectedChain.image} alt={selectedChain.name}
-                                             className="w-7 h-7 rounded-full"/>
-
-                                    }
-                                    <ConnectWallet/>
                                 </div>
                             ) : <div>
                                 <button
