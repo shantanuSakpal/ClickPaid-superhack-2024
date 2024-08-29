@@ -45,7 +45,7 @@ export default function Navbar() {
                 votes: [],
                 payouts: [],
                 aiGeneratedImages: [],
-                balance: 0,
+                balance: 100,
                 // Add any other fields you want to store
             });
 
@@ -53,7 +53,7 @@ export default function Navbar() {
             setUserData({
                 id: userId,
                 name: randomName,
-                balance: 0,
+                balance: 100,
             });
         } else {
             // Retrieve user data from Firestore
