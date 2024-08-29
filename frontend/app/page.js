@@ -127,9 +127,7 @@ export default function Home() {
                     </div>
                 </div>
 
-                <div className="my-5 w-full">
-                    {/*<LogoCloud/>*/}
-                </div>
+
             </main>
 
         </>
