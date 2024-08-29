@@ -5,28 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0b7f72ca-d7d5-44d3-99bc-14772b94337b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.env.example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/_lib/client.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/api/fetchUserChainBalances/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/fetchUserBalance/route.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/api/submitVote/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/submitVote/route.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/api/withdrawUserBalance/route.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/api/withdrawUserBalance/route.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/page.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/page.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/post/[pid]/page.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/profile/page.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/profile/page.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/AllChainBalances.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/UserBalance.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/ConnectWallet.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/DepositEth.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/LogoCloud.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/Navbar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Navbar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/PriceConvertor.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/Providers.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/Providers.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/SwitchChains.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/users/Balances.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/users/Balances.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/components/users/Posts.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/components/users/Posts.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,26 +27,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "web2",
-    "last_opened_file_path": "/home/shantanu/web_projects/web3/superhack/clickpaid-superhack-24/frontend",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.standard": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.standard": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_interpreter_path": "/home/shantanu/.nvm/versions/node/v20.12.2/bin/node",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "ts.external.directory.path": "/snap/webstorm/398/plugins/javascript-plugin/jsLanguageServicesImpl/external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;web2&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/shantanu/web_projects/web3/eth-online-2024/decentrix-ai-eth-online-2024&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.standard&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_interpreter_path&quot;: &quot;/home/shantanu/.nvm/versions/node/v20.12.2/bin/node&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/snap/webstorm/398/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/frontend/app" />
@@ -138,7 +117,9 @@
       <workItem from="1724165242117" duration="4932000" />
       <workItem from="1724248077470" duration="1286000" />
       <workItem from="1724644609901" duration="7151000" />
-      <workItem from="1724657248056" duration="3087000" />
+      <workItem from="1724657248056" duration="3211000" />
+      <workItem from="1724686604178" duration="272000" />
+      <workItem from="1724857559146" duration="3193000" />
     </task>
     <servers />
   </component>
