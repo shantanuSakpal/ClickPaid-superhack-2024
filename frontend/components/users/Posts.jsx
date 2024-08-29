@@ -64,10 +64,14 @@ function Page() {
                                     className="relative bg-white p-4 rounded border-1 mb-4 cursor-pointer hover:shadow-lg hover:shadow-gray-200"
                                     onClick={() => handlePostClick(post.id)}
                                 >
-                                    <div className=" absolute right-5 items-center justify-center  flex gap-4">
-                                        <img src={post.selectedChain.image}
-                                             className="w-10 h-auto rounded-full overflow-clip" alt=""/>
-                                    </div>
+                                    {
+                                        post.selectedChain?.image && (
+                                            <div className=" absolute right-5 items-center justify-center  flex gap-4">
+                                                <img src={post.selectedChain.image}
+                                                     className="w-10 h-auto rounded-full overflow-clip" alt=""/>
+                                            </div>)
+                                    }
+
                                     <h3 className="font-bold text-xl mb-2">{post.title}</h3>
                                     <div className="flex gap-2 mb-2">
                                         {post.options.map((option, i) => (

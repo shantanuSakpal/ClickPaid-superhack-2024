@@ -130,12 +130,17 @@ export default function Home() {
                                         onClick={() => handlePostClick(post.id)}
                                     >
 
-                                        <div className=" flex flex-row gap-3 items-center  absolute right-5  rounded-full overflow-clip">
-                                            <img className="w-10 h-auto" src={post.selectedChain.image} alt=""/>
-                                            <div className="text-sm">
-                                                Created on {new Date(post.date).toLocaleDateString()} at {new Date(post.date).toLocaleTimeString()}
-                                            </div>
-                                        </div>
+                                        {
+                                            post.selectedChain?.image && (
+                                                <div
+                                                    className=" flex flex-row gap-3 items-center  absolute right-5  rounded-full overflow-clip">
+                                                    <img className="w-10 h-auto" src={post.selectedChain.image} alt=""/>
+                                                    <div className="text-sm">
+                                                        Created
+                                                        on {new Date(post.date).toLocaleDateString()} at {new Date(post.date).toLocaleTimeString()}
+                                                    </div>
+                                                </div>)
+                                        }
                                         <h3 className="font-bold text-xl ">{post.title}</h3>
                                         <div className="mb-2">{post.description}</div>
                                         <div className="flex gap-2 mb-2 mt-5">
